@@ -17,6 +17,7 @@
 -- 11. scholarships          - Snehank (Financial solver eligibility matching)
 -- 12. scholarship_careers [NEW]- Snehank (Scholarship queries), Joel (Data linkage)
 -- 13. results               - Snehank (Engine outputs), Aayush (Dashboard & PDF)
+-- 14. explanations [NEW]    - Snehank (Gemini response cache)
 --
 -- Views:
 -- 1. v_careers              - Joins careers with domain names for easy API querying
@@ -39,6 +40,34 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX IF NOT EXISTS idx_users_linked_user_id ON users(linked_user_id);
 CREATE INDEX IF NOT EXISTS idx_users_invite_token ON users(invite_token);
 
+-- Trigger for syncing Supabase auth.users to public.users
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.users (id, email, role, full_name)
+    VALUES (
+        NEW.id,
+        NEW.email,
+        COALESCE(NEW.raw_user_meta_data->>'role', 'student'),
+        COALESCE(NEW.raw_user_meta_data->>'full_name', '')
+    )
+    ON CONFLICT (id) DO UPDATE SET
+        email = EXCLUDED.email,
+        full_name = EXCLUDED.full_name;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'auth') THEN
+        DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+        CREATE TRIGGER on_auth_user_created
+            AFTER INSERT ON auth.users
+            FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+    END IF;
+END $$;
+
 -- 2. QUESTIONS TABLE
 CREATE TABLE IF NOT EXISTS questions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -47,6 +76,7 @@ CREATE TABLE IF NOT EXISTS questions (
     position INT NOT NULL,
     text TEXT NOT NULL,
     options JSONB NOT NULL,
+    answer_key JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT uq_questions_audience_position UNIQUE (audience, position)
 );
@@ -76,6 +106,14 @@ CREATE TABLE IF NOT EXISTS profiles (
     savings NUMERIC(12,2) CHECK (savings IS NULL OR savings >= 0),
     loan_tolerance NUMERIC(12,2) CHECK (loan_tolerance IS NULL OR loan_tolerance >= 0),
     risk_appetite INT CHECK (risk_appetite IS NULL OR (risk_appetite BETWEEN 1 AND 5)),
+    breakeven_tolerance_years NUMERIC(4,1) CHECK (breakeven_tolerance_years IS NULL OR breakeven_tolerance_years > 0),
+    preferred_state TEXT,
+    open_to_abroad BOOLEAN NOT NULL DEFAULT false,
+    annual_income NUMERIC(12,2) CHECK (annual_income IS NULL OR annual_income >= 0),
+    home_state TEXT,
+    category TEXT,
+    percentage NUMERIC(5,2) CHECK (percentage IS NULL OR (percentage BETWEEN 0 AND 100)),
+    gender TEXT,
     assessment_completed_at TIMESTAMPTZ,
     consent_to_compare BOOLEAN NOT NULL DEFAULT false,
     consent_at TIMESTAMPTZ,
@@ -111,6 +149,7 @@ CREATE TABLE IF NOT EXISTS careers (
     domain_id UUID NOT NULL REFERENCES domains(id) ON DELETE RESTRICT,
     education_path TEXT,
     avg_course_cost NUMERIC(12,2) CHECK (avg_course_cost IS NULL OR avg_course_cost >= 0),
+    trait_weights JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -126,6 +165,7 @@ SELECT
     d.description AS domain_description,
     c.education_path,
     c.avg_course_cost,
+    c.trait_weights,
     c.created_at
 FROM careers c
 JOIN domains d ON c.domain_id = d.id;
@@ -165,15 +205,20 @@ CREATE INDEX IF NOT EXISTS idx_market_data_career_region ON market_data(career_i
 CREATE TABLE IF NOT EXISTS exams_colleges (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     career_id UUID NOT NULL REFERENCES careers(id) ON DELETE CASCADE,
+    course_id UUID REFERENCES courses(id) ON DELETE CASCADE,
     exam TEXT NOT NULL,
     college TEXT NOT NULL,
     annual_fee NUMERIC(12,2) CHECK (annual_fee IS NULL OR annual_fee >= 0),
     rank INT CHECK (rank IS NULL OR rank > 0),
+    source TEXT NOT NULL DEFAULT 'NIRF 2026 / Official Portal',
+    source_url TEXT,
+    as_of DATE NOT NULL DEFAULT '2026-09-01',
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT uq_exams_colleges_career_college_exam UNIQUE (career_id, college, exam)
 );
 
 CREATE INDEX IF NOT EXISTS idx_exams_colleges_career_id ON exams_colleges(career_id);
+CREATE INDEX IF NOT EXISTS idx_exams_colleges_course_id ON exams_colleges(course_id);
 
 -- 11. SCHOLARSHIPS TABLE
 CREATE TABLE IF NOT EXISTS scholarships (
@@ -207,10 +252,29 @@ CREATE INDEX IF NOT EXISTS idx_scholarship_careers_career_id ON scholarship_care
 CREATE TABLE IF NOT EXISTS results (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     student_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    parent_id UUID REFERENCES users(id) ON DELETE CASCADE,
     scores JSONB NOT NULL,
+    weights JSONB NOT NULL DEFAULT '{"fit": 0.45, "finance": 0.30, "market": 0.25}'::jsonb,
     conflict_index NUMERIC(5,2) CHECK (conflict_index IS NULL OR (conflict_index BETWEEN 0 AND 100)),
     roadmap JSONB NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_results_student_id ON results(student_id);
+CREATE INDEX IF NOT EXISTS idx_results_parent_id ON results(parent_id);
+
+-- 14. EXPLANATIONS TABLE [NEW]
+CREATE TABLE IF NOT EXISTS explanations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    result_id UUID NOT NULL REFERENCES results(id) ON DELETE CASCADE,
+    career_id UUID NOT NULL REFERENCES careers(id) ON DELETE CASCADE,
+    weights_hash TEXT NOT NULL,
+    model_name TEXT NOT NULL,
+    explanation_text TEXT NOT NULL,
+    source TEXT NOT NULL CHECK (source IN ('gemini', 'template', 'cache')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT uq_explanations_result_career_weights_model UNIQUE (result_id, career_id, weights_hash, model_name)
+);
+
+CREATE INDEX IF NOT EXISTS idx_explanations_result_id ON explanations(result_id);
+CREATE INDEX IF NOT EXISTS idx_explanations_career_id ON explanations(career_id);
