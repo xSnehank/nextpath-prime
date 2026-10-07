@@ -1,181 +1,66 @@
 "use client";
 
 import * as React from "react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle2, Flame } from "lucide-react";
 import type { ConflictResult } from "@/types/api";
 
 interface ConflictGaugeProps {
   conflict: ConflictResult;
 }
 
+const LEVELS = {
+  low: { text: "You mostly agree", color: "var(--success)", className: "text-success" },
+  moderate: { text: "Some differences", color: "var(--warning)", className: "text-warning" },
+  high: { text: "Big differences", color: "var(--danger)", className: "text-danger" },
+} as const;
+
+const AREA_NAMES: Record<string, string> = { domain: "Career area", risk: "Risk", location: "Location", budget: "Budget" };
+
+/** How far apart the student and parent are (0 = agree, 100 = fully apart), and the biggest differences. */
 export function ConflictGauge({ conflict }: ConflictGaugeProps) {
-  const { index, label, topDisagreements } = conflict;
-
-  // Determine colors & styling based on index (under 30 low, 30-60 mod, >60 high)
-  const getLabelConfig = () => {
-    if (index < 30) {
-      return {
-        badgeVariant: "success" as const,
-        badgeText: "Low Conflict (Harmonious)",
-        color: "#10b981", // Emerald
-        textColor: "text-emerald-400",
-        bgLight: "bg-emerald-500/10",
-        icon: CheckCircle2,
-        description: "Student aspirations and parental parameters align strongly.",
-      };
-    }
-    if (index <= 60) {
-      return {
-        badgeVariant: "warning" as const,
-        badgeText: "Moderate Friction (Negotiable)",
-        color: "#f59e0b", // Amber
-        textColor: "text-amber-400",
-        bgLight: "bg-amber-500/10",
-        icon: AlertTriangle,
-        description: "Key differences exist in budget flexibility, location, or risk tolerance.",
-      };
-    }
-    return {
-      badgeVariant: "danger" as const,
-      badgeText: "High Divergence (Intervention Required)",
-      color: "#f43f5e", // Rose
-      textColor: "text-rose-400",
-      bgLight: "bg-rose-500/10",
-      icon: Flame,
-      description: "Substantial gap between student passion vectors and parental constraints.",
-    };
-  };
-
-  const config = getLabelConfig();
-  const Icon = config.icon;
-
-  // Semicircle gauge calculation:
+  const { index, topDisagreements } = conflict;
+  const level = index < 30 ? LEVELS.low : index <= 60 ? LEVELS.moderate : LEVELS.high;
   const radius = 70;
-  const strokeWidth = 14;
-  const arcLength = Math.PI * radius; // ~219.9
-  const clampedIndex = Math.min(Math.max(index, 0), 100);
-  const strokeDashoffset = arcLength - (arcLength * clampedIndex) / 100;
+  const arc = Math.PI * radius;
+  const offset = arc - (arc * Math.min(Math.max(index, 0), 100)) / 100;
 
   return (
-    <Card className="border-white/10 bg-slate-900/70 backdrop-blur-xl relative overflow-hidden">
-      {/* Background glow tailored to conflict */}
-      <div
-        className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl pointer-events-none opacity-20 -mr-20 -mt-20"
-        style={{ backgroundColor: config.color }}
-      />
-
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-white/5 border border-white/10">
-              <Icon className={`h-4 w-4 ${config.textColor}`} />
-            </span>
-            <CardTitle className="text-lg">Parent-Student Conflict Index</CardTitle>
-          </div>
-          <Badge variant={config.badgeVariant}>{config.badgeText}</Badge>
+    <div className="rounded-2xl border border-border bg-card p-5">
+      <h3 className="font-semibold">How far apart you are</h3>
+      <div className="relative mx-auto mt-4 w-48">
+        <svg viewBox="0 0 160 90" className="w-full" aria-hidden>
+          <path d="M 10 80 A 70 70 0 0 1 150 80" fill="none" stroke="var(--chart-grid)" strokeWidth={14} strokeLinecap="round" />
+          <path
+            d="M 10 80 A 70 70 0 0 1 150 80"
+            fill="none"
+            stroke={level.color}
+            strokeWidth={14}
+            strokeLinecap="round"
+            strokeDasharray={arc}
+            strokeDashoffset={offset}
+          />
+        </svg>
+        <div className="absolute inset-x-0 bottom-0 text-center">
+          <span className="font-display text-3xl font-semibold">{index}</span>
+          <span className="text-sm text-muted-foreground">/100</span>
         </div>
-        <CardDescription className="text-xs">
-          Quantifies preference variance across risk appetite, geographic flexibility, and financial limits.
-        </CardDescription>
-      </CardHeader>
+      </div>
+      <p className={`mt-2 text-center text-sm font-medium ${level.className}`}>{level.text}</p>
 
-      <CardContent className="space-y-6 pt-2">
-        {/* SVG Semicircle Gauge */}
-        <div className="flex flex-col items-center justify-center pt-2">
-          <div className="relative w-48 h-28 flex items-center justify-center">
-            <svg
-              className="w-48 h-28 overflow-visible"
-              viewBox="0 0 160 90"
-            >
-              {/* Background Arc */}
-              <path
-                d="M 10 80 A 70 70 0 0 1 150 80"
-                fill="none"
-                stroke="rgba(255, 255, 255, 0.08)"
-                strokeWidth={strokeWidth}
-                strokeLinecap="round"
-              />
-              {/* Dynamic Filled Arc */}
-              <path
-                d="M 10 80 A 70 70 0 0 1 150 80"
-                fill="none"
-                stroke={config.color}
-                strokeWidth={strokeWidth}
-                strokeLinecap="round"
-                strokeDasharray={arcLength}
-                strokeDashoffset={strokeDashoffset}
-                className="transition-all duration-1000 ease-out"
-              />
-            </svg>
-
-            {/* Numeric Display inside Arc */}
-            <div className="absolute bottom-1 flex flex-col items-center text-center">
-              <span className="text-3xl font-extrabold text-white tracking-tight font-[Outfit,sans-serif]">
-                {index}
-                <span className="text-xs font-normal text-slate-400">/100</span>
-              </span>
-              <span className={`text-[11px] font-semibold uppercase tracking-wider ${config.textColor}`}>
-                {label} Friction
-              </span>
-            </div>
-          </div>
-
-          <p className="text-xs text-center text-slate-400 max-w-xs mt-1">
-            {config.description}
-          </p>
-        </div>
-
-        {/* Top Disagreements */}
-        <div className="space-y-3 pt-2 border-t border-white/5">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
-            <span>Primary Divergence Drivers</span>
-            <span className="text-slate-400">Gap Magnitude</span>
-          </div>
-
-          <div className="space-y-2.5">
-            {topDisagreements && topDisagreements.length > 0 ? (
-              topDisagreements.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="p-3 rounded-xl bg-white/[0.03] border border-white/5 space-y-2 hover:bg-white/[0.06] transition-colors"
-                >
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-slate-200 capitalize">
-                      {item.dimension}
-                    </span>
-                    <span className="font-mono font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
-                      Δ {item.gap}%
-                    </span>
-                  </div>
-
-                  {item.text && (
-                    <p className="text-[11px] text-slate-300 leading-relaxed">
-                      {item.text}
-                    </p>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-white/[0.04]">
-                    <div className="flex flex-col bg-violet-950/30 p-2 rounded border border-violet-500/20 space-y-0.5">
-                      <span className="text-[10px] text-violet-300 uppercase tracking-wide">Student Side:</span>
-                      <span className="font-semibold text-white truncate">{item.studentValue}</span>
-                    </div>
-                    <div className="flex flex-col bg-cyan-950/30 p-2 rounded border border-cyan-500/20 space-y-0.5">
-                      <span className="text-[10px] text-cyan-300 uppercase tracking-wide">Parent Side:</span>
-                      <span className="font-semibold text-white truncate">{item.parentValue}</span>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-xs text-slate-400 italic text-center py-2">
-                No significant divergence points detected.
-              </p>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      <ul className="mt-5 space-y-3">
+        {topDisagreements?.length ? (
+          topDisagreements.map((item) => (
+            <li key={item.dimension} className="rounded-xl bg-muted p-3 text-sm">
+              <div className="flex justify-between">
+                <span className="font-medium">{AREA_NAMES[item.dimension] ?? item.dimension}</span>
+                <span className="text-muted-foreground">{item.gap}/100</span>
+              </div>
+              {item.text && <p className="mt-1 text-muted-foreground">{item.text}</p>}
+            </li>
+          ))
+        ) : (
+          <li className="text-sm text-muted-foreground">No real differences.</li>
+        )}
+      </ul>
+    </div>
   );
 }

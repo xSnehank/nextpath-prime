@@ -3,24 +3,17 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-all duration-200 outline-none select-none disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] cursor-pointer",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring select-none disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] cursor-pointer",
   {
     variants: {
       variant: {
-        default:
-          "bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] font-semibold shadow-sm shadow-[#d4ff3a]/25",
-        secondary:
-          "bg-[#16181b] hover:bg-[#1f2227] text-[#eeeee8] border border-white/10",
-        outline:
-          "border border-white/15 bg-transparent hover:bg-white/[0.05] text-[#eeeee8]",
-        ghost:
-          "text-[#75766f] hover:text-[#eeeee8] hover:bg-white/[0.05]",
-        destructive:
-          "bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/30",
-        glow:
-          "bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] font-semibold shadow-lg shadow-[#d4ff3a]/30",
-        volt:
-          "bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] font-semibold shadow-sm",
+        default: "bg-primary text-primary-foreground font-semibold hover:bg-primary-hover",
+        secondary: "bg-muted text-foreground border border-border hover:bg-border/60",
+        outline: "border border-border bg-transparent text-foreground hover:bg-muted",
+        ghost: "text-muted-foreground hover:text-foreground hover:bg-muted",
+        destructive: "bg-danger text-white hover:opacity-90",
+        glow: "bg-primary text-primary-foreground font-semibold hover:bg-primary-hover",
+        volt: "bg-primary text-primary-foreground font-semibold hover:bg-primary-hover",
       },
       size: {
         default: "h-11 px-5 py-2.5",

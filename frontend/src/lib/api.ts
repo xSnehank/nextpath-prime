@@ -20,7 +20,6 @@ import type {
   CareerMarket,
   ConflictResult,
   ConsentResponse,
-  DemoRunResponse,
   DomainItem,
   DomainScore,
   ExplainResponse,
@@ -485,10 +484,4 @@ export const api = {
   /** Demand and salary by region for one career (GET /careers/{career_id}/market). */
   getMarket: (careerId: string): Promise<CareerMarket> =>
     fetcher<CareerMarket>(`/careers/${careerId}/market`),
-
-  /** Load the demo family and return its result id (POST /demo/run). */
-  runDemo: () =>
-    fetcher<DemoRunResponse>("/demo/run", {
-      method: "POST",
-    }),
 } as const;

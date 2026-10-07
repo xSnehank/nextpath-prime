@@ -61,6 +61,23 @@ Best prompts used with AI tools, and what they produced (proof of AI-led build).
 - Eliminated redundant `getUser()` calls by reading Supabase session once in `getHeaders()`.
 - Dynamically rendered assessment question counts using `questions.length` and `me.progress.questions_required`.
 
+### feat/fe-simplify-theme (Snehank, Claude Code with Opus 5.5)
+**Prompt** (plan mode): "1. Remove Live Demo 2. Everything looks very crowded and stuffed with a lot of options.
+Reduce the texts and buttons ... Make everything very simplistic without changing any functionality. 3. Add
+information about what the User is filling. When hovered over the text, a floating box appears below the cursor
+explaining what the question is (Parent and Student choice filling not Psychometric test). 4. Add Light/Dark Theme
+option with Light as Default."
+
+**What it produced:**
+- Theme tokens in `globals.css` (light by default, `.dark` on request, saved in `localStorage.theme`, applied
+  before first paint); UI primitives and charts use the tokens instead of hard-coded colours.
+- Live Demo removed (frontend, `api.runDemo`, `DEMO_ENABLED=false` in `.env.example`).
+- Every page simplified: landing 917 to about 90 lines, sign-up is account-only (preferences on onboarding), shared
+  `ChoiceFields`/`PageShell`, optional fields collapsed, dashboard tabs Careers / Comparison / Cost / Jobs /
+  Strengths with the sliders behind "Adjust priorities"; new Sign out; the broken "Retake Assessment" removed.
+- `FieldHint`: hover box below the cursor (portal, kept on screen, flips above near the bottom), also on keyboard
+  focus and tap, on every student and parent choice; texts in `lib/constants.ts` follow what the backend does.
+
 ---
 
 ## Backend (Snehank, Claude Code with Opus 5.5)
