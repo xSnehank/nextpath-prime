@@ -1,0 +1,16 @@
+{
+  "role": "parent",
+  "annual_education_budget": 250000,
+  "savings": 600000,
+  "max_loan": 800000,
+  "annual_income": 1200000,
+  "risk_appetite": 2,
+  "breakeven_tolerance_years": 5,
+  "preferred_state": "Maharashtra",
+  "open_to_abroad": false,
+  "top_domain_ids": [
+    "d0000000-0000-4000-8000-000000000004",
+    "d0000000-0000-4000-8000-000000000001",
+    "d0000000-0000-4000-8000-000000000002"
+  ]
+}
