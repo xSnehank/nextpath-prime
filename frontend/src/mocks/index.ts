@@ -304,13 +304,33 @@ const routes: Record<string, MockHandler> = {
     return audience === "parent" ? parentQuestions : studentQuestions;
   },
   "/responses": () => ({ ok: true }),
+  "/auth/invite": () => ({ invite_code: "PRISM-78X2A" }),
   "/auth/link": () => ({ ok: true }),
+  "/me": () => ({ id: "demo-student-001", email: "aarav.sharma@example.in", role: "student" }),
+  "/domains": () => [
+    "Engineering / Technology",
+    "Sciences / Research",
+    "Business / Management",
+    "Medicine / Healthcare",
+    "Arts / Design / Media",
+    "Law / Civil Services",
+    "Education / Teaching",
+    "Defence / Sports",
+  ],
+  "/profile": () => ({
+    annual_budget: 800000,
+    savings: 1200000,
+    max_loan: 1500000,
+    loan_comfort: 3,
+    risk_appetite: 2,
+    ranked_domains: ["Engineering / Technology", "Sciences / Research"],
+  }),
   "/analyze": () => demoAnalyzeResponse,
   "/explain": (_path, options) => {
     const body = options?.body ? JSON.parse(options.body as string) : {};
-    const career = demoRoadmap.find((c) => c.id === body.careerId);
+    const career = demoRoadmap.find((c) => c.id === (body.career_id || body.careerId));
     return {
-      careerId: body.careerId ?? "c1",
+      careerId: (body.career_id || body.careerId) ?? "c1",
       explanation: career
         ? `Based on your assessment, ${career.title} ranks #${career.rank} with a composite score of ${career.compositeScore}/100. Your aptitude aligns strongly with the ${career.domain} domain. Financial viability is ${career.financialViability}% and market demand is at ${career.marketDemand}%. This path offers a ${career.timeline.toLowerCase()}, with multiple scholarship opportunities to offset costs.`
         : "Career explanation not available.",
