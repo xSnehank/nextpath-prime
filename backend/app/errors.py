@@ -63,15 +63,6 @@ class AppError(Exception):
         self.details = details or {}
 
 
-def not_implemented(branch: str) -> AppError:
-    """For live mode on endpoints whose real code has not landed yet."""
-    return AppError(
-        ErrorCode.NOT_IMPLEMENTED,
-        f"Only mock mode works here so far; the real version arrives in {branch}.",
-        {"branch": branch},
-    )
-
-
 def error_response(
     code: ErrorCode,
     message: str,

@@ -667,7 +667,7 @@
           "analysis"
         ],
         "summary": "Run the whole pipeline for a linked pair and return the roadmap",
-        "description": "Mock mode returns the saved demo result. Custom weights are validated\nbut only change the ranking once feat/be-E1-E2-roadmap-endpoint lands.",
+        "description": "Needs both assessments finished (409 ASSESSMENT_INCOMPLETE) and both consents (409 CONSENT_REQUIRED).\nMock mode returns the saved demo result.",
         "operationId": "analyze_analyze_post",
         "requestBody": {
           "content": {
@@ -739,6 +739,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "UPSTREAM_UNAVAILABLE: the database or the sign-in service cannot be reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -753,7 +763,8 @@
         "tags": [
           "analysis"
         ],
-        "summary": "A saved roadmap",
+        "summary": "A saved roadmap (the demo family's needs no sign-in while DEMO_ENABLED=true)",
+        "description": "Only for the linked pair, and only while both still agree to the comparison (409 CONSENT_REQUIRED).",
         "operationId": "get_result_results__result_id__get",
         "security": [
           {
@@ -803,8 +814,8 @@
               }
             }
           },
-          "403": {
-            "description": "FORBIDDEN: signed in, but not allowed to do this",
+          "404": {
+            "description": "NOT_FOUND",
             "content": {
               "application/json": {
                 "schema": {
@@ -813,8 +824,8 @@
               }
             }
           },
-          "404": {
-            "description": "NOT_FOUND",
+          "409": {
+            "description": "ASSESSMENT_INCOMPLETE or CONSENT_REQUIRED",
             "content": {
               "application/json": {
                 "schema": {
@@ -842,6 +853,7 @@
           "analysis"
         ],
         "summary": "Plain-language explanation of one career in a result",
+        "description": "Cached Gemini text, fresh Gemini text, or the template, in that order (source says which).",
         "operationId": "explain_explain_post",
         "requestBody": {
           "content": {
@@ -884,8 +896,8 @@
               }
             }
           },
-          "403": {
-            "description": "FORBIDDEN: signed in, but not allowed to do this",
+          "404": {
+            "description": "NOT_FOUND",
             "content": {
               "application/json": {
                 "schema": {
@@ -894,8 +906,8 @@
               }
             }
           },
-          "404": {
-            "description": "NOT_FOUND",
+          "409": {
+            "description": "ASSESSMENT_INCOMPLETE or CONSENT_REQUIRED",
             "content": {
               "application/json": {
                 "schema": {
@@ -1006,6 +1018,7 @@
           "demo"
         ],
         "summary": "Load the demo family and return its result id (only when DEMO_ENABLED=true; no login)",
+        "description": "Runs the full analysis for the seeded demo family with the default weights.",
         "operationId": "run_demo_demo_run_post",
         "responses": {
           "200": {
@@ -1030,6 +1043,16 @@
           },
           "404": {
             "description": "NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "UPSTREAM_UNAVAILABLE: the database or the sign-in service cannot be reached",
             "content": {
               "application/json": {
                 "schema": {
