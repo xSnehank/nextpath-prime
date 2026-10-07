@@ -3,238 +3,215 @@
   "questions": [
     {
       "id": "a0000000-0000-4000-8000-000000000001",
+      "kind": "choice",
       "group": "aptitude",
       "dimension": "logical",
-      "text": "I enjoy puzzles that need step-by-step reasoning.",
+      "text": "If all Coders write Logic, and some Logic writers use Python, which statement must be true?",
       "options": [
         {
           "value": 1,
-          "label": "Strongly disagree"
+          "label": "All Coders use Python"
         },
         {
           "value": 2,
-          "label": "Disagree"
+          "label": "Some Coders might use Python"
         },
         {
           "value": 3,
-          "label": "Neutral"
+          "label": "No Coders use Python"
         },
         {
           "value": 4,
-          "label": "Agree"
-        },
-        {
-          "value": 5,
-          "label": "Strongly agree"
+          "label": "Python is the only programming language"
         }
       ],
       "required": true
     },
     {
       "id": "a0000000-0000-4000-8000-000000000002",
+      "kind": "choice",
       "group": "aptitude",
       "dimension": "logical",
-      "text": "I can usually spot the flaw in an argument.",
+      "text": "Find the missing number in the sequence: 3, 7, 15, 31, __?",
       "options": [
         {
           "value": 1,
-          "label": "Strongly disagree"
+          "label": "47"
         },
         {
           "value": 2,
-          "label": "Disagree"
+          "label": "55"
         },
         {
           "value": 3,
-          "label": "Neutral"
+          "label": "61"
         },
         {
           "value": 4,
-          "label": "Agree"
-        },
-        {
-          "value": 5,
-          "label": "Strongly agree"
+          "label": "63"
         }
       ],
       "required": true
     },
     {
       "id": "a0000000-0000-4000-8000-000000000003",
+      "kind": "choice",
       "group": "aptitude",
       "dimension": "numerical",
-      "text": "I am comfortable working with numbers, percentages and graphs.",
+      "text": "A student scored 80% in an examination worth 150 total marks. How many marks did the student obtain?",
       "options": [
         {
           "value": 1,
-          "label": "Strongly disagree"
+          "label": "110"
         },
         {
           "value": 2,
-          "label": "Disagree"
+          "label": "120"
         },
         {
           "value": 3,
-          "label": "Neutral"
+          "label": "125"
         },
         {
           "value": 4,
-          "label": "Agree"
-        },
-        {
-          "value": 5,
-          "label": "Strongly agree"
+          "label": "130"
         }
       ],
       "required": true
     },
     {
       "id": "a0000000-0000-4000-8000-000000000004",
+      "kind": "choice",
       "group": "aptitude",
       "dimension": "numerical",
-      "text": "Mental maths comes easily to me.",
+      "text": "A car travels at a constant speed of 60 km/h. How many minutes will it take to cover a distance of 15 km?",
       "options": [
         {
           "value": 1,
-          "label": "Strongly disagree"
+          "label": "15 minutes"
         },
         {
           "value": 2,
-          "label": "Disagree"
+          "label": "20 minutes"
         },
         {
           "value": 3,
-          "label": "Neutral"
+          "label": "25 minutes"
         },
         {
           "value": 4,
-          "label": "Agree"
-        },
-        {
-          "value": 5,
-          "label": "Strongly agree"
+          "label": "30 minutes"
         }
       ],
       "required": true
     },
     {
       "id": "a0000000-0000-4000-8000-000000000005",
+      "kind": "choice",
       "group": "aptitude",
       "dimension": "verbal",
-      "text": "I can explain complicated ideas clearly in writing.",
+      "text": "Choose the word that is most nearly OPPOSITE in meaning to \"OPTIONAL\".",
       "options": [
         {
           "value": 1,
-          "label": "Strongly disagree"
+          "label": "Voluntary"
         },
         {
           "value": 2,
-          "label": "Disagree"
+          "label": "Elective"
         },
         {
           "value": 3,
-          "label": "Neutral"
+          "label": "Mandatory"
         },
         {
           "value": 4,
-          "label": "Agree"
-        },
-        {
-          "value": 5,
-          "label": "Strongly agree"
+          "label": "Flexible"
         }
       ],
       "required": true
     },
     {
       "id": "a0000000-0000-4000-8000-000000000006",
+      "kind": "choice",
       "group": "aptitude",
       "dimension": "verbal",
-      "text": "I enjoy reading and learning new words.",
+      "text": "Complete the analogy: Architect : Building :: Author : ____.",
       "options": [
         {
           "value": 1,
-          "label": "Strongly disagree"
+          "label": "Pen"
         },
         {
           "value": 2,
-          "label": "Disagree"
+          "label": "Library"
         },
         {
           "value": 3,
-          "label": "Neutral"
+          "label": "Book"
         },
         {
           "value": 4,
-          "label": "Agree"
-        },
-        {
-          "value": 5,
-          "label": "Strongly agree"
+          "label": "Reader"
         }
       ],
       "required": true
     },
     {
       "id": "a0000000-0000-4000-8000-000000000007",
+      "kind": "choice",
       "group": "aptitude",
       "dimension": "spatial",
-      "text": "I can picture how an object looks from a different angle.",
+      "text": "A square sheet of paper is folded in half vertically, and a hole is punched through the top-right corner of the folded sheet. How many holes are there when it is unfolded?",
       "options": [
         {
           "value": 1,
-          "label": "Strongly disagree"
+          "label": "1"
         },
         {
           "value": 2,
-          "label": "Disagree"
+          "label": "2"
         },
         {
           "value": 3,
-          "label": "Neutral"
+          "label": "3"
         },
         {
           "value": 4,
-          "label": "Agree"
-        },
-        {
-          "value": 5,
-          "label": "Strongly agree"
+          "label": "4"
         }
       ],
       "required": true
     },
     {
       "id": "a0000000-0000-4000-8000-000000000008",
+      "kind": "choice",
       "group": "aptitude",
       "dimension": "spatial",
-      "text": "I find maps and diagrams easy to follow.",
+      "text": "Which 3D shape do you get by folding a flat net of 6 connected, equal squares?",
       "options": [
         {
           "value": 1,
-          "label": "Strongly disagree"
+          "label": "Square pyramid"
         },
         {
           "value": 2,
-          "label": "Disagree"
+          "label": "Cylinder"
         },
         {
           "value": 3,
-          "label": "Neutral"
+          "label": "Cube"
         },
         {
           "value": 4,
-          "label": "Agree"
-        },
-        {
-          "value": 5,
-          "label": "Strongly agree"
+          "label": "Cone"
         }
       ],
       "required": true
     },
     {
       "id": "a0000000-0000-4000-8000-000000000009",
+      "kind": "likert",
       "group": "aptitude",
       "dimension": "creative",
       "text": "I often come up with unusual ideas.",
@@ -264,6 +241,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000010",
+      "kind": "likert",
       "group": "aptitude",
       "dimension": "creative",
       "text": "I like making things that did not exist before, such as drawings, stories or apps.",
@@ -293,6 +271,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000011",
+      "kind": "likert",
       "group": "interest",
       "dimension": "realistic",
       "text": "I like working with tools, machines or my hands.",
@@ -322,6 +301,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000012",
+      "kind": "likert",
       "group": "interest",
       "dimension": "realistic",
       "text": "I would enjoy a job where I build or repair things.",
@@ -351,6 +331,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000013",
+      "kind": "likert",
       "group": "interest",
       "dimension": "investigative",
       "text": "I like finding out how and why things work.",
@@ -380,6 +361,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000014",
+      "kind": "likert",
       "group": "interest",
       "dimension": "investigative",
       "text": "I would enjoy doing experiments or research.",
@@ -409,6 +391,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000015",
+      "kind": "likert",
       "group": "interest",
       "dimension": "artistic",
       "text": "I like expressing myself through art, music, writing or design.",
@@ -438,6 +421,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000016",
+      "kind": "likert",
       "group": "interest",
       "dimension": "artistic",
       "text": "I would enjoy a job with a lot of creative freedom.",
@@ -467,6 +451,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000017",
+      "kind": "likert",
       "group": "interest",
       "dimension": "social",
       "text": "I like helping people with their problems.",
@@ -496,6 +481,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000018",
+      "kind": "likert",
       "group": "interest",
       "dimension": "social",
       "text": "I would enjoy teaching, caring for or counselling others.",
@@ -525,6 +511,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000019",
+      "kind": "likert",
       "group": "interest",
       "dimension": "enterprising",
       "text": "I like leading a team or persuading people.",
@@ -554,6 +541,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000020",
+      "kind": "likert",
       "group": "interest",
       "dimension": "enterprising",
       "text": "I would enjoy starting my own business one day.",
@@ -583,6 +571,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000021",
+      "kind": "likert",
       "group": "interest",
       "dimension": "conventional",
       "text": "I like organising information and keeping records neat.",
@@ -612,6 +601,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000022",
+      "kind": "likert",
       "group": "interest",
       "dimension": "conventional",
       "text": "I prefer tasks with clear rules and procedures.",
@@ -641,6 +631,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000023",
+      "kind": "likert",
       "group": "cognitive",
       "dimension": "analytical",
       "text": "I make decisions by carefully weighing facts and evidence.",
@@ -670,6 +661,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000024",
+      "kind": "likert",
       "group": "cognitive",
       "dimension": "analytical",
       "text": "I usually go with my gut feeling.",
@@ -699,6 +691,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000025",
+      "kind": "likert",
       "group": "cognitive",
       "dimension": "structured",
       "text": "I like to plan my work in detail before I start.",
@@ -728,6 +721,7 @@
     },
     {
       "id": "a0000000-0000-4000-8000-000000000026",
+      "kind": "likert",
       "group": "cognitive",
       "dimension": "structured",
       "text": "I am happy to change plans at the last minute.",

@@ -7,7 +7,11 @@ from app.schemas.common import StrictModel
 
 class Answer(StrictModel):
     question_id: UUID
-    value: int = Field(ge=1, le=5, description="1 = strongly disagree ... 5 = strongly agree")
+    value: int = Field(
+        ge=1,
+        le=5,
+        description="likert: 1 = strongly disagree ... 5 = strongly agree; choice: the picked option's value (1-4 = A-D)",
+    )
 
 
 class ResponsesBatch(StrictModel):
