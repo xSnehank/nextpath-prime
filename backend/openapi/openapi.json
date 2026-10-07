@@ -2233,6 +2233,18 @@
           "role": {
             "$ref": "#/components/schemas/Role"
           },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name",
+            "description": "So the UI can say who is linked; null if they gave no name"
+          },
           "assessment_complete": {
             "type": "boolean",
             "title": "Assessment Complete"
@@ -2246,11 +2258,12 @@
         "type": "object",
         "required": [
           "role",
+          "full_name",
           "assessment_complete",
           "consented"
         ],
         "title": "PartnerStatus",
-        "description": "Only status flags about the linked partner; never their answers."
+        "description": "The linked partner's name and status flags; never their answers."
       },
       "Progress": {
         "properties": {
