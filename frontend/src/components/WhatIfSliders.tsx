@@ -6,11 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Sliders, RotateCcw, Zap } from "lucide-react";
 
 export interface WeightVector {
-  alpha: number; // Student psychometrics weight (default 0.45)
-  beta: number;  // Financial viability weight (default 0.30)
-  gamma: number; // Market demand weight (default 0.25)
-  maxLoan: number; // in INR
-  annualBudget: number; // in INR
+  fit: number;     // Student psychometric fit weight (default 0.45)
+  finance: number; // Financial solvency & ROI weight (default 0.30)
+  market: number;  // Market demand & velocity weight (default 0.25)
+  // Compatibility aliases
+  alpha?: number;
+  beta?: number;
+  gamma?: number;
 }
 
 interface WhatIfSlidersProps {
@@ -20,19 +22,63 @@ interface WhatIfSlidersProps {
 }
 
 export function WhatIfSliders({ weights, onChange, onReset }: WhatIfSlidersProps) {
-  const handleWeightChange = (field: keyof WeightVector, val: number) => {
-    onChange({
-      ...weights,
-      [field]: val,
-    });
+  // Ensure weights sum to 1.0 by adjusting other two sliders proportionally
+  const handleLinkedWeightChange = (
+    target: "fit" | "finance" | "market",
+    newVal: number
+  ) => {
+    // Clamp newVal to [0.05, 0.90]
+    const clampedNew = Math.min(Math.max(newVal, 0.05), 0.90);
+    const remaining = 1.0 - clampedNew;
+
+    let other1Key: "fit" | "finance" | "market";
+    let other2Key: "fit" | "finance" | "market";
+
+    if (target === "fit") {
+      other1Key = "finance";
+      other2Key = "market";
+    } else if (target === "finance") {
+      other1Key = "fit";
+      other2Key = "market";
+    } else {
+      other1Key = "fit";
+      other2Key = "finance";
+    }
+
+    const currentOther1 = weights[other1Key] || 0.3;
+    const currentOther2 = weights[other2Key] || 0.25;
+    const sumOther = currentOther1 + currentOther2;
+
+    let newOther1: number;
+    let newOther2: number;
+
+    if (sumOther > 0.001) {
+      newOther1 = (remaining * currentOther1) / sumOther;
+      newOther2 = remaining - newOther1;
+    } else {
+      newOther1 = remaining / 2;
+      newOther2 = remaining / 2;
+    }
+
+    const nextFit = Number((target === "fit" ? clampedNew : other1Key === "fit" ? newOther1 : newOther2).toFixed(3));
+    const nextFinance = Number((target === "finance" ? clampedNew : other1Key === "finance" ? newOther1 : newOther2).toFixed(3));
+    const nextMarket = Number(Math.max(0, 1.0 - nextFit - nextFinance).toFixed(3));
+
+    const updated: WeightVector = {
+      fit: nextFit,
+      finance: nextFinance,
+      market: nextMarket,
+      alpha: nextFit,
+      beta: nextFinance,
+      gamma: nextMarket,
+    };
+
+    onChange(updated);
   };
 
-  const formatInr = (amount: number) => {
-    if (amount >= 100000) {
-      return `₹${(amount / 100000).toFixed(1)}L`;
-    }
-    return `₹${amount.toLocaleString("en-IN")}`;
-  };
+  const fitPct = Math.round((weights.fit ?? weights.alpha ?? 0.45) * 100);
+  const financePct = Math.round((weights.finance ?? weights.beta ?? 0.30) * 100);
+  const marketPct = Math.max(0, 100 - fitPct - financePct);
 
   return (
     <Card className="border-white/10 bg-slate-900/70 backdrop-blur-xl">
@@ -47,9 +93,10 @@ export function WhatIfSliders({ weights, onChange, onReset }: WhatIfSlidersProps
           <div className="flex items-center gap-2">
             <Badge variant="cyan" className="flex items-center gap-1">
               <Zap className="h-3 w-3 text-amber-300" />
-              Recalculates in &lt; 0.1s
+              Linked Sum = 100%
             </Badge>
             <button
+              type="button"
               onClick={onReset}
               className="text-xs text-slate-400 hover:text-white flex items-center gap-1 px-2 py-1 rounded bg-white/5 hover:bg-white/10 transition-colors"
               title="Reset default weights"
@@ -60,20 +107,20 @@ export function WhatIfSliders({ weights, onChange, onReset }: WhatIfSlidersProps
           </div>
         </div>
         <CardDescription className="text-xs">
-          Dynamically adjust model weights (α Psychometrics + β Affordability + γ Market Velocity = 1.0) and see roadmap rearrange instantly.
+          Dynamically re-rank the roadmap by balancing Student Fit (w_fit) + Family Affordability (w_finance) + Market Hiring Demand (w_market).
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4 pt-1">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Alpha Slider */}
-          <div className="space-y-2 p-3 rounded-xl bg-white/[0.03] border border-white/5">
+          {/* Fit Slider */}
+          <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
             <div className="flex justify-between items-center text-xs">
               <span className="font-semibold text-violet-300">
-                α Student Passion / Aptitude
+                Fit: Student Passion / Aptitude
               </span>
               <span className="font-mono font-bold text-white bg-violet-500/20 px-2 py-0.5 rounded">
-                {(weights.alpha * 100).toFixed(0)}%
+                {fitPct}%
               </span>
             </div>
             <input
@@ -81,23 +128,23 @@ export function WhatIfSliders({ weights, onChange, onReset }: WhatIfSlidersProps
               min="0.10"
               max="0.80"
               step="0.05"
-              value={weights.alpha}
-              onChange={(e) => handleWeightChange("alpha", parseFloat(e.target.value))}
+              value={weights.fit ?? weights.alpha ?? 0.45}
+              onChange={(e) => handleLinkedWeightChange("fit", parseFloat(e.target.value))}
               className="w-full accent-violet-500 cursor-pointer"
             />
             <p className="text-[10px] text-slate-400">
-              Prioritizes student intrinsic strengths over market yield.
+              Prioritizes student intrinsic strengths and psychometric alignment.
             </p>
           </div>
 
-          {/* Beta Slider */}
-          <div className="space-y-2 p-3 rounded-xl bg-white/[0.03] border border-white/5">
+          {/* Finance Slider */}
+          <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
             <div className="flex justify-between items-center text-xs">
               <span className="font-semibold text-emerald-300">
-                β Financial Affordability
+                Finance: Family Solvency &amp; ROI
               </span>
               <span className="font-mono font-bold text-white bg-emerald-500/20 px-2 py-0.5 rounded">
-                {(weights.beta * 100).toFixed(0)}%
+                {financePct}%
               </span>
             </div>
             <input
@@ -105,23 +152,23 @@ export function WhatIfSliders({ weights, onChange, onReset }: WhatIfSlidersProps
               min="0.10"
               max="0.80"
               step="0.05"
-              value={weights.beta}
-              onChange={(e) => handleWeightChange("beta", parseFloat(e.target.value))}
+              value={weights.finance ?? weights.beta ?? 0.30}
+              onChange={(e) => handleLinkedWeightChange("finance", parseFloat(e.target.value))}
               className="w-full accent-emerald-500 cursor-pointer"
             />
             <p className="text-[10px] text-slate-400">
-              Boosts careers with lowest tuition and shortest break-even.
+              Favors lower debt burden, faster break-even, and affordable tuition.
             </p>
           </div>
 
-          {/* Gamma Slider */}
-          <div className="space-y-2 p-3 rounded-xl bg-white/[0.03] border border-white/5">
+          {/* Market Slider */}
+          <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
             <div className="flex justify-between items-center text-xs">
               <span className="font-semibold text-cyan-300">
-                γ Industry & Market Demand
+                Market: Hiring Velocity &amp; Salary
               </span>
               <span className="font-mono font-bold text-white bg-cyan-500/20 px-2 py-0.5 rounded">
-                {(weights.gamma * 100).toFixed(0)}%
+                {marketPct}%
               </span>
             </div>
             <input
@@ -129,53 +176,27 @@ export function WhatIfSliders({ weights, onChange, onReset }: WhatIfSlidersProps
               min="0.10"
               max="0.80"
               step="0.05"
-              value={weights.gamma}
-              onChange={(e) => handleWeightChange("gamma", parseFloat(e.target.value))}
+              value={weights.market ?? weights.gamma ?? 0.25}
+              onChange={(e) => handleLinkedWeightChange("market", parseFloat(e.target.value))}
               className="w-full accent-cyan-500 cursor-pointer"
             />
             <p className="text-[10px] text-slate-400">
-              Boosts high-growth fields and high-velocity geographic hiring.
+              Rewards high hiring velocity, starting yield, and regional growth.
             </p>
           </div>
         </div>
 
-        {/* Dynamic Budget & Loan Sliders */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-          <div className="space-y-2 p-3 rounded-xl bg-white/[0.03] border border-white/5">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-slate-300 font-medium">Household Annual Budget</span>
-              <span className="font-mono font-bold text-white bg-white/10 px-2 py-0.5 rounded">
-                {formatInr(weights.annualBudget)}
-              </span>
-            </div>
-            <input
-              type="range"
-              min="100000"
-              max="2500000"
-              step="50000"
-              value={weights.annualBudget}
-              onChange={(e) => handleWeightChange("annualBudget", parseInt(e.target.value))}
-              className="w-full accent-indigo-500 cursor-pointer"
-            />
-          </div>
-
-          <div className="space-y-2 p-3 rounded-xl bg-white/[0.03] border border-white/5">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-slate-300 font-medium">Max Loan Tolerance</span>
-              <span className="font-mono font-bold text-white bg-white/10 px-2 py-0.5 rounded">
-                {formatInr(weights.maxLoan)}
-              </span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="4000000"
-              step="100000"
-              value={weights.maxLoan}
-              onChange={(e) => handleWeightChange("maxLoan", parseInt(e.target.value))}
-              className="w-full accent-amber-500 cursor-pointer"
-            />
-          </div>
+        {/* Live Equation Banner */}
+        <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/5 flex items-center justify-between text-[11px] text-slate-400">
+          <span>
+            Current Blending Formula:{" "}
+            <code className="text-slate-300 font-mono">
+              R = {((weights.fit ?? 0.45) * 100).toFixed(0)}%·Fit + {((weights.finance ?? 0.3) * 100).toFixed(0)}%·Finance + {((weights.market ?? 0.25) * 100).toFixed(0)}%·Market
+            </code>
+          </span>
+          <span className="font-mono text-emerald-400 font-semibold">
+            Σ Weights = 1.00
+          </span>
         </div>
       </CardContent>
     </Card>

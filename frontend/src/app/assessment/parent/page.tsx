@@ -16,90 +16,168 @@ import {
   Info,
   CheckCircle2,
   XCircle,
+  Loader2,
+  Globe2,
+  MapPin,
+  Clock,
 } from "lucide-react";
+import { api, ApiError } from "@/lib/api";
+import type { DomainItem, IndianState, ParentProfile } from "@/types/api";
 
-const DOMAINS_LIST = [
-  "Engineering / Technology",
-  "Medicine / Healthcare",
-  "Business / Management",
-  "Law / Civil Services",
-  "Arts / Design / Media",
-  "Sciences / Research",
-  "Education / Teaching",
-  "Defence / Sports",
+const INDIAN_STATES: IndianState[] = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa",
+  "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala",
+  "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland",
+  "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+  "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands",
+  "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi",
+  "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
 ];
 
 export default function ParentAssessmentPage() {
   const router = useRouter();
 
-  // Financial inputs (Epic B2)
-  const [annualBudget, setAnnualBudget] = React.useState<number>(800000);
-  const [savings, setSavings] = React.useState<number>(1200000);
-  const [maxLoan, setMaxLoan] = React.useState<number>(1500000);
-  const [loanComfort, setLoanComfort] = React.useState<number>(3); // 1-5 scale
-  const [riskAppetite, setRiskAppetite] = React.useState<number>(2); // 1-5 scale
-  const [geographicFlexibility, setGeographicFlexibility] = React.useState<number>(3); // 1-5 scale
+  // Dynamic domains fetched from GET /domains (Comment 8/14 & 10/14)
+  const [availableDomains, setAvailableDomains] = React.useState<DomainItem[]>([]);
+  const [loadingDomains, setLoadingDomains] = React.useState(true);
 
-  // Hoped-for Domains ranking (Epic B3)
-  const [selectedDomains, setSelectedDomains] = React.useState<string[]>([
-    "Engineering / Technology",
-    "Sciences / Research",
-  ]);
-  const [notes, setNotes] = React.useState<string>("");
+  // Financial inputs start EMPTY (Comment 10/14: no demo money!)
+  const [annualBudget, setAnnualBudget] = React.useState<string>("");
+  const [savings, setSavings] = React.useState<string>("");
+  const [maxLoan, setMaxLoan] = React.useState<string>("");
+  const [annualIncome, setAnnualIncome] = React.useState<string>("");
+
+  // Risk & ROI parameters
+  const [riskAppetite, setRiskAppetite] = React.useState<number>(3); // 1-5 scale
+  const [breakevenYears, setBreakevenYears] = React.useState<number>(5); // 1-20 scale
+  const [preferredState, setPreferredState] = React.useState<IndianState>("Maharashtra");
+  const [openToAbroad, setOpenToAbroad] = React.useState<boolean>(false);
+
+  // Exactly 3 ranked domain IDs (UUIDs from GET /domains)
+  const [selectedDomainIds, setSelectedDomainIds] = React.useState<string[]>([]);
 
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
 
-  const handleToggleDomain = (domain: string) => {
-    if (selectedDomains.includes(domain)) {
-      setSelectedDomains(selectedDomains.filter((d) => d !== domain));
+  // Fetch real domains from GET /domains
+  React.useEffect(() => {
+    let active = true;
+
+    async function loadDomains() {
+      setLoadingDomains(true);
+      try {
+        const domains = await api.getDomains();
+        if (active) {
+          setAvailableDomains(domains);
+        }
+      } catch (err) {
+        if (active) {
+          console.error("Failed to load career domains:", err);
+          setError("Failed to load domains from backend.");
+        }
+      } finally {
+        if (active) setLoadingDomains(false);
+      }
+    }
+
+    loadDomains();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleToggleDomain = (domainId: string) => {
+    if (selectedDomainIds.includes(domainId)) {
+      setSelectedDomainIds(selectedDomainIds.filter((id) => id !== domainId));
+      setError("");
     } else {
-      if (selectedDomains.length >= 3) {
-        setError("You can select and rank a maximum of 3 preferred domains.");
+      if (selectedDomainIds.length >= 3) {
+        setError("You must select exactly 3 preferred domains. Deselect one first to replace it.");
         return;
       }
       setError("");
-      setSelectedDomains([...selectedDomains, domain]);
+      setSelectedDomainIds([...selectedDomainIds, domainId]);
     }
   };
 
   const handleMoveDomainRank = (index: number, direction: "up" | "down") => {
-    const newDomains = [...selectedDomains];
+    const newDomains = [...selectedDomainIds];
     const targetIdx = direction === "up" ? index - 1 : index + 1;
     if (targetIdx < 0 || targetIdx >= newDomains.length) return;
     const temp = newDomains[index];
     newDomains[index] = newDomains[targetIdx];
     newDomains[targetIdx] = temp;
-    setSelectedDomains(newDomains);
+    setSelectedDomainIds(newDomains);
   };
 
-  const formatInr = (amount: number) => {
-    if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(2)} Cr`;
-    if (amount >= 100000) return `₹${(amount / 100000).toFixed(1)} Lakh`;
-    return `₹${amount.toLocaleString("en-IN")}`;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedDomains.length === 0) {
-      setError("Please select at least 1 hoped-for career domain for your child.");
+    setError("");
+
+    // Validate money fields
+    const parsedBudget = parseFloat(annualBudget.replace(/,/g, ""));
+    const parsedSavings = parseFloat(savings.replace(/,/g, ""));
+    const parsedMaxLoan = parseFloat(maxLoan.replace(/,/g, ""));
+    const parsedIncome = annualIncome ? parseFloat(annualIncome.replace(/,/g, "")) : null;
+
+    if (isNaN(parsedBudget) || parsedBudget < 0) {
+      setError("Please enter a valid Annual Education Budget in Rupees.");
+      return;
+    }
+    if (isNaN(parsedSavings) || parsedSavings < 0) {
+      setError("Please enter valid Education Savings set aside in Rupees.");
+      return;
+    }
+    if (isNaN(parsedMaxLoan) || parsedMaxLoan < 0) {
+      setError("Please enter the maximum Education Loan threshold your family is willing to consider.");
+      return;
+    }
+
+    // Require exactly 3 domains (Comment 10/14)
+    if (selectedDomainIds.length !== 3) {
+      setError(`Please select exactly 3 preferred domains for your child (currently ${selectedDomainIds.length} selected).`);
       return;
     }
 
     setLoading(true);
+
     try {
+      // Act as demo parent if in dev/mock mode
+      const parentDevUser = "22222222-2222-4222-8222-222222222222";
+
+      const profilePayload: ParentProfile = {
+        role: "parent",
+        annual_education_budget: parsedBudget,
+        savings: parsedSavings,
+        max_loan: parsedMaxLoan,
+        annual_income: parsedIncome,
+        risk_appetite: riskAppetite,
+        breakeven_tolerance_years: breakevenYears,
+        preferred_state: preferredState,
+        open_to_abroad: openToAbroad,
+        top_domain_ids: selectedDomainIds,
+      };
+
+      // 1. Submit PUT /profile (Comment 10/14)
+      await api.updateProfile(profilePayload, parentDevUser);
+
+      // 2. Submit POST /consent (Comment 2/14)
+      await api.postConsent(true, parentDevUser);
+
+      // Save dev user indicator for mock mode
+      localStorage.setItem("prism_dev_user", parentDevUser);
       localStorage.setItem("prism_parent_completed", "true");
-      localStorage.setItem("prism_parent_budget", annualBudget.toString());
-      localStorage.setItem("prism_parent_savings", savings.toString());
-      localStorage.setItem("prism_parent_max_loan", maxLoan.toString());
-      localStorage.setItem("prism_parent_loan_comfort", loanComfort.toString());
-      localStorage.setItem("prism_parent_risk_appetite", riskAppetite.toString());
-      localStorage.setItem("prism_parent_geo_flex", geographicFlexibility.toString());
-      localStorage.setItem("prism_parent_ranked_domains", JSON.stringify(selectedDomains));
-      localStorage.setItem("prism_parent_notes", notes);
 
       // Navigate to comprehensive Roadmap Dashboard
       router.push("/dashboard");
+    } catch (err) {
+      console.error("Failed to save parent profile:", err);
+      if (err instanceof ApiError) {
+        setError(`Backend validation error: ${err.message}`);
+      } else {
+        setError("Failed to save profile. Please check your inputs and try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -113,294 +191,353 @@ export default function ParentAssessmentPage() {
         <Card className="border-white/10 bg-slate-900/80 backdrop-blur-2xl shadow-2xl">
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-between">
-              <Badge variant="cyan">Epic B2 &amp; B3 • Parent Financial &amp; Aspirational Portal</Badge>
-              <span className="text-xs text-slate-400">Collaborative Calibration</span>
+              <Badge variant="cyan">Parent Financial &amp; Aspirational Calibration</Badge>
+              <span className="text-xs text-slate-400">Collaborative Alignment</span>
             </div>
-            <CardTitle className="text-2xl pt-2">Family Constraint &amp; Expectation Vectors</CardTitle>
+            <CardTitle className="text-2xl pt-2">Family Constraint &amp; Expectation Calibration</CardTitle>
             <CardDescription className="text-xs text-slate-400 leading-relaxed">
               Your inputs power the Financial Constraint Solver (tuition, debt-tolerance, break-even years)
-              and allow NextPath to calculate the Parent-Student Conflict Index.
+              and allow NextPath to calculate the Parent-Student Conflict Index. All fields are kept confidential.
             </CardDescription>
           </CardHeader>
 
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-6">
               {error && (
-                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs">
-                  {error}
+                <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                  <XCircle className="h-4 w-4 shrink-0 text-rose-400" />
+                  <span>{error}</span>
                 </div>
               )}
 
-              {/* SECTION 1: FINANCIAL PARAMETERS (Epic B2) */}
+              {/* SECTION 1: FINANCIAL PARAMETERS (Comment 10/14) */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm font-bold text-white border-b border-white/5 pb-2">
                   <Banknote className="h-4 w-4 text-emerald-400" />
                   <span>1. Household Affordability &amp; Education Budget (in ₹ INR)</span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Annual Budget */}
-                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.03] border border-white/5">
-                    <label className="text-xs font-semibold text-slate-300">
-                      Annual Education Budget
+                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <label className="text-xs font-semibold text-slate-200">
+                      Annual Education Budget *
                     </label>
+                    <p className="text-[11px] text-slate-400">
+                      Amount your family can spend each year out of regular income.
+                    </p>
                     <Input
                       type="number"
-                      min={0}
-                      max={10000000}
-                      step={50000}
+                      min="0"
+                      step="10000"
+                      placeholder="e.g. 250000"
                       value={annualBudget}
-                      onChange={(e) => setAnnualBudget(Number(e.target.value))}
+                      onChange={(e) => setAnnualBudget(e.target.value)}
                       required
+                      className="font-mono text-emerald-300 text-sm"
                     />
-                    <span className="text-[11px] font-mono font-bold text-emerald-400 block pt-0.5">
-                      {formatInr(annualBudget)} / year
-                    </span>
                   </div>
 
-                  {/* Liquid Savings */}
-                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.03] border border-white/5">
-                    <label className="text-xs font-semibold text-slate-300">
-                      Target Savings Earmarked
+                  {/* Savings */}
+                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <label className="text-xs font-semibold text-slate-200">
+                      Education Savings Pool *
                     </label>
+                    <p className="text-[11px] text-slate-400">
+                      Lump-sum savings set aside specifically for higher education.
+                    </p>
                     <Input
                       type="number"
-                      min={0}
-                      max={50000000}
-                      step={100000}
+                      min="0"
+                      step="10000"
+                      placeholder="e.g. 600000"
                       value={savings}
-                      onChange={(e) => setSavings(Number(e.target.value))}
+                      onChange={(e) => setSavings(e.target.value)}
                       required
+                      className="font-mono text-emerald-300 text-sm"
                     />
-                    <span className="text-[11px] font-mono font-bold text-cyan-400 block pt-0.5">
-                      {formatInr(savings)} saved
-                    </span>
                   </div>
 
-                  {/* Maximum Loan Comfort */}
-                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.03] border border-white/5">
-                    <label className="text-xs font-semibold text-slate-300">
-                      Max Acceptable Student Loan
+                  {/* Max Loan */}
+                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <label className="text-xs font-semibold text-slate-200">
+                      Maximum Education Loan Limit *
                     </label>
+                    <p className="text-[11px] text-slate-400">
+                      Largest total debt your family is willing to take across 4 years.
+                    </p>
                     <Input
                       type="number"
-                      min={0}
-                      max={50000000}
-                      step={100000}
+                      min="0"
+                      step="10000"
+                      placeholder="e.g. 800000"
                       value={maxLoan}
-                      onChange={(e) => setMaxLoan(Number(e.target.value))}
+                      onChange={(e) => setMaxLoan(e.target.value)}
                       required
+                      className="font-mono text-amber-300 text-sm"
                     />
-                    <span className="text-[11px] font-mono font-bold text-amber-400 block pt-0.5">
-                      {formatInr(maxLoan)} loan limit
-                    </span>
+                  </div>
+
+                  {/* Annual Income (Optional) */}
+                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <label className="text-xs font-semibold text-slate-200">
+                      Gross Household Annual Income (Optional)
+                    </label>
+                    <p className="text-[11px] text-slate-400">
+                      Used strictly for matching income-based merit scholarships.
+                    </p>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="50000"
+                      placeholder="e.g. 1200000 (optional)"
+                      value={annualIncome}
+                      onChange={(e) => setAnnualIncome(e.target.value)}
+                      className="font-mono text-slate-300 text-sm"
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* SECTION 2: 5-POINT RISK & LOAN SCALES */}
+              {/* SECTION 2: RISK, ROI & LOCATION */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm font-bold text-white border-b border-white/5 pb-2">
-                  <Scale className="h-4 w-4 text-amber-400" />
-                  <span>2. Risk Appetite &amp; Mobility Scales (1–5 Standardized Scale)</span>
+                  <Scale className="h-4 w-4 text-violet-400" />
+                  <span>2. Risk Appetite, Break-Even Horizon &amp; Location</span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {/* Loan Comfort */}
-                  <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="font-semibold text-slate-300">Loan Comfort</span>
-                      <span className="font-mono font-bold text-amber-400">{loanComfort}/5</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={1}
-                      max={5}
-                      step={1}
-                      value={loanComfort}
-                      onChange={(e) => setLoanComfort(Number(e.target.value))}
-                      className="w-full accent-amber-400 cursor-pointer"
-                    />
-                    <span className="text-[10px] text-slate-400 block">
-                      {loanComfort === 1 && "Strongly avoid all debt"}
-                      {loanComfort === 2 && "Prefer self-funded"}
-                      {loanComfort === 3 && "Neutral / moderate loan"}
-                      {loanComfort === 4 && "Comfortable if high ROI"}
-                      {loanComfort === 5 && "Aggressively leverage loans"}
-                    </span>
-                  </div>
-
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Risk Appetite */}
-                  <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
+                  <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
                     <div className="flex justify-between items-center text-xs">
-                      <span className="font-semibold text-slate-300">Non-Traditional Risk</span>
-                      <span className="font-mono font-bold text-violet-400">{riskAppetite}/5</span>
+                      <span className="font-semibold text-slate-200">
+                        Career Risk Appetite (1–5)
+                      </span>
+                      <span className="font-mono font-bold text-violet-300 bg-violet-500/20 px-2 py-0.5 rounded">
+                        Level {riskAppetite} / 5
+                      </span>
                     </div>
                     <input
                       type="range"
-                      min={1}
-                      max={5}
-                      step={1}
+                      min="1"
+                      max="5"
+                      step="1"
                       value={riskAppetite}
-                      onChange={(e) => setRiskAppetite(Number(e.target.value))}
+                      onChange={(e) => setRiskAppetite(parseInt(e.target.value, 10))}
                       className="w-full accent-violet-500 cursor-pointer"
                     />
-                    <span className="text-[10px] text-slate-400 block">
-                      {riskAppetite <= 2
-                        ? "Prefer guaranteed, traditional careers"
-                        : riskAppetite === 3
-                        ? "Open to emerging tech / hybrid paths"
-                        : "Supportive of unconventional STEAM/startups"}
-                    </span>
+                    <div className="flex justify-between text-[10px] text-slate-500">
+                      <span>1: Security &amp; PSU/Govt</span>
+                      <span>5: High-upside Startups</span>
+                    </div>
                   </div>
 
-                  {/* Geographic Mobility */}
-                  <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
+                  {/* Break-Even Tolerance Years */}
+                  <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
                     <div className="flex justify-between items-center text-xs">
-                      <span className="font-semibold text-slate-300">Geographic Mobility</span>
-                      <span className="font-mono font-bold text-cyan-400">{geographicFlexibility}/5</span>
+                      <span className="font-semibold text-slate-200">
+                        Break-Even Tolerance Window
+                      </span>
+                      <span className="font-mono font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded">
+                        {breakevenYears} Years
+                      </span>
                     </div>
                     <input
                       type="range"
-                      min={1}
-                      max={5}
-                      step={1}
-                      value={geographicFlexibility}
-                      onChange={(e) => setGeographicFlexibility(Number(e.target.value))}
-                      className="w-full accent-cyan-400 cursor-pointer"
+                      min="1"
+                      max="15"
+                      step="1"
+                      value={breakevenYears}
+                      onChange={(e) => setBreakevenYears(parseInt(e.target.value, 10))}
+                      className="w-full accent-cyan-500 cursor-pointer"
                     />
-                    <span className="text-[10px] text-slate-400 block">
-                      {geographicFlexibility <= 2
-                        ? "Prefer home state or city"
-                        : geographicFlexibility === 3
-                        ? "Pan-India tier 1 cities"
-                        : "Full global / overseas flexibility"}
-                    </span>
+                    <div className="flex justify-between text-[10px] text-slate-500">
+                      <span>1 Year (Fast ROI)</span>
+                      <span>15 Years (Long term)</span>
+                    </div>
+                  </div>
+
+                  {/* Preferred State */}
+                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5 text-cyan-400" />
+                      <span>Preferred Study/Work State *</span>
+                    </label>
+                    <select
+                      value={preferredState}
+                      onChange={(e) => setPreferredState(e.target.value as IndianState)}
+                      className="w-full p-2.5 rounded-xl bg-slate-900 border border-white/10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                    >
+                      {INDIAN_STATES.map((st) => (
+                        <option key={st} value={st}>
+                          {st}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Open To Abroad */}
+                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col justify-between">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+                        <Globe2 className="h-3.5 w-3.5 text-violet-400" />
+                        <span>Open to Studying Abroad?</span>
+                      </label>
+                      <p className="text-[11px] text-slate-400 mt-1">
+                        Permits recommendations including global university pathways.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setOpenToAbroad(false)}
+                        className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium border transition-colors ${
+                          !openToAbroad
+                            ? "bg-violet-600 border-violet-500 text-white"
+                            : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        India Only
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setOpenToAbroad(true)}
+                        className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium border transition-colors ${
+                          openToAbroad
+                            ? "bg-violet-600 border-violet-500 text-white"
+                            : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        Open to Abroad
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* SECTION 3: HOPED-FOR DOMAINS RANKER (Epic B3) */}
+              {/* SECTION 3: TOP 3 DOMAINS PICKER (Comment 10/14) */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
                   <div className="flex items-center gap-2 text-sm font-bold text-white">
-                    <Sparkles className="h-4 w-4 text-cyan-400" />
-                    <span>3. Rank Up to 3 Preferred Domains for Your Child</span>
+                    <Sparkles className="h-4 w-4 text-amber-400" />
+                    <span>3. Top 3 Hoped-For Career Domains (Pick exactly 3)</span>
                   </div>
                   <span className="text-xs font-mono text-cyan-400">
-                    {selectedDomains.length}/3 Selected
+                    {selectedDomainIds.length} of 3 selected
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-400">
-                  Select up to 3 sectors. Order them by priority to calculate Parent-Student alignment.
-                </p>
-
-                {/* Ranked List */}
-                {selectedDomains.length > 0 && (
-                  <div className="space-y-2 p-3 rounded-xl bg-white/[0.02] border border-white/10">
-                    <span className="text-[11px] font-semibold text-slate-300">
-                      Current Ranking Order:
-                    </span>
-                    {selectedDomains.map((domain, idx) => (
-                      <div
-                        key={domain}
-                        className="flex items-center justify-between p-2 rounded-lg bg-slate-900 border border-white/10 text-xs"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="h-5 w-5 rounded-full bg-violet-600/30 text-violet-300 flex items-center justify-center font-mono font-bold text-[10px] border border-violet-500/30">
-                            #{idx + 1}
-                          </span>
-                          <span className="font-semibold text-white">{domain}</span>
-                        </div>
-
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => handleMoveDomainRank(idx, "up")}
-                            disabled={idx === 0}
-                            className="p-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 text-slate-300"
-                            title="Move Up"
-                          >
-                            ▲
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleMoveDomainRank(idx, "down")}
-                            disabled={idx === selectedDomains.length - 1}
-                            className="p-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 text-slate-300"
-                            title="Move Down"
-                          >
-                            ▼
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleToggleDomain(domain)}
-                            className="p-1 text-rose-400 hover:text-rose-300"
-                            title="Remove"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                {loadingDomains ? (
+                  <div className="flex items-center gap-2 text-xs text-slate-400 py-4 justify-center">
+                    <Loader2 className="h-4 w-4 animate-spin text-cyan-400" />
+                    Loading available domains from catalog...
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {availableDomains.map((domain) => {
+                      const isSelected = selectedDomainIds.includes(domain.id);
+                      const rankIndex = selectedDomainIds.indexOf(domain.id);
+                      return (
+                        <button
+                          key={domain.id}
+                          type="button"
+                          onClick={() => handleToggleDomain(domain.id)}
+                          className={`p-3 rounded-xl border text-left text-xs transition-all flex items-start justify-between gap-2 ${
+                            isSelected
+                              ? "bg-cyan-500/15 border-cyan-400 text-white shadow-md shadow-cyan-950/40"
+                              : "bg-white/[0.02] border-white/5 text-slate-300 hover:bg-white/[0.06] hover:border-white/15"
+                          }`}
+                        >
+                          <div className="space-y-1">
+                            <span className="font-semibold block text-white">
+                              {domain.name}
+                            </span>
+                            {domain.description && (
+                              <p className="text-[11px] text-slate-400 line-clamp-2">
+                                {domain.description}
+                              </p>
+                            )}
+                          </div>
+                          {isSelected && (
+                            <span className="shrink-0 h-5 px-1.5 rounded-full bg-cyan-400 text-slate-950 font-bold text-[10px] flex items-center justify-center">
+                              #{rankIndex + 1}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
 
-                {/* Available domains chips */}
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {DOMAINS_LIST.map((domain) => {
-                    const isSelected = selectedDomains.includes(domain);
-                    return (
-                      <button
-                        key={domain}
-                        type="button"
-                        onClick={() => handleToggleDomain(domain)}
-                        className={`text-xs px-3 py-1.5 rounded-xl border transition-all ${
-                          isSelected
-                            ? "bg-violet-600/20 border-violet-400 text-violet-200 font-semibold"
-                            : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
-                        }`}
-                      >
-                        {isSelected ? "✓ " : "+ "}
-                        {domain}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Optional Notes */}
-              <div className="space-y-1.5 pt-1">
-                <label className="text-xs font-semibold text-slate-300">
-                  Specific Concerns, Aspirations or Family Considerations (Optional)
-                </label>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="e.g. Prefer colleges with campus placement guarantees or opportunities near home state."
-                  rows={2}
-                  className="w-full rounded-xl border border-white/10 bg-slate-900/60 p-3 text-xs text-slate-100 placeholder:text-slate-500 shadow-inner focus:border-cyan-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="flex items-center gap-2 pt-1 text-[11px] text-slate-400">
-                <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
-                <span>
-                  Both parties have contributed. The NextPath Engine will now normalize the vectors and generate the unified roadmap.
-                </span>
+                {/* Ranked Order Controller */}
+                {selectedDomainIds.length > 0 && (
+                  <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 space-y-2 mt-2">
+                    <span className="text-xs font-semibold text-slate-300">
+                      Preference Priority (1st Choice to 3rd Choice):
+                    </span>
+                    <div className="space-y-1.5">
+                      {selectedDomainIds.map((domainId, idx) => {
+                        const domainObj = availableDomains.find((d) => d.id === domainId);
+                        return (
+                          <div
+                            key={domainId}
+                            className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5 text-xs text-white"
+                          >
+                            <span className="flex items-center gap-2">
+                              <span className="font-mono font-bold text-cyan-400">
+                                Choice #{idx + 1}:
+                              </span>
+                              <span>{domainObj?.name || domainId}</span>
+                            </span>
+                            <div className="flex gap-1">
+                              {idx > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveDomainRank(idx, "up")}
+                                  className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px]"
+                                >
+                                  ▲ Up
+                                </button>
+                              )}
+                              {idx < selectedDomainIds.length - 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveDomainRank(idx, "down")}
+                                  className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px]"
+                                >
+                                  ▼ Down
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
 
-            <CardFooter className="pt-4 border-t border-white/5">
+            <CardFooter className="pt-4 border-t border-white/5 flex items-center justify-between">
+              <span className="text-xs text-slate-500">
+                Data used strictly for deterministic solver constraints.
+              </span>
               <Button
                 type="submit"
-                disabled={loading}
-                variant="glow"
-                className="w-full gap-2 font-semibold shadow-xl shadow-cyan-600/25"
+                disabled={loading || selectedDomainIds.length !== 3}
+                className="bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-950/50"
               >
-                <span>{loading ? "Generating Roadmap..." : "Synthesize Multi-Vector Roadmap"}</span>
-                <ArrowRight className="h-4 w-4" />
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving Parameters &amp; Consenting...
+                  </>
+                ) : (
+                  <>
+                    Save Constraints &amp; Launch Dashboard
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </>
+                )}
               </Button>
             </CardFooter>
           </form>

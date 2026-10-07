@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Compass, Menu, X, ShieldAlert } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Compass, Menu, X, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
@@ -16,7 +17,23 @@ const NAV_ITEMS = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [launchingDemo, setLaunchingDemo] = React.useState(false);
+
+  const handleLaunchDemo = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setLaunchingDemo(true);
+    try {
+      const res = await api.runDemo();
+      router.push(`/dashboard?result_id=${res.result_id}`);
+    } catch {
+      router.push("/dashboard");
+    } finally {
+      setLaunchingDemo(false);
+      setMobileOpen(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
@@ -30,7 +47,7 @@ export function Navbar() {
           </div>
           <div className="flex flex-col">
             <span className="text-lg font-black tracking-tight text-white font-[Outfit,sans-serif]">
-              PRISM<span className="text-cyan-400 font-normal ml-0.5">ENGINE</span>
+              NEXT<span className="text-cyan-400 font-normal ml-0.5">PATH</span>
             </span>
             <span className="text-[10px] font-medium tracking-widest text-slate-400 uppercase -mt-1">
               DataQuest 3.0
@@ -61,12 +78,15 @@ export function Navbar() {
 
         {/* CTA & Demo Button */}
         <div className="hidden sm:flex items-center gap-3">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] text-xs font-semibold tracking-tight transition-all"
+          <button
+            type="button"
+            onClick={handleLaunchDemo}
+            disabled={launchingDemo}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] text-xs font-semibold tracking-tight transition-all active:scale-95 cursor-pointer shadow-sm shadow-[#d4ff3a]/20"
           >
-            <span>Live Demo</span>
-          </Link>
+            <span>{launchingDemo ? "Loading..." : "Live Demo"}</span>
+            <ArrowUpRight className="h-3 w-3 stroke-[2.5]" />
+          </button>
         </div>
 
         {/* Mobile menu trigger */}
@@ -101,13 +121,15 @@ export function Navbar() {
           </div>
 
           <div className="pt-2 border-t border-white/10">
-            <Link
-              href="/dashboard"
-              onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-center p-2.5 rounded-xl bg-[#d4ff3a] text-[#08090a] font-semibold text-xs"
+            <button
+              type="button"
+              onClick={handleLaunchDemo}
+              disabled={launchingDemo}
+              className="w-full flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-[#d4ff3a] text-[#08090a] font-semibold text-xs"
             >
-              <span>Live Demo</span>
-            </Link>
+              <span>{launchingDemo ? "Loading..." : "Live Demo"}</span>
+              <ArrowUpRight className="h-3.5 w-3.5 stroke-[2.5]" />
+            </button>
           </div>
         </div>
       )}

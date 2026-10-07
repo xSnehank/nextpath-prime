@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 import {
   ArrowUpRight,
   Brain,
@@ -164,9 +166,24 @@ const FAQS = [
 ];
 
 export default function LandingPage() {
+  const router = useRouter();
   const [selectedPersonaId, setSelectedPersonaId] = React.useState("aarav");
   const [budgetSlider, setBudgetSlider] = React.useState(800000);
   const [openFaqIndex, setOpenFaqIndex] = React.useState<number | null>(null);
+  const [launchingDemo, setLaunchingDemo] = React.useState(false);
+
+  const handleLaunchDemo = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setLaunchingDemo(true);
+    try {
+      const res = await api.runDemo();
+      router.push(`/dashboard?result_id=${res.result_id}`);
+    } catch {
+      router.push("/dashboard");
+    } finally {
+      setLaunchingDemo(false);
+    }
+  };
 
   const activePersona = PERSONAS.find((p) => p.id === selectedPersonaId) || PERSONAS[0];
 
@@ -220,12 +237,17 @@ export default function LandingPage() {
 
           {/* Reachwise Signature Pill Action Row */}
           <div className="flex flex-wrap items-center gap-3 pt-2">
-            <Link href="/dashboard" className="rw-pill-btn rw-pill-solid">
-              <span>Launch 1-Click Demo Family</span>
+            <button
+              type="button"
+              onClick={handleLaunchDemo}
+              disabled={launchingDemo}
+              className="rw-pill-btn rw-pill-solid"
+            >
+              <span>{launchingDemo ? "Loading Demo..." : "Launch 1-Click Demo Family"}</span>
               <span className="rw-arrow-chip">
                 <ArrowUpRight className="h-4 w-4 stroke-[2.5]" />
               </span>
-            </Link>
+            </button>
 
             <Link href="/assessment/student" className="rw-pill-btn rw-pill-ghost">
               <span>Start Student Assessment</span>
@@ -866,12 +888,17 @@ export default function LandingPage() {
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-3 pt-4 relative z-10">
-              <Link href="/dashboard" className="rw-pill-btn rw-pill-solid">
-                <span>Launch Instant Demo Family</span>
+              <button
+                type="button"
+                onClick={handleLaunchDemo}
+                disabled={launchingDemo}
+                className="rw-pill-btn rw-pill-solid"
+              >
+                <span>{launchingDemo ? "Loading Demo..." : "Launch Instant Demo Family"}</span>
                 <span className="rw-arrow-chip">
                   <ArrowUpRight className="h-4 w-4 stroke-[2.5]" />
                 </span>
-              </Link>
+              </button>
 
               <Link href="/assessment/student" className="rw-pill-btn rw-pill-ghost">
                 <span>Start Student Test (~10 min)</span>

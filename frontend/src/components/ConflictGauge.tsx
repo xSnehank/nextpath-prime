@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle2, Flame, HelpCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Flame } from "lucide-react";
 import type { ConflictResult } from "@/types/api";
 
 interface ConflictGaugeProps {
@@ -34,7 +34,7 @@ export function ConflictGauge({ conflict }: ConflictGaugeProps) {
         textColor: "text-amber-400",
         bgLight: "bg-amber-500/10",
         icon: AlertTriangle,
-        description: "Key differences exist in budget flexibility or risk tolerance.",
+        description: "Key differences exist in budget flexibility, location, or risk tolerance.",
       };
     }
     return {
@@ -44,7 +44,7 @@ export function ConflictGauge({ conflict }: ConflictGaugeProps) {
       textColor: "text-rose-400",
       bgLight: "bg-rose-500/10",
       icon: Flame,
-      description: "Substantial gap between student passion and parental constraints.",
+      description: "Substantial gap between student passion vectors and parental constraints.",
     };
   };
 
@@ -52,8 +52,6 @@ export function ConflictGauge({ conflict }: ConflictGaugeProps) {
   const Icon = config.icon;
 
   // Semicircle gauge calculation:
-  // Angle from -90 deg to +90 deg (or 180 deg arc)
-  // Arc length = PI * r
   const radius = 70;
   const strokeWidth = 14;
   const arcLength = Math.PI * radius; // ~219.9
@@ -129,38 +127,52 @@ export function ConflictGauge({ conflict }: ConflictGaugeProps) {
           </p>
         </div>
 
-        {/* Top 3 Disagreements */}
+        {/* Top Disagreements */}
         <div className="space-y-3 pt-2 border-t border-white/5">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
-            <span>Top 3 Friction Drivers</span>
-            <span className="text-slate-400">Divergence Gap</span>
+            <span>Primary Divergence Drivers</span>
+            <span className="text-slate-400">Gap Magnitude</span>
           </div>
 
           <div className="space-y-2.5">
-            {topDisagreements.map((item, idx) => (
-              <div
-                key={idx}
-                className="p-3 rounded-xl bg-white/[0.03] border border-white/5 space-y-2 hover:bg-white/[0.06] transition-colors"
-              >
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-slate-200">{item.area}</span>
-                  <span className="font-mono font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
-                    Δ {item.gap} pts
-                  </span>
-                </div>
+            {topDisagreements && topDisagreements.length > 0 ? (
+              topDisagreements.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="p-3 rounded-xl bg-white/[0.03] border border-white/5 space-y-2 hover:bg-white/[0.06] transition-colors"
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-semibold text-slate-200 capitalize">
+                      {item.dimension}
+                    </span>
+                    <span className="font-mono font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
+                      Δ {item.gap}%
+                    </span>
+                  </div>
 
-                <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-white/[0.04]">
-                  <div className="flex items-center justify-between bg-violet-950/30 px-2 py-1 rounded border border-violet-500/20">
-                    <span className="text-violet-300">Student:</span>
-                    <span className="font-semibold text-white">{item.studentValue}%</span>
-                  </div>
-                  <div className="flex items-center justify-between bg-cyan-950/30 px-2 py-1 rounded border border-cyan-500/20">
-                    <span className="text-cyan-300">Parent:</span>
-                    <span className="font-semibold text-white">{item.parentValue}%</span>
+                  {item.text && (
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      {item.text}
+                    </p>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-white/[0.04]">
+                    <div className="flex flex-col bg-violet-950/30 p-2 rounded border border-violet-500/20 space-y-0.5">
+                      <span className="text-[10px] text-violet-300 uppercase tracking-wide">Student Side:</span>
+                      <span className="font-semibold text-white truncate">{item.studentValue}</span>
+                    </div>
+                    <div className="flex flex-col bg-cyan-950/30 p-2 rounded border border-cyan-500/20 space-y-0.5">
+                      <span className="text-[10px] text-cyan-300 uppercase tracking-wide">Parent Side:</span>
+                      <span className="font-semibold text-white truncate">{item.parentValue}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-xs text-slate-400 italic text-center py-2">
+                No significant divergence points detected.
+              </p>
+            )}
           </div>
         </div>
       </CardContent>

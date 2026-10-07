@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, ArrowUpRight, Brain, Banknote, LayoutDashboard, Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 interface NavItem {
   id: string;
@@ -23,9 +24,25 @@ const NAV_ITEMS: NavItem[] = [
 
 export function FloatingPillNavbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [hoveredItem, setHoveredItem] = React.useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+  const [launchingDemo, setLaunchingDemo] = React.useState(false);
+
+  const handleLaunchDemo = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setLaunchingDemo(true);
+    try {
+      const res = await api.runDemo();
+      router.push(`/dashboard?result_id=${res.result_id}`);
+    } catch {
+      router.push("/dashboard");
+    } finally {
+      setLaunchingDemo(false);
+      setMobileMenuOpen(false);
+    }
+  };
 
   // Detect scroll to adjust pill shadow & opacity
   React.useEffect(() => {
@@ -144,12 +161,17 @@ export function FloatingPillNavbar() {
 
           {/* Right Action CTA (Pill End) */}
           <div className="flex items-center gap-1.5 pl-1">
-            <Link href="/dashboard" className="hidden sm:inline-block">
+            <button
+              type="button"
+              onClick={handleLaunchDemo}
+              disabled={launchingDemo}
+              className="hidden sm:inline-block"
+            >
               <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] text-xs font-semibold tracking-tight transition-all active:scale-95 cursor-pointer shadow-sm shadow-[#d4ff3a]/20">
-                <span>Live Demo</span>
+                <span>{launchingDemo ? "Loading..." : "Live Demo"}</span>
                 <ArrowUpRight className="h-3 w-3 stroke-[2.5]" />
               </span>
-            </Link>
+            </button>
 
             {/* Mobile Hamburger Trigger */}
             <button
@@ -200,16 +222,15 @@ export function FloatingPillNavbar() {
             </div>
 
             <div className="pt-3 mt-2 border-t border-white/[0.08]">
-              <Link
-                href="/dashboard"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full"
+              <button
+                type="button"
+                onClick={handleLaunchDemo}
+                disabled={launchingDemo}
+                className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] font-semibold text-xs transition-colors"
               >
-                <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] font-semibold text-xs transition-colors">
-                  <span>Launch 1-Click Demo Family</span>
-                  <ArrowUpRight className="h-4 w-4 stroke-[2.5]" />
-                </div>
-              </Link>
+                <span>{launchingDemo ? "Loading Demo..." : "Launch 1-Click Demo Family"}</span>
+                <ArrowUpRight className="h-4 w-4 stroke-[2.5]" />
+              </button>
             </div>
           </motion.div>
         )}

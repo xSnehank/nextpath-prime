@@ -1,42 +1,81 @@
 /* ============================================
-   PRISM Engine — Shared API Types
-   Matches the OpenAPI contract from backend.
+   PRISM Engine — Shared API & Component Types
+   Derived strictly from backend/openapi/openapi.json
    ============================================ */
+
+import type { components } from "./openapi";
+
+export type Role = components["schemas"]["Role"];
+export type IndianState = components["schemas"]["IndianState"];
+export type Dimension = components["schemas"]["Dimension"];
+export type TraitGroup = components["schemas"]["TraitGroup"];
+export type ErrorCode = components["schemas"]["ErrorCode"];
 
 // ---------- Questions ----------
 
-export interface Question {
-  id: string;
-  audience: "student" | "parent";
-  category: "aptitude" | "interest" | "thinking_style" | "budget" | "risk" | "aspiration";
-  text: string;
-  type: "likert" | "scale" | "choice" | "number" | "rank";
-  options?: string[];
-  min?: number;
-  max?: number;
+export interface AnswerOption {
+  value: number;
+  label: string;
 }
 
-// ---------- Scores & Domains ----------
+export interface Question {
+  id: string; // UUID from backend
+  group: TraitGroup;
+  dimension: Dimension;
+  text: string;
+  options: AnswerOption[];
+  required: boolean;
+  audience?: Role;
+  type?: "likert";
+}
+
+// ---------- Domain & Domain Scores ----------
+
+export interface DomainItem {
+  id: string;
+  name: string;
+  description: string | null;
+}
 
 export interface DomainScore {
+  domainId: string;
   domain: string;
-  aptitude: number;      // 0-100
-  interest: number;      // 0-100
-  cognitiveFit: number;  // 0-100
-  composite: number;     // weighted combination
+  fit: number;         // 0-100 scaled for display
+  aptitude: number;    // 0-100 scaled for display
+  interest: number;    // 0-100 scaled for display
+  cognitive: number;   // 0-100 scaled for display
+  cognitiveFit?: number; // alias for backwards compatibility
+  composite?: number;    // alias for backwards compatibility
+  raw: {
+    fit: number;
+    aptitude: number;
+    interest: number;
+    cognitive: number;
+  };
 }
 
-// ---------- Conflict Index ----------
+export interface Trait {
+  dimension: Dimension;
+  group: TraitGroup;
+  value: number | null; // 0..1
+}
+
+// ---------- Conflict Index & Gaps ----------
+
+export interface ConflictGap {
+  area: string;
+  dimension: string;
+  gap: number;
+  text: string;
+  studentValue: string;
+  parentValue: string;
+}
 
 export interface ConflictResult {
   index: number;         // 0-100
   label: "low" | "moderate" | "high";
-  topDisagreements: {
-    area: string;
-    studentValue: number;
-    parentValue: number;
-    gap: number;
-  }[];
+  topDisagreements: ConflictGap[];
+  gaps: ConflictGap[];
 }
 
 // ---------- Finance ----------
@@ -44,37 +83,53 @@ export interface ConflictResult {
 export interface FinancePath {
   careerId: string;
   careerName: string;
-  totalCost4Year: number;       // INR
-  familyShare: number;
-  loanNeeded: number;
-  expectedStartingSalary: number;
-  breakEvenYears: number;
-  isViable: boolean;
-  failReason?: string;
-  cheaperAlternative?: string;
+  totalCost4Year: number;       // INR (finance.total_cost)
+  totalCost: number;            // INR
+  familyShare: number;          // INR (finance.capacity)
+  capacity: number;             // INR
+  loanNeeded: number;           // INR
+  expectedStartingSalary: number; // INR (finance.starting_salary)
+  startingSalary: number;       // INR
+  breakEvenYears: number;       // finance.breakeven_years
+  durationYears: number;
+  isViable: boolean;            // finance.viable
+  viable: boolean;
+  failReason?: string;          // formatted from finance.reasons
+  reasons: components["schemas"]["FinanceReason"][];
+  cheaperAlternative?: string | null;
 }
 
 // ---------- Market ----------
 
+export interface MarketRegionItem {
+  region: string;
+  demandIndex: number;       // 0-100
+  medianSalary: number;      // INR annual
+  growth: string;            // e.g. "+16%"
+}
+
 export interface MarketData {
   careerId: string;
   careerName: string;
-  regions: {
-    region: string;
-    demandIndex: number;       // 0-100
-    medianSalary: number;      // INR annual
-    growth: string;            // e.g. "+12%"
-  }[];
+  region: string;
+  demandIndex: number;       // 0-100
+  growthRate: number | null;
+  growth: string;            // formatted e.g. "+22%"
+  medianSalary: number | null;
+  entrySalary: number | null;
+  asOf: string;              // date string
   source: string;
-  asOf: string;                // ISO date
+  dataQuality: "sourced" | "estimated";
+  regions: MarketRegionItem[];
 }
 
-// ---------- Roadmap ----------
+// ---------- Roadmap & Careers ----------
 
 export interface CollegeInfo {
   name: string;
   location: string;
   ranking?: number;
+  annualFee?: number;
 }
 
 export interface ExamInfo {
@@ -88,21 +143,35 @@ export interface ScholarshipInfo {
   amount: string;
   eligibility: string;
   deadline: string;
+  matchedRule: string;
 }
 
 export interface CareerPath {
-  id: string;
+  id: string; // career_id
   rank: number;
   domain: string;
   title: string;
-  finalScore: number;
-  compositeScore: number;
-  financialViability: number;
-  marketDemand: number;
+  career: string;
+  finalScore: number;         // 0-100 display (scores.final_100)
+  compositeScore: number;     // 0-100 display (round(scores.fit * 100))
+  financialViability: number; // 0-100 display (round(scores.finance * 100))
+  marketDemand: number;       // 0-100 display (round(scores.market * 100))
+  financeViable: boolean;     // finance.viable
+  rawScores: {
+    fit: number;
+    finance: number;
+    market: number;
+    final: number;
+    final100: number;
+  };
+  finance: FinancePath;
+  market: MarketData;
   exams: ExamInfo[];
+  rawExams: string[];
   colleges: CollegeInfo[];
   scholarships: ScholarshipInfo[];
   timeline: string;
+  cheaperAlternative: string | null;
   explanation?: string;
 }
 
@@ -110,6 +179,7 @@ export interface CareerPath {
 
 export interface SwotItem {
   text: string;
+  value: number;
   relatedDomain?: string;
   score?: number;
 }
@@ -124,32 +194,47 @@ export interface SwotAnalysis {
 // ---------- Full Analyze Response ----------
 
 export interface AnalyzeResponse {
-  studentId: string;
-  parentId: string;
+  resultId: string;
+  studentId?: string;
+  parentId?: string;
+  weights: {
+    fit: number;
+    finance: number;
+    market: number;
+  };
   domainScores: DomainScore[];
+  traits: Trait[];
   conflict: ConflictResult;
   finance: FinancePath[];
   market: MarketData[];
   roadmap: CareerPath[];
+  rejected: {
+    careerId: string;
+    career: string;
+    reasons: components["schemas"]["FinanceReason"][];
+    cheaperAlternative: string | null;
+  }[];
   swot?: SwotAnalysis;
-  generatedAt: string;  // ISO datetime
+  createdAt: string;
+  generatedAt: string; // alias for backwards compatibility
 }
 
 // ---------- Explain ----------
 
 export interface ExplainResponse {
   careerId: string;
-  explanation: string;  // under 150 words, cites scores
+  text: string;
+  source: "cache" | "gemini" | "template";
+  explanation?: string; // backwards compatibility
 }
 
-// ---------- User ----------
+// ---------- User & Profile ----------
 
-export interface User {
-  id: string;
-  email: string;
-  role: "student" | "parent";
-  name: string;
-  grade?: string;
-  state?: string;
-  linkedUserId?: string;
-}
+export type MeResponse = components["schemas"]["MeResponse"];
+export type ParentProfile = components["schemas"]["ParentProfile"];
+export type StudentProfile = components["schemas"]["StudentProfile"];
+export type CareerMarket = components["schemas"]["CareerMarket"];
+export type DemoRunResponse = components["schemas"]["DemoRunResponse"];
+export type LinkResponse = components["schemas"]["LinkResponse"];
+export type InviteResponse = components["schemas"]["InviteResponse"];
+export type ConsentResponse = components["schemas"]["ConsentResponse"];
