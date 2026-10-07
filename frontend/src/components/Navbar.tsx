@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Compass, Menu, X, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
@@ -26,9 +26,10 @@ export function Navbar() {
     setLaunchingDemo(true);
     try {
       const res = await api.runDemo();
-      router.push(`/dashboard?result_id=${res.result_id}`);
-    } catch {
-      router.push("/dashboard");
+      router.push(`/dashboard?result_id=${res.result_id}&demo=1`);
+    } catch (err) {
+      console.error("Live demo launch failed:", err);
+      alert(err instanceof ApiError ? err.message : "Failed to launch live demo. Please ensure the backend is running.");
     } finally {
       setLaunchingDemo(false);
       setMobileOpen(false);

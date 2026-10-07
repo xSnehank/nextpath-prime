@@ -14,7 +14,7 @@ interface PdfExportButtonProps {
 
 export function PdfExportButton({
   data,
-  studentName = "Aarav Sharma",
+  studentName = "Student",
   parentName = "Parent",
 }: PdfExportButtonProps) {
   const [exporting, setExporting] = React.useState(false);

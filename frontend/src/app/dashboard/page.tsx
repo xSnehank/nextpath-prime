@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,9 +30,20 @@ import {
 import { api, ApiError } from "@/lib/api";
 import type { AnalyzeResponse, CareerPath } from "@/types/api";
 
+const DEFAULT_WEIGHTS: WeightVector = {
+  fit: 0.45,
+  finance: 0.30,
+  market: 0.25,
+  alpha: 0.45,
+  beta: 0.30,
+  gamma: 0.25,
+};
+
 function DashboardContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const queryResultId = searchParams.get("result_id");
+  const isDemo = searchParams.get("demo") === "1";
 
   // Real backend analysis data state - NO hardcoded INITIAL_ANALYSIS (Comment 3/14)
   const [data, setData] = React.useState<AnalyzeResponse | null>(null);
@@ -43,27 +54,30 @@ function DashboardContent() {
     details?: Record<string, unknown>;
   } | null>(null);
 
-  const [studentName, setStudentName] = React.useState("Aarav Sharma");
-  const [parentName, setParentName] = React.useState("Rajesh Sharma");
+  // Names derived strictly from GET /me (Items 5a, 5b, 5c: no hard-coded defaults)
+  const [studentName, setStudentName] = React.useState("");
+  const [parentName, setParentName] = React.useState("");
+
+  // Missing prerequisites tracking when analysis cannot run yet (Item 3b)
+  const [missingPrerequisites, setMissingPrerequisites] = React.useState<{
+    role: "student" | "parent";
+    hasPair: boolean;
+    userAssessmentComplete: boolean;
+    userConsented: boolean;
+    partnerAssessmentComplete: boolean;
+    partnerConsented: boolean;
+  } | null>(null);
 
   // Dynamic weights state for What-If sensitivity recalculation (Comment 5/14 & 9/14)
-  const defaultWeights: WeightVector = {
-    fit: 0.45,
-    finance: 0.30,
-    market: 0.25,
-    alpha: 0.45,
-    beta: 0.30,
-    gamma: 0.25,
-  };
-  const [weights, setWeights] = React.useState<WeightVector>(defaultWeights);
+  const [weights, setWeights] = React.useState<WeightVector>(DEFAULT_WEIGHTS);
 
   // Store active career by ID, NOT index (Comment 13/14 fix)
   const [selectedCareerId, setSelectedCareerId] = React.useState<string>("");
   const [formattedDate, setFormattedDate] = React.useState("");
 
-  // AI explanation state per career from POST /explain (Comment 4/14 fix)
+  // AI explanation state per career from POST /explain (Item 8)
   const [aiExplanations, setAiExplanations] = React.useState<
-    Record<string, { text: string; source: string }>
+    Record<string, { text?: string; source?: string; error?: boolean }>
   >({});
   const [loadingAi, setLoadingAi] = React.useState(false);
 
@@ -71,6 +85,37 @@ function DashboardContent() {
   const [activeTab, setActiveTab] = React.useState<
     "roadmap" | "alignment" | "finance" | "market" | "swot"
   >("roadmap");
+
+  const fetchExplanation = React.useCallback(
+    async (careerId: string) => {
+      if (!data) return;
+      setLoadingAi(true);
+      try {
+        const res = await api.explain({
+          result_id: data.resultId,
+          career_id: careerId,
+        });
+        setAiExplanations((prev) => ({
+          ...prev,
+          [careerId]: {
+            text: res.text,
+            source: res.source,
+          },
+        }));
+      } catch (err) {
+        console.warn("AI explanation fetch failed:", err);
+        setAiExplanations((prev) => ({
+          ...prev,
+          [careerId]: {
+            error: true,
+          },
+        }));
+      } finally {
+        setLoadingAi(false);
+      }
+    },
+    [data]
+  );
 
   // Load real analysis data from API (Comment 2/14 & 3/14)
   React.useEffect(() => {
@@ -89,44 +134,75 @@ function DashboardContent() {
           })
         );
 
-        const sName = localStorage.getItem("prism_student_name");
-        const pName = localStorage.getItem("prism_parent_name");
-        if (sName) setStudentName(sName);
-        if (pName) setParentName(pName);
-
         let result: AnalyzeResponse | null = null;
 
-        // Path A: Direct result_id provided in query params (e.g. from demo/run or saved link)
+        // Path A: If ?result_id= is present, call GET /results/{id} (Item 3b)
         if (queryResultId) {
           result = await api.getResults(queryResultId);
-        } else {
-          // Path B: Identity discovery via GET /me
-          try {
-            const me = await api.getMe();
-            if (me.full_name) setStudentName(me.full_name);
 
-            if (me.latest_result_id) {
-              result = await api.getResults(me.latest_result_id);
-            } else if (me.pair && me.progress.assessment_complete) {
-              // Run POST /analyze
-              result = await api.analyze({
-                student_id: me.pair.student_id,
-                parent_id: me.pair.parent_id,
-                weights: {
-                  fit: defaultWeights.fit,
-                  finance: defaultWeights.finance,
-                  market: defaultWeights.market,
-                },
-              });
+          if (!isDemo) {
+            try {
+              const me = await api.getMe();
+              const partnerObj = me.partner as { full_name?: string | null } | null;
+              if (me.role === "student") {
+                setStudentName(me.full_name || "");
+                setParentName(partnerObj?.full_name || "your parent");
+              } else if (me.role === "parent") {
+                setParentName(me.full_name || "");
+                setStudentName(partnerObj?.full_name || "your child");
+              }
+            } catch {
+              // Ignore failure in direct result mode
             }
-          } catch (meErr) {
-            console.warn("GET /me did not resolve existing pair:", meErr);
+          }
+        } else {
+          // Path B: Identity discovery via GET /me (do NOT swallow error)
+          const me = await api.getMe();
+
+          // Populate names based on me.role (Items 5a, 5b)
+          const partnerObj = me.partner as { full_name?: string | null } | null;
+          if (me.role === "student") {
+            setStudentName(me.full_name || "");
+            setParentName(partnerObj?.full_name || "your parent");
+          } else if (me.role === "parent") {
+            setParentName(me.full_name || "");
+            setStudentName(partnerObj?.full_name || "your child");
           }
 
-          // Path C: If no result yet, launch demo run to provide working sandbox
-          if (!result) {
-            const demoRes = await api.runDemo();
-            result = await api.getResults(demoRes.result_id);
+          if (me.latest_result_id) {
+            // me.latest_result_id exists: call GET /results/{latest_result_id}
+            result = await api.getResults(me.latest_result_id);
+          } else if (
+            me.pair &&
+            me.progress?.assessment_complete &&
+            me.consented &&
+            me.partner?.assessment_complete &&
+            me.partner?.consented
+          ) {
+            // Run POST /analyze with pair ids
+            result = await api.analyze({
+              student_id: me.pair.student_id,
+              parent_id: me.pair.parent_id,
+              weights: {
+                fit: DEFAULT_WEIGHTS.fit,
+                finance: DEFAULT_WEIGHTS.finance,
+                market: DEFAULT_WEIGHTS.market,
+              },
+            });
+          } else {
+            // Otherwise: show status screen listing what is still missing
+            if (active) {
+              setMissingPrerequisites({
+                role: me.role,
+                hasPair: Boolean(me.pair),
+                userAssessmentComplete: Boolean(me.progress?.assessment_complete),
+                userConsented: Boolean(me.consented),
+                partnerAssessmentComplete: Boolean(me.partner?.assessment_complete),
+                partnerConsented: Boolean(me.partner?.consented),
+              });
+              setLoading(false);
+              return;
+            }
           }
         }
 
@@ -171,7 +247,7 @@ function DashboardContent() {
     return () => {
       active = false;
     };
-  }, [queryResultId]);
+  }, [queryResultId, isDemo]);
 
   // Dynamic ranking based on linked weights (Comment 9/14)
   // Keeps viable paths first; recomputes linear blend: w_fit*fit + w_fin*finance + w_market*market
@@ -207,53 +283,20 @@ function DashboardContent() {
   const activeCareer: CareerPath | undefined =
     rankedRoadmap.find((c) => c.id === selectedCareerId) || rankedRoadmap[0];
 
-  // Request real AI explanation for active career via POST /explain (Comment 4/14)
+  // Request real AI explanation for active career via POST /explain (Item 8)
   React.useEffect(() => {
     if (!activeCareer || !data) return;
-    const career = activeCareer;
-    if (aiExplanations[career.id]) return;
+    const careerId = activeCareer.id;
+    if (aiExplanations[careerId]) return;
 
-    let cancelled = false;
-    const timer = setTimeout(async () => {
-      setLoadingAi(true);
-      try {
-        const res = await api.explain({
-          result_id: data.resultId,
-          career_id: career.id,
-        });
-
-        if (!cancelled) {
-          setAiExplanations((prev) => ({
-            ...prev,
-            [career.id]: {
-              text: res.text,
-              source: res.source,
-            },
-          }));
-        }
-      } catch (err) {
-        console.warn("AI explanation fetch failed:", err);
-        if (!cancelled) {
-          setAiExplanations((prev) => ({
-            ...prev,
-            [career.id]: {
-              text: `${career.title} achieves a final score of ${career.finalScore}/100 based on ${career.compositeScore}/100 psychometric affinity and ${career.marketDemand}% regional market demand.`,
-              source: "cache",
-            },
-          }));
-        }
-      } finally {
-        if (!cancelled) {
-          setLoadingAi(false);
-        }
-      }
+    const timer = setTimeout(() => {
+      fetchExplanation(careerId);
     }, 0);
 
     return () => {
-      cancelled = true;
       clearTimeout(timer);
     };
-  }, [activeCareer?.id, data?.resultId]);
+  }, [activeCareer, data, fetchExplanation, aiExplanations]);
 
   // Loading State
   if (loading) {
@@ -272,7 +315,125 @@ function DashboardContent() {
     );
   }
 
-  // Error State with error.code branching (Comment 11/14)
+  // Missing Prerequisites Status Screen (Item 3b)
+  if (missingPrerequisites) {
+    const isStudent = missingPrerequisites.role === "student";
+    const partnerRole = isStudent ? "parent" : "child";
+
+    const items = [
+      {
+        title: "Your Assessment",
+        description: isStudent
+          ? "Complete your 30-question psychometric battery."
+          : "Calibrate your household education budget, savings, and debt limits.",
+        complete: missingPrerequisites.userAssessmentComplete,
+        action: !missingPrerequisites.userAssessmentComplete ? (
+          <Link href={isStudent ? "/assessment/student" : "/assessment/parent"}>
+            <Button size="sm" className="text-xs bg-violet-600 hover:bg-violet-500">
+              Complete Assessment
+            </Button>
+          </Link>
+        ) : null,
+      },
+      {
+        title: `Link With Your ${partnerRole === "parent" ? "Parent" : "Child"}`,
+        description: isStudent
+          ? "Share your invite code with your parent so they can join your family account."
+          : "Enter the student invite code to link your family profile.",
+        complete: missingPrerequisites.hasPair,
+        action: !missingPrerequisites.hasPair ? (
+          <Link href={isStudent ? "/assessment/student" : "/parent/join"}>
+            <Button size="sm" variant="outline" className="text-xs border-cyan-500/30 text-cyan-300">
+              {isStudent ? "Get Invite Code" : "Join Family Link"}
+            </Button>
+          </Link>
+        ) : null,
+      },
+      {
+        title: `${partnerRole === "parent" ? "Parent" : "Child"}'s Assessment`,
+        description: `Waiting for your ${partnerRole} to submit their calibrated assessment profile.`,
+        complete: missingPrerequisites.partnerAssessmentComplete,
+        action: null,
+      },
+      {
+        title: "Your Data Sharing Consent",
+        description: "Explicit permission to compare results while safeguarding private answers.",
+        complete: missingPrerequisites.userConsented,
+        action: !missingPrerequisites.userConsented ? (
+          <Link href={isStudent ? "/assessment/student" : "/assessment/parent"}>
+            <Button size="sm" className="text-xs bg-emerald-600 hover:bg-emerald-500">
+              Grant Consent
+            </Button>
+          </Link>
+        ) : null,
+      },
+      {
+        title: `${partnerRole === "parent" ? "Parent" : "Child"}'s Data Sharing Consent`,
+        description: `Waiting for your ${partnerRole} to review and grant cross-generational consent.`,
+        complete: missingPrerequisites.partnerConsented,
+        action: null,
+      },
+    ];
+
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center min-h-[70vh] px-4 max-w-2xl mx-auto py-12 space-y-6">
+        <div className="text-center space-y-2">
+          <Badge variant="cyan">Action Items Required</Badge>
+          <h2 className="text-2xl font-bold text-white tracking-tight">
+            Roadmap Calibration Prerequisites
+          </h2>
+          <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+            PRISM Engine generates multi-stakeholder roadmaps once both family members have completed their calibrated inputs and granted sharing consent.
+          </p>
+        </div>
+
+        <div className="w-full space-y-3">
+          {items.map((item, idx) => (
+            <div
+              key={idx}
+              className="p-4 rounded-xl border border-white/10 bg-slate-900/60 backdrop-blur-md flex items-center justify-between gap-4"
+            >
+              <div className="flex items-start gap-3">
+                <div
+                  className={`mt-0.5 h-5 w-5 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
+                    item.complete
+                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
+                      : "bg-slate-800 text-slate-500 border border-white/10"
+                  }`}
+                >
+                  {item.complete ? "✓" : idx + 1}
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+                    {item.title}
+                    {item.complete && (
+                      <span className="text-[10px] text-emerald-400 font-mono font-normal">
+                        (Completed)
+                      </span>
+                    )}
+                  </h4>
+                  <p className="text-xs text-slate-400 mt-0.5">{item.description}</p>
+                </div>
+              </div>
+              {item.action}
+            </div>
+          ))}
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => window.location.reload()}
+          className="text-xs"
+        >
+          <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
+          Refresh Status
+        </Button>
+      </div>
+    );
+  }
+
+  // Error State with error.code branching (Item 3d: keep CONSENT_REQUIRED and ASSESSMENT_INCOMPLETE)
   if (errorInfo || !data) {
     const isConsentRequired = errorInfo?.code === "CONSENT_REQUIRED";
     const isIncomplete = errorInfo?.code === "ASSESSMENT_INCOMPLETE";
@@ -303,14 +464,14 @@ function DashboardContent() {
         <div className="flex gap-2 pt-2">
           {isConsentRequired ? (
             <Button
-              onClick={() => routerPush("/assessment/student")}
+              onClick={() => router.push("/assessment/student")}
               className="bg-violet-600 hover:bg-violet-500 text-xs"
             >
               Review Consent Status
             </Button>
           ) : isIncomplete ? (
             <Button
-              onClick={() => routerPush("/assessment/student")}
+              onClick={() => router.push("/assessment/student")}
               className="bg-violet-600 hover:bg-violet-500 text-xs"
             >
               Complete Assessment
@@ -331,11 +492,16 @@ function DashboardContent() {
 
   return (
     <div className="flex-1 px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto w-full space-y-8">
-      {/* Top Header Banner */}
+      {/* Top Header Banner (Items 3c, 5c, 6) */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl border border-white/[0.08] bg-[#121316]">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Badge variant="default">MULTI-VECTOR ROADMAP</Badge>
+            {isDemo && (
+              <Badge variant="outline" className="bg-amber-500/15 text-amber-300 border-amber-500/30 font-semibold">
+                Demo family (sample data)
+              </Badge>
+            )}
             <span className="text-xs font-mono text-[#75766f]">
               Evaluated: {formattedDate || "Live"}
             </span>
@@ -344,7 +510,19 @@ function DashboardContent() {
             Family Career Command Center
           </h1>
           <p className="text-xs text-[#75766f]">
-            Candidate: <strong className="text-slate-200">{studentName}</strong> • Domicile: Maharashtra • Primary Aspirant Focus: Engineering &amp; Technology
+            {!isDemo && (
+              <>
+                Candidate: <strong className="text-slate-200">{studentName || "—"}</strong>
+              </>
+            )}
+            {data.domainScores?.[0]?.domain && (
+              <>
+                {!isDemo ? " • " : ""}Best-fit domain:{" "}
+                <span className="text-slate-200 font-medium">
+                  {data.domainScores[0].domain}
+                </span>
+              </>
+            )}
           </p>
         </div>
 
@@ -355,8 +533,8 @@ function DashboardContent() {
               ...data,
               roadmap: rankedRoadmap,
             }}
-            studentName={studentName}
-            parentName={parentName}
+            studentName={isDemo ? "Demo Student" : (studentName || "Student")}
+            parentName={isDemo ? "Demo Parent" : (parentName || "Parent")}
           />
 
           <Link href="/assessment/student">
@@ -443,7 +621,7 @@ function DashboardContent() {
           <WhatIfSliders
             weights={weights}
             onChange={(newW) => setWeights(newW)}
-            onReset={() => setWeights(defaultWeights)}
+            onReset={() => setWeights(DEFAULT_WEIGHTS)}
           />
 
           {/* Master-Detail Roadmap Layout */}
@@ -548,24 +726,39 @@ function DashboardContent() {
                   </CardHeader>
 
                   <CardContent className="space-y-6 pt-4">
-                    {/* Capped LLM / Engine Explanation Card (Comment 4/14 fix) */}
+                    {/* Capped LLM / Engine Explanation Card (Item 8) */}
                     <div className="p-4 rounded-xl bg-violet-950/20 border border-violet-500/30 space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-300">
                           <Bot className="h-4 w-4" />
                           <span>Deterministic Decision Explanation</span>
                         </div>
-                        {aiExplanations[activeCareer.id] && (
-                          <Badge variant="outline" className="text-[10px] uppercase font-mono">
-                            {aiExplanations[activeCareer.id].source}
-                          </Badge>
-                        )}
+                        {aiExplanations[activeCareer.id]?.source &&
+                          !aiExplanations[activeCareer.id]?.error && (
+                            <Badge variant="outline" className="text-[10px] uppercase font-mono">
+                              {aiExplanations[activeCareer.id].source}
+                            </Badge>
+                          )}
                       </div>
 
                       {loadingAi ? (
                         <div className="flex items-center gap-2 text-xs text-slate-400 py-1">
                           <Loader2 className="h-3.5 w-3.5 animate-spin text-violet-400" />
                           <span>Generating synthesis from empirical result metrics...</span>
+                        </div>
+                      ) : aiExplanations[activeCareer.id]?.error ? (
+                        <div className="flex items-center justify-between text-xs py-1">
+                          <span className="text-slate-400">Explanation unavailable</span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => fetchExplanation(activeCareer.id)}
+                            className="h-7 text-xs border-violet-500/30 text-violet-300 hover:bg-violet-950/30"
+                          >
+                            <RotateCcw className="h-3 w-3 mr-1" />
+                            Retry
+                          </Button>
                         </div>
                       ) : (
                         <p className="text-xs text-slate-200 leading-relaxed font-sans">
@@ -699,12 +892,6 @@ function DashboardContent() {
       )}
     </div>
   );
-}
-
-function routerPush(href: string) {
-  if (typeof window !== "undefined") {
-    window.location.href = href;
-  }
 }
 
 export default function DashboardPage() {

@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, ArrowUpRight, Brain, Banknote, LayoutDashboard, Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 
 interface NavItem {
   id: string;
@@ -35,9 +35,10 @@ export function FloatingPillNavbar() {
     setLaunchingDemo(true);
     try {
       const res = await api.runDemo();
-      router.push(`/dashboard?result_id=${res.result_id}`);
-    } catch {
-      router.push("/dashboard");
+      router.push(`/dashboard?result_id=${res.result_id}&demo=1`);
+    } catch (err) {
+      console.error("Live demo launch failed:", err);
+      alert(err instanceof ApiError ? err.message : "Failed to launch live demo. Please ensure the backend is running.");
     } finally {
       setLaunchingDemo(false);
       setMobileMenuOpen(false);

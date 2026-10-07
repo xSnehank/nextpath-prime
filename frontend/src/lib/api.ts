@@ -9,8 +9,11 @@
  *   into clean component types without fictional data.
  */
 
-import { getAuthToken } from "@/lib/supabase";
+import { getAuthToken, supabase } from "@/lib/supabase";
 import type { components } from "@/types/openapi";
+
+export const MOCK_STUDENT_ID = "11111111-1111-4111-8111-111111111111";
+export const MOCK_PARENT_ID = "22222222-2222-4222-8222-222222222222";
 import type {
   AnalyzeResponse,
   CareerPath,
@@ -63,39 +66,49 @@ export class ApiError extends Error {
 // REQUEST HEADERS & FETCHER
 // =========================================================================
 
-interface FetcherOptions extends RequestInit {
-  devUser?: string;
-}
-
-async function getHeaders(extra?: HeadersInit, devUserOverride?: string): Promise<Headers> {
+async function getHeaders(extra?: HeadersInit): Promise<Headers> {
   const headers = new Headers({
     "Content-Type": "application/json",
     ...extra,
   });
 
   if (typeof window !== "undefined") {
-    // 1. Bearer Token
+    // 1. Bearer Token from Supabase session
     const token = await getAuthToken();
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }
 
-    // 2. Mock mode dev user (demo student or parent)
-    const devUser = devUserOverride || localStorage.getItem("prism_dev_user");
-    if (devUser) {
-      headers.set("X-Dev-User", devUser);
+    // 2. Mock mode dev user (ONLY when NEXT_PUBLIC_USE_MOCKS === "true")
+    if (process.env.NEXT_PUBLIC_USE_MOCKS === "true") {
+      let role: string | null = null;
+      try {
+        const { data } = await supabase.auth.getUser();
+        role = (data?.user?.user_metadata?.role as string) || null;
+      } catch {
+        // Supabase error / not configured
+      }
+
+      if (!role) {
+        role = sessionStorage.getItem("prism_mock_role");
+      }
+
+      if (role === "parent") {
+        headers.set("X-Dev-User", MOCK_PARENT_ID);
+      } else {
+        headers.set("X-Dev-User", MOCK_STUDENT_ID);
+      }
     }
   }
 
   return headers;
 }
 
-async function fetcher<T>(path: string, options?: FetcherOptions): Promise<T> {
-  const { devUser, ...init } = options || {};
-  const headers = await getHeaders(init.headers, devUser);
+async function fetcher<T>(path: string, options?: RequestInit): Promise<T> {
+  const headers = await getHeaders(options?.headers);
 
   const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
+    ...options,
     headers,
   });
 
@@ -118,14 +131,14 @@ async function fetcher<T>(path: string, options?: FetcherOptions): Promise<T> {
 // ADAPTER: Converts Backend OpenAPI AnalyzeResponse -> Frontend Component Types
 // =========================================================================
 
-function formatFinanceReason(reason: components["schemas"]["FinanceReason"]): string {
+function formatFinanceReason(reason: components["schemas"]["FinanceReason"], durationYears?: number): string {
   switch (reason) {
     case "LOAN_EXCEEDS_LIMIT":
       return "Required education loan exceeds family debt threshold";
     case "BREAKEVEN_TOO_LONG":
       return "Investment recovery duration exceeds acceptable break-even window";
     case "COST_EXCEEDS_CAPACITY":
-      return "Total 4-year tuition & living costs exceed family savings capacity";
+      return `Total ${durationYears ?? 4}-year cost exceeds family savings capacity`;
     default:
       return reason;
   }
@@ -154,7 +167,7 @@ export function adaptBackendAnalyzeResponse(
       durationYears: item.finance.duration_years,
       isViable: item.finance.viable,
       viable: item.finance.viable,
-      failReason: finReasons.length > 0 ? formatFinanceReason(finReasons[0]) : undefined,
+      failReason: finReasons.length > 0 ? formatFinanceReason(finReasons[0], item.finance.duration_years) : undefined,
       reasons: finReasons,
       cheaperAlternative: item.cheaper_alternative,
     };
@@ -198,7 +211,7 @@ export function adaptBackendAnalyzeResponse(
 
     const colleges = (item.path.colleges || []).map((col) => ({
       name: col.name,
-      location: "India",
+      location: undefined,
       annualFee: col.annual_fee,
     }));
 
@@ -346,8 +359,8 @@ export const api = {
     fetcher<components["schemas"]["HealthResponse"]>("/health"),
 
   /** Current user identity, linked pair and progress (GET /me). */
-  getMe: (devUser?: string) =>
-    fetcher<MeResponse>("/me", { devUser }),
+  getMe: () =>
+    fetcher<MeResponse>("/me"),
 
   /** Fetch assessment questions for students or parents (GET /questions). */
   getQuestions: async (audience: "student" | "parent"): Promise<Question[]> => {
@@ -380,23 +393,21 @@ export const api = {
     }),
 
   /** Parent redeems invite code to link accounts (POST /auth/link). */
-  linkParent: (inviteCode: string, devUser?: string) =>
+  linkParent: (inviteCode: string) =>
     fetcher<LinkResponse>("/auth/link", {
       method: "POST",
       body: JSON.stringify({ invite_code: inviteCode }),
-      devUser,
     }),
 
   /** Get user saved profile (GET /profile). */
-  getProfile: (devUser?: string) =>
-    fetcher<ParentProfile | StudentProfile>("/profile", { devUser }),
+  getProfile: () =>
+    fetcher<ParentProfile | StudentProfile>("/profile"),
 
   /** Save parent or student profile (PUT /profile). */
-  updateProfile: (profile: ParentProfile | StudentProfile, devUser?: string) =>
+  updateProfile: (profile: ParentProfile | StudentProfile) =>
     fetcher<ParentProfile | StudentProfile>("/profile", {
       method: "PUT",
       body: JSON.stringify(profile),
-      devUser,
     }),
 
   /** Get career domain list for parent top-3 picker (GET /domains). */
@@ -404,11 +415,10 @@ export const api = {
     fetcher<DomainItem[]>("/domains"),
 
   /** Agree or stop agreeing to parent-student comparison (POST /consent). */
-  postConsent: (agree: boolean = true, devUser?: string) =>
+  postConsent: (agree: boolean = true) =>
     fetcher<ConsentResponse>("/consent", {
       method: "POST",
       body: JSON.stringify({ agree }),
-      devUser,
     }),
 
   /**
@@ -420,18 +430,16 @@ export const api = {
     parent_id: string;
     weights?: { fit: number; finance: number; market: number };
   }): Promise<AnalyzeResponse> => {
+    const round4 = (x: number) => Number(x.toFixed(4));
     let weights = req.weights;
-    if (weights) {
-      const sum = weights.fit + weights.finance + weights.market;
-      if (sum > 0 && Math.abs(sum - 1.0) > 0.001) {
-        weights = {
-          fit: Number((weights.fit / sum).toFixed(4)),
-          finance: Number((weights.finance / sum).toFixed(4)),
-          market: Number((1.0 - weights.fit / sum - weights.finance / sum).toFixed(4)),
-        };
-      }
+    const sum = (weights?.fit ?? 0) + (weights?.finance ?? 0) + (weights?.market ?? 0);
+    if (!weights || sum <= 0) {
+      weights = { fit: 0.45, finance: 0.30, market: 0.25 };
     } else {
-      weights = { fit: 0.45, finance: 0.3, market: 0.25 };
+      const fit = round4(weights.fit / sum);
+      const finance = round4(weights.finance / sum);
+      const market = round4(1 - fit - finance);
+      weights = { fit, finance, market };
     }
 
     const raw = await fetcher<components["schemas"]["AnalyzeResponse"]>("/analyze", {

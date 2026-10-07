@@ -1,19 +1,39 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "http://localhost:54321";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "dummy-anon-key";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: typeof window !== "undefined",
-    autoRefreshToken: true,
-  },
-});
+let hasWarned = false;
+
+const isMockMode = process.env.NEXT_PUBLIC_USE_MOCKS === "true";
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  if (process.env.NODE_ENV === "production" && !isMockMode) {
+    throw new Error(
+      "Missing Supabase configuration: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY must be defined in production."
+    );
+  } else if (typeof window !== "undefined" && !hasWarned) {
+    console.warn(
+      "Supabase environment variables (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY) are missing. Running in mock-mode fallback."
+    );
+    hasWarned = true;
+  }
+}
+
+export const supabase: SupabaseClient = createClient(
+  supabaseUrl || "http://localhost:54321",
+  supabaseAnonKey || "dummy-anon-key",
+  {
+    auth: {
+      persistSession: typeof window !== "undefined",
+      autoRefreshToken: true,
+    },
+  }
+);
 
 /**
- * Resolves the active access token:
- * 1. Checks Supabase session if available.
- * 2. Falls back to localStorage.getItem("prism_token").
+ * Resolves the active access token directly from the Supabase session.
+ * Does NOT fall back to localStorage.
  */
 export async function getAuthToken(): Promise<string | null> {
   if (typeof window === "undefined") return null;
@@ -24,8 +44,8 @@ export async function getAuthToken(): Promise<string | null> {
       return data.session.access_token;
     }
   } catch {
-    // Supabase auth session unavailable
+    // Supabase session unavailable
   }
 
-  return localStorage.getItem("prism_token");
+  return null;
 }

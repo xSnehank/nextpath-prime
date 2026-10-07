@@ -127,7 +127,7 @@ export interface MarketData {
 
 export interface CollegeInfo {
   name: string;
-  location: string;
+  location?: string;
   ranking?: number;
   annualFee?: number;
 }

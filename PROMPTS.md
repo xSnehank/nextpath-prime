@@ -38,6 +38,16 @@ Best prompts used with AI tools, and what they produced (proof of AI-led build).
 ### Prompt 9: NextPath Editorial Revamp (Anti-AI-Slop Reachwise Style)
 > "Revamp the landing page and navigation to follow Reachwise editorial design with Obsidian black (#08090a), electric volt (#d4ff3a) accents, Funnel Display and Geist Mono typography, interactive persona sandbox simulator, crisis metrics, and deterministic tri-vector architecture."
 
+### Prompt 10: Contract Adherence, Real Supabase Auth & Wireframes Hardening
+> "Make every change listed in PR #4 change request: real Supabase auth for student signup and parent join, dual explicit consent step, strict API loading order on dashboard without silent demo fallback, user-specific survey answer caching with 1-5 validation, whole rupee validation on parent finances, weights normalization to exact 1.0, AI explanation fallback retry, and removal of hardcoded mock IDs, fake names ('Aarav Sharma' / 'Rajesh Sharma'), and stale localStorage keys."
+
+**What it produced:**
+- Connected frontend authentication to Supabase Auth (`signUp`, `signInWithPassword`) with fallback mock roles (`sessionStorage`) when mock mode is enabled.
+- Replaced automatic consent with a dedicated two-sentence `ConsentStep` component requiring explicit checkbox confirmation and supporting consent withdrawal.
+- Cleaned up API adapter: Bearer token injection, conditional `X-Dev-User` header only in mock mode, exact weights normalization (`round4`), and real duration calculation for `COST_EXCEEDS_CAPACITY`.
+- Implemented robust dashboard data resolution: `?result_id=` lookup, `GET /me` error surfacing, missing prerequisites checklist screen, demo badge toggle, and deterministic AI explanation retry fallback.
+- Sanitized user data: removed fictional placeholder names ("Aarav Sharma", "Rajesh Sharma"), removed hardcoded domicile, and validated whole rupees on parent financial calibration.
+
 ---
 
 ## Backend (Snehank, Claude Code with Opus 5.5)

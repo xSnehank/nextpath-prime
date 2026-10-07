@@ -17,6 +17,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
+import { ConsentStep } from "@/components/ConsentStep";
 import type { DomainItem, IndianState, ParentProfile } from "@/types/api";
 
 const INDIAN_STATES: IndianState[] = [
@@ -53,6 +54,8 @@ export default function ParentAssessmentPage() {
 
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
+  const [showConsentStep, setShowConsentStep] = React.useState(false);
 
   // Fetch real domains from GET /domains
   React.useEffect(() => {
@@ -109,27 +112,42 @@ export default function ParentAssessmentPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setFieldErrors({});
 
-    // Validate money fields
-    const parsedBudget = parseFloat(annualBudget.replace(/,/g, ""));
-    const parsedSavings = parseFloat(savings.replace(/,/g, ""));
-    const parsedMaxLoan = parseFloat(maxLoan.replace(/,/g, ""));
-    const parsedIncome = annualIncome ? parseFloat(annualIncome.replace(/,/g, "")) : null;
+    // Validate money fields (Item 10: remove commas, require digits only, send parseInt)
+    const cleanBudget = annualBudget.replace(/,/g, "").trim();
+    const cleanSavings = savings.replace(/,/g, "").trim();
+    const cleanMaxLoan = maxLoan.replace(/,/g, "").trim();
+    const cleanIncome = annualIncome.replace(/,/g, "").trim();
 
-    if (isNaN(parsedBudget) || parsedBudget < 0) {
-      setError("Please enter a valid Annual Education Budget in Rupees.");
+    if (!cleanBudget || !/^\d+$/.test(cleanBudget)) {
+      setError("Please enter a valid Annual Education Budget in whole Rupees (digits only).");
       return;
     }
-    if (isNaN(parsedSavings) || parsedSavings < 0) {
-      setError("Please enter valid Education Savings set aside in Rupees.");
+    if (!cleanSavings || !/^\d+$/.test(cleanSavings)) {
+      setError("Please enter valid Education Savings in whole Rupees (digits only).");
       return;
     }
-    if (isNaN(parsedMaxLoan) || parsedMaxLoan < 0) {
-      setError("Please enter the maximum Education Loan threshold your family is willing to consider.");
+    if (!cleanMaxLoan || !/^\d+$/.test(cleanMaxLoan)) {
+      setError("Please enter a valid Maximum Education Loan in whole Rupees (digits only).");
+      return;
+    }
+    if (cleanIncome && !/^\d+$/.test(cleanIncome)) {
+      setError("Please enter Gross Annual Income in whole Rupees (digits only).");
       return;
     }
 
-    // Require exactly 3 domains (Comment 10/14)
+    const parsedBudget = parseInt(cleanBudget, 10);
+    const parsedSavings = parseInt(cleanSavings, 10);
+    const parsedMaxLoan = parseInt(cleanMaxLoan, 10);
+    const parsedIncome = cleanIncome ? parseInt(cleanIncome, 10) : null;
+
+    if (parsedBudget < 0 || parsedSavings < 0 || parsedMaxLoan < 0) {
+      setError("Monetary values cannot be negative.");
+      return;
+    }
+
+    // Require exactly 3 domains
     if (selectedDomainIds.length !== 3) {
       setError(`Please select exactly 3 preferred domains for your child (currently ${selectedDomainIds.length} selected).`);
       return;
@@ -138,9 +156,6 @@ export default function ParentAssessmentPage() {
     setLoading(true);
 
     try {
-      // Act as demo parent if in dev/mock mode
-      const parentDevUser = "22222222-2222-4222-8222-222222222222";
-
       const profilePayload: ParentProfile = {
         role: "parent",
         annual_education_budget: parsedBudget,
@@ -154,22 +169,25 @@ export default function ParentAssessmentPage() {
         top_domain_ids: selectedDomainIds,
       };
 
-      // 1. Submit PUT /profile (Comment 10/14)
-      await api.updateProfile(profilePayload, parentDevUser);
+      // 1. Submit PUT /profile (Item 1f: no devUser parameter)
+      await api.updateProfile(profilePayload);
 
-      // 2. Submit POST /consent (Comment 2/14)
-      await api.postConsent(true, parentDevUser);
-
-      // Save dev user indicator for mock mode
-      localStorage.setItem("prism_dev_user", parentDevUser);
-      localStorage.setItem("prism_parent_completed", "true");
-
-      // Navigate to comprehensive Roadmap Dashboard
-      router.push("/dashboard");
+      // Transition to explicit Consent Step (Item 2b)
+      setShowConsentStep(true);
     } catch (err) {
       console.error("Failed to save parent profile:", err);
       if (err instanceof ApiError) {
-        setError(`Backend validation error: ${err.message}`);
+        setError(err.message);
+        const detailsObj = err.details as { fields?: Array<{ field?: string; issue?: string }> } | undefined;
+        if (detailsObj && Array.isArray(detailsObj.fields)) {
+          const map: Record<string, string> = {};
+          for (const f of detailsObj.fields) {
+            if (f.field && f.issue) {
+              map[f.field] = f.issue;
+            }
+          }
+          setFieldErrors(map);
+        }
       } else {
         setError("Failed to save profile. Please check your inputs and try again.");
       }
@@ -177,6 +195,20 @@ export default function ParentAssessmentPage() {
       setLoading(false);
     }
   };
+
+  if (showConsentStep) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 relative">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none" />
+        <ConsentStep
+          role="parent"
+          onConsentGranted={() => {
+            router.push("/dashboard");
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 relative">
@@ -222,15 +254,18 @@ export default function ParentAssessmentPage() {
                       Amount your family can spend each year out of regular income.
                     </p>
                     <Input
-                      type="number"
-                      min="0"
-                      step="10000"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       placeholder="e.g. 250000"
                       value={annualBudget}
                       onChange={(e) => setAnnualBudget(e.target.value)}
                       required
                       className="font-mono text-emerald-300 text-sm"
                     />
+                    {fieldErrors["annual_education_budget"] && (
+                      <p className="text-[11px] text-rose-400 font-medium">{fieldErrors["annual_education_budget"]}</p>
+                    )}
                   </div>
 
                   {/* Savings */}
@@ -242,15 +277,18 @@ export default function ParentAssessmentPage() {
                       Lump-sum savings set aside specifically for higher education.
                     </p>
                     <Input
-                      type="number"
-                      min="0"
-                      step="10000"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       placeholder="e.g. 600000"
                       value={savings}
                       onChange={(e) => setSavings(e.target.value)}
                       required
                       className="font-mono text-emerald-300 text-sm"
                     />
+                    {fieldErrors["savings"] && (
+                      <p className="text-[11px] text-rose-400 font-medium">{fieldErrors["savings"]}</p>
+                    )}
                   </div>
 
                   {/* Max Loan */}
@@ -262,15 +300,18 @@ export default function ParentAssessmentPage() {
                       Largest total debt your family is willing to take across 4 years.
                     </p>
                     <Input
-                      type="number"
-                      min="0"
-                      step="10000"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       placeholder="e.g. 800000"
                       value={maxLoan}
                       onChange={(e) => setMaxLoan(e.target.value)}
                       required
                       className="font-mono text-amber-300 text-sm"
                     />
+                    {fieldErrors["max_loan"] && (
+                      <p className="text-[11px] text-rose-400 font-medium">{fieldErrors["max_loan"]}</p>
+                    )}
                   </div>
 
                   {/* Annual Income (Optional) */}
@@ -282,14 +323,17 @@ export default function ParentAssessmentPage() {
                       Used strictly for matching income-based merit scholarships.
                     </p>
                     <Input
-                      type="number"
-                      min="0"
-                      step="50000"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       placeholder="e.g. 1200000 (optional)"
                       value={annualIncome}
                       onChange={(e) => setAnnualIncome(e.target.value)}
                       className="font-mono text-slate-300 text-sm"
                     />
+                    {fieldErrors["annual_income"] && (
+                      <p className="text-[11px] text-rose-400 font-medium">{fieldErrors["annual_income"]}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -462,6 +506,10 @@ export default function ParentAssessmentPage() {
                       );
                     })}
                   </div>
+                )}
+
+                {fieldErrors["top_domain_ids"] && (
+                  <p className="text-[11px] text-rose-400 font-medium">{fieldErrors["top_domain_ids"]}</p>
                 )}
 
                 {/* Ranked Order Controller */}

@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 import {
   ArrowUpRight,
   Brain,
@@ -171,9 +171,10 @@ export default function LandingPage() {
     setLaunchingDemo(true);
     try {
       const res = await api.runDemo();
-      router.push(`/dashboard?result_id=${res.result_id}`);
-    } catch {
-      router.push("/dashboard");
+      router.push(`/dashboard?result_id=${res.result_id}&demo=1`);
+    } catch (err) {
+      console.error("Live demo launch failed:", err);
+      alert(err instanceof ApiError ? err.message : "Failed to launch live demo. Please ensure the backend is running.");
     } finally {
       setLaunchingDemo(false);
     }

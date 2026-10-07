@@ -7,8 +7,9 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, ArrowRight, Link2, ShieldCheck, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle, ArrowRight, Link2, ShieldCheck, Loader2, AlertCircle, KeyRound, User } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 
 function ParentJoinContent() {
   const router = useRouter();
@@ -17,80 +18,135 @@ function ParentJoinContent() {
   // Read code from ?code= ONLY with NO default (Comment 6/14)
   const initialCode = searchParams.get("code") || "";
   const [inviteCode, setInviteCode] = React.useState(initialCode);
+
+  // Parent authentication state (Item 1b)
+  const [authMode, setAuthMode] = React.useState<"signup" | "signin">("signup");
+  const [parentName, setParentName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [emailNotice, setEmailNotice] = React.useState("");
+
   const [isLinked, setIsLinked] = React.useState(false);
   const [linkedInfo, setLinkedInfo] = React.useState<{
     studentId: string;
     parentId: string;
     linkedAt: string;
-    studentName?: string;
+    partnerLabel: string;
   } | null>(null);
-  const [verifying, setVerifying] = React.useState(false);
+
+  const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
 
-  // Dev user for demo/mock mode
-  const parentDevUser = "22222222-2222-4222-8222-222222222222";
-
-  const handleLinkAccounts = async (codeToLink: string) => {
-    const cleanCode = codeToLink.trim();
+  const handleLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanCode = inviteCode.trim();
     if (!cleanCode) {
-      setError("Please enter a valid invite code from your child.");
+      setError("Please enter the invite code provided by your child.");
+      return;
+    }
+    if (!email.trim() || !email.includes("@")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (!password || password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+    if (authMode === "signup" && !parentName.trim()) {
+      setError("Please enter your name.");
       return;
     }
 
-    setVerifying(true);
+    setLoading(true);
     setError("");
+    setEmailNotice("");
 
     try {
-      // Call POST /auth/link { invite_code } (Comment 6/14)
-      const res = await api.linkParent(cleanCode, parentDevUser);
-      localStorage.setItem("prism_dev_user", parentDevUser);
-      localStorage.setItem("prism_profiles_linked", "true");
+      // 1. Authenticate parent with role "parent" (Item 1b)
+      if (authMode === "signup") {
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              role: "parent",
+              full_name: parentName,
+            },
+          },
+        });
 
-      // Fetch GET /me to get linked partner details
-      let studentName = "Linked Student";
+        if (authError) {
+          setError(authError.message);
+          return;
+        }
+
+        // Record per-tab mock role fallback (Item 1e)
+        sessionStorage.setItem("prism_mock_role", "parent");
+
+        // 2. Email confirmation check (Item 1c)
+        if (authData.user && !authData.session) {
+          setEmailNotice("Check your email to confirm your account, then sign in");
+          return;
+        }
+      } else {
+        const { error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (authError) {
+          setError(authError.message);
+          return;
+        }
+
+        // Record per-tab mock role fallback (Item 1e)
+        sessionStorage.setItem("prism_mock_role", "parent");
+      }
+
+      // 3. Link parent account using invite code (POST /auth/link)
+      const res = await api.linkParent(cleanCode);
+
+      // Clean up legacy keys (Item 13b)
+      localStorage.removeItem("prism_dev_user");
+      localStorage.removeItem("prism_profiles_linked");
+
+      // 4. Discover partner label (Item 5b: no "Aarav Sharma", show "your child")
+      let partnerLabel = "your child";
       try {
-        const me = await api.getMe(parentDevUser);
-        if (me.partner) {
-          studentName = me.full_name || "Aarav Sharma";
+        const me = await api.getMe();
+        if (me.partner && (me.partner as unknown as { full_name?: string }).full_name) {
+          partnerLabel = (me.partner as unknown as { full_name: string }).full_name;
         }
       } catch {
-        // me endpoint fallback
+        // fallback
       }
 
       setLinkedInfo({
         studentId: res.student_id,
         parentId: res.parent_id,
         linkedAt: res.linked_at,
-        studentName,
+        partnerLabel,
       });
       setIsLinked(true);
-    } catch (err) {
-      console.error("Link failed:", err);
+    } catch (err: unknown) {
+      console.error("Linking failed:", err);
       if (err instanceof ApiError) {
         if (err.code === "NOT_FOUND") {
-          setError("The invite code is invalid or has expired. Please ask your student for a new code.");
+          setError("The invite code is invalid or has expired. Please ask your child for a new code.");
         } else if (err.code === "VALIDATION_ERROR") {
           setError("Please check the invite code format.");
         } else {
-          setError(`Linking error: ${err.message}`);
+          setError(err.message);
         }
+      } else if (err instanceof Error) {
+        setError(err.message);
       } else {
         setError("Unable to connect to the backend server. Please check your network.");
       }
     } finally {
-      setVerifying(false);
+      setLoading(false);
     }
   };
-
-  // If code was provided via URL query params on initial load, auto-verify once
-  React.useEffect(() => {
-    if (initialCode) {
-      const timer = setTimeout(() => {
-        handleLinkAccounts(initialCode);
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-  }, [initialCode]);
 
   return (
     <div className="flex-1 flex items-center justify-center px-4 py-12 relative">
@@ -100,96 +156,180 @@ function ParentJoinContent() {
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
             <Badge variant="cyan">Parent Account Linking</Badge>
-            <span className="text-xs text-slate-400">Profile Pairing</span>
+            <div className="flex rounded-lg border border-white/10 bg-white/5 p-0.5 text-xs">
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode("signup");
+                  setError("");
+                }}
+                className={`px-2.5 py-1 rounded-md transition-all ${
+                  authMode === "signup"
+                    ? "bg-cyan-600 text-white font-medium"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Sign Up
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode("signin");
+                  setError("");
+                }}
+                className={`px-2.5 py-1 rounded-md transition-all ${
+                  authMode === "signin"
+                    ? "bg-cyan-600 text-white font-medium"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Sign In
+              </button>
+            </div>
           </div>
-          <CardTitle className="text-2xl pt-2">Join via Student Invite</CardTitle>
+          <CardTitle className="text-2xl pt-2">
+            {authMode === "signup" ? "Join via Student Invite" : "Sign In & Link Account"}
+          </CardTitle>
           <CardDescription className="text-xs text-slate-400">
-            Link your parent account to calibrate household tuition affordability, enter debt constraints, and calculate conflict indices together.
+            Create or access your parent account and link with your child using their unique invite code.
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-4">
-          {error && (
-            <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
-              <span>{error}</span>
+        {isLinked && linkedInfo ? (
+          <div className="p-6 space-y-4">
+            <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 space-y-2">
+              <div className="flex items-center gap-2 font-semibold text-sm text-emerald-200">
+                <CheckCircle className="h-5 w-5 text-emerald-400 shrink-0" />
+                <span>Successfully Linked with {linkedInfo.partnerLabel}!</span>
+              </div>
+              <p className="text-xs text-slate-300">
+                Your parent profile is now paired. Complete your financial calibration form to solve tuition affordability and generate the joint roadmap.
+              </p>
             </div>
-          )}
 
-          {/* Invite Code Verification Box */}
-          <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-3">
-            <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <Link2 className="h-3.5 w-3.5 text-cyan-400" />
-              <span>Student Invite Code</span>
-            </label>
-            <div className="flex gap-2">
-              <Input
-                value={inviteCode}
-                onChange={(e) => {
-                  setInviteCode(e.target.value);
-                  setIsLinked(false);
-                  setError("");
-                }}
-                placeholder="e.g. PRISM-8X2A9"
-                className="font-mono tracking-widest text-cyan-300 uppercase"
-                disabled={verifying}
-              />
-              <Button
+            <Button
+              type="button"
+              onClick={() => router.push("/assessment/parent")}
+              className="w-full bg-cyan-600 hover:bg-cyan-500 text-white"
+            >
+              <span>Proceed to Parent Calibration</span>
+              <ArrowRight className="h-4 w-4 ml-1.5" />
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleLink}>
+            <CardContent className="space-y-4">
+              {emailNotice && (
+                <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-cyan-200 text-xs font-medium">
+                  {emailNotice}
+                </div>
+              )}
+
+              {error && (
+                <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              {/* Invite Code Box */}
+              <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-2">
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                  <Link2 className="h-3.5 w-3.5 text-cyan-400" />
+                  <span>Student Invite Code</span>
+                </label>
+                <Input
+                  value={inviteCode}
+                  onChange={(e) => {
+                    setInviteCode(e.target.value);
+                    setError("");
+                  }}
+                  placeholder="e.g. PRISM-8X2A9"
+                  className="font-mono tracking-widest text-cyan-300 uppercase"
+                  disabled={loading}
+                  required
+                />
+              </div>
+
+              {/* Parent Auth Details */}
+              {authMode === "signup" && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                    <User className="h-3.5 w-3.5 text-slate-400" />
+                    <span>Parent Full Name</span>
+                  </label>
+                  <Input
+                    placeholder="e.g. Rajesh Sharma"
+                    value={parentName}
+                    onChange={(e) => setParentName(e.target.value)}
+                    required
+                  />
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-300">
+                  Parent Email Address
+                </label>
+                <Input
+                  type="email"
+                  placeholder="parent@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                  <KeyRound className="h-3.5 w-3.5 text-cyan-400" />
+                  <span>Password</span>
+                </label>
+                <Input
+                  type="password"
+                  placeholder="Minimum 8 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                />
+              </div>
+
+              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-slate-400 flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
+                <span>Confidential pairing. Your financial data is protected by dual consent.</span>
+              </div>
+            </CardContent>
+
+            <CardFooter className="pt-2 flex justify-between items-center">
+              <button
                 type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => handleLinkAccounts(inviteCode)}
-                disabled={verifying || !inviteCode.trim()}
-                className="shrink-0 text-xs"
+                onClick={() => setAuthMode(authMode === "signup" ? "signin" : "signup")}
+                className="text-xs text-slate-400 hover:text-white transition-colors"
               >
-                {verifying ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                {authMode === "signup" ? "Already registered? Sign in" : "Need an account? Sign up"}
+              </button>
+
+              <Button
+                type="submit"
+                disabled={loading || !inviteCode.trim()}
+                className="bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-950/50"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Connecting...
+                  </>
                 ) : (
-                  "Verify & Link"
+                  <>
+                    <span>{authMode === "signup" ? "Sign Up & Link" : "Sign In & Link"}</span>
+                    <ArrowRight className="h-4 w-4 ml-1.5" />
+                  </>
                 )}
               </Button>
-            </div>
-
-            {/* Linked Confirmation Status from Server */}
-            {isLinked && linkedInfo && (
-              <div className="p-3.5 rounded-lg bg-emerald-950/25 border border-emerald-500/30 text-xs flex items-start gap-2.5 animate-fade-in-up">
-                <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <p className="text-emerald-300 font-semibold">
-                    Successfully Linked with Student Profile
-                  </p>
-                  <p className="text-slate-300">
-                    Linked Pair: <strong className="text-white font-mono">{linkedInfo.studentId.slice(0, 8)}...</strong> (Parent: <span className="font-mono">{linkedInfo.parentId.slice(0, 8)}...</span>)
-                  </p>
-                  <p className="text-[10px] text-slate-400">
-                    Linked at: {new Date(linkedInfo.linkedAt).toLocaleString("en-IN")}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Data Privacy Notice */}
-          <div className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-slate-400">
-            <ShieldCheck className="h-4 w-4 text-cyan-400 shrink-0 mt-0.5" />
-            <p>
-              Under our dual-consent protocol, student psychometric answers remain confidential.
-              Only aggregate conflict deltas and affordability models are shared with parents.
-            </p>
-          </div>
-        </CardContent>
-
-        <CardFooter className="pt-2 flex flex-col sm:flex-row gap-2 justify-end">
-          <Button
-            type="button"
-            disabled={!isLinked || verifying}
-            onClick={() => router.push("/assessment/parent")}
-            className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-950/50"
-          >
-            <span>Proceed to Financial Calibration</span>
-            <ArrowRight className="h-4 w-4 ml-1.5" />
-          </Button>
-        </CardFooter>
+            </CardFooter>
+          </form>
+        )}
       </Card>
     </div>
   );
@@ -199,8 +339,8 @@ export default function ParentJoinPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex-1 flex items-center justify-center min-h-[50vh]">
-          <Loader2 className="h-6 w-6 animate-spin text-cyan-400" />
+        <div className="flex-1 flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
         </div>
       }
     >

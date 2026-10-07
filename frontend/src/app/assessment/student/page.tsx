@@ -14,6 +14,7 @@ import {
   Share2,
 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
+import { ConsentStep } from "@/components/ConsentStep";
 import type { Question } from "@/types/api";
 
 export default function StudentAssessmentPage() {
@@ -28,6 +29,8 @@ export default function StudentAssessmentPage() {
   const [statusMessage, setStatusMessage] = React.useState("");
   const [errorMessage, setErrorMessage] = React.useState("");
   const [inviteModalCode, setInviteModalCode] = React.useState<string | null>(null);
+  const [showConsentStep, setShowConsentStep] = React.useState(false);
+  const [userId, setUserId] = React.useState<string>("");
 
   // Timer ref to prevent race condition & double-skipping (Comment 7/14 fix)
   const timerRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -45,7 +48,7 @@ export default function StudentAssessmentPage() {
     };
   }, []);
 
-  // Fetch real questions from GET /questions?audience=student (Comment 2/14 & 8/14)
+  // Fetch real questions and user ID from GET /questions and GET /me
   React.useEffect(() => {
     let active = true;
 
@@ -53,16 +56,41 @@ export default function StudentAssessmentPage() {
       setLoadingQuestions(true);
       setErrorMessage("");
       try {
-        const data = await api.getQuestions("student");
+        const [data, me] = await Promise.all([
+          api.getQuestions("student"),
+          api.getMe().catch(() => null),
+        ]);
         if (active) {
           setQuestions(data);
+          const currentUserId = me?.user_id || "";
+          if (currentUserId) {
+            setUserId(currentUserId);
+          }
 
-          // Restore answers from localStorage if available
+          // Restore answers from localStorage if available (Items 7a, 7b)
           try {
-            const savedAnswers = localStorage.getItem("prism_student_answers");
-            const savedIndex = localStorage.getItem("prism_student_current_index");
+            const validQuestionIds = new Set(data.map((q) => q.id));
+            const storageKey = currentUserId
+              ? `prism_student_answers:${currentUserId}`
+              : "prism_student_answers";
+            const indexKey = currentUserId
+              ? `prism_student_current_index:${currentUserId}`
+              : "prism_student_current_index";
+
+            const savedAnswers = localStorage.getItem(storageKey);
+            const savedIndex = localStorage.getItem(indexKey);
             if (savedAnswers) {
-              setAnswers(JSON.parse(savedAnswers));
+              const parsed = JSON.parse(savedAnswers);
+              if (typeof parsed === "object" && parsed !== null) {
+                const filtered: Record<string, number> = {};
+                for (const [qid, val] of Object.entries(parsed)) {
+                  const num = Number(val);
+                  if (validQuestionIds.has(qid) && Number.isInteger(num) && num >= 1 && num <= 5) {
+                    filtered[qid] = num;
+                  }
+                }
+                setAnswers(filtered);
+              }
             }
             if (savedIndex) {
               const idx = parseInt(savedIndex, 10);
@@ -104,8 +132,10 @@ export default function StudentAssessmentPage() {
 
   const saveProgress = (newAnswers: Record<string, number>, newIdx: number) => {
     try {
-      localStorage.setItem("prism_student_answers", JSON.stringify(newAnswers));
-      localStorage.setItem("prism_student_current_index", newIdx.toString());
+      const storageKey = userId ? `prism_student_answers:${userId}` : "prism_student_answers";
+      const indexKey = userId ? `prism_student_current_index:${userId}` : "prism_student_current_index";
+      localStorage.setItem(storageKey, JSON.stringify(newAnswers));
+      localStorage.setItem(indexKey, newIdx.toString());
     } catch {
       // Ignore
     }
@@ -159,17 +189,16 @@ export default function StudentAssessmentPage() {
 
       await api.postResponses(answersPayload);
 
-      // 2. Give consent via POST /consent (Comment 2/14)
-      await api.postConsent(true);
-
-      // 3. Create parent invite code via POST /auth/invite (Comment 2/14)
-      const invite = await api.createInvite().catch(() => null);
-      if (invite?.invite_code) {
-        setInviteModalCode(invite.invite_code);
-        localStorage.setItem("prism_parent_invite_code", invite.invite_code);
-      } else {
-        router.push("/dashboard");
+      // Clear saved progress (Item 7c)
+      if (userId) {
+        localStorage.removeItem(`prism_student_answers:${userId}`);
+        localStorage.removeItem(`prism_student_current_index:${userId}`);
       }
+      localStorage.removeItem("prism_student_answers");
+      localStorage.removeItem("prism_student_current_index");
+
+      // 2. Transition to ConsentStep (Item 2b: NO automatic postConsent)
+      setShowConsentStep(true);
     } catch (err) {
       console.error("Submission failed:", err);
       if (err instanceof ApiError) {
@@ -204,6 +233,98 @@ export default function StudentAssessmentPage() {
         <Button onClick={() => window.location.reload()} variant="outline">
           Retry Connecting
         </Button>
+      </div>
+    );
+  }
+
+  if (showConsentStep) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 relative">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-violet-600/10 rounded-full blur-[120px] pointer-events-none" />
+
+        {inviteModalCode && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in">
+            <Card className="w-full max-w-md border-white/10 bg-slate-900/90 shadow-2xl p-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                  <CheckCircle2 className="h-6 w-6" />
+                </span>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Assessment Complete!</h3>
+                  <p className="text-xs text-slate-400">Invite your parent to link parameters</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Your 30 psychometric indicators are securely saved. Share this invite code with your parent so they can calibrate the Financial Constraint Solver:
+              </p>
+
+              <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 text-center space-y-1">
+                <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+                  Single-Use Invite Code
+                </span>
+                <p className="font-mono text-2xl font-extrabold text-cyan-300 tracking-wider select-all">
+                  {inviteModalCode}
+                </p>
+                <p className="text-[10px] text-slate-400">
+                  Direct link: <code>/parent/join?code={inviteModalCode}</code>
+                </p>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  className="flex-1 text-xs"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/parent/join?code=${inviteModalCode}`
+                    );
+                    alert("Copied invite link to clipboard!");
+                  }}
+                >
+                  <Share2 className="h-3.5 w-3.5 mr-1" />
+                  Copy Link
+                </Button>
+                <Button
+                  variant="default"
+                  className="flex-1 text-xs bg-violet-600 hover:bg-violet-500"
+                  onClick={() => router.push("/dashboard")}
+                >
+                  View Dashboard
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {errorMessage && (
+          <div className="mb-4 p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs">
+            {errorMessage}
+          </div>
+        )}
+
+        <ConsentStep
+          role="student"
+          onConsentGranted={async () => {
+            setErrorMessage("");
+            try {
+              const invite = await api.createInvite();
+              if (invite?.invite_code) {
+                setInviteModalCode(invite.invite_code);
+              } else {
+                router.push("/dashboard");
+              }
+            } catch (err) {
+              console.error("Failed to generate invite code:", err);
+              if (err instanceof ApiError) {
+                setErrorMessage(err.message);
+              } else {
+                setErrorMessage("Failed to create parent invite code.");
+              }
+              router.push("/dashboard");
+            }
+          }}
+        />
       </div>
     );
   }
