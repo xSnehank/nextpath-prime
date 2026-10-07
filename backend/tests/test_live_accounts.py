@@ -160,6 +160,9 @@ def test_profile_errors(db_url: str) -> None:
     details = assert_error(client.put("/profile", headers=as_user(parent), json=unknown), 422, "VALIDATION_ERROR")
     assert details["unknown_domain_ids"] == ["d0000000-0000-4000-8000-000000000099"]
     assert_error(client.put("/profile", headers=as_user(parent), json=STUDENT_PROFILE), 403, "FORBIDDEN")
+    bad = PARENT_PROFILE | {"risk_appetite": 9}
+    details = assert_error(client.put("/profile", headers=as_user(parent), json=bad), 422, "VALIDATION_ERROR")
+    assert [f["field"] for f in details["fields"]] == ["risk_appetite"], "no 'parent.' prefix: it matches the form field"
 
 
 # ---------- questions and answers ----------

@@ -939,13 +939,8 @@
         "tags": [
           "careers"
         ],
-        "summary": "Demand and salary by region for one career",
+        "summary": "Demand and salary by region for one career (public reference data; no sign-in needed)",
         "operationId": "career_market_careers__career_id__market_get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "parameters": [
           {
             "name": "career_id",
@@ -971,16 +966,6 @@
           },
           "500": {
             "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "UNAUTHENTICATED: missing or invalid access token",
             "content": {
               "application/json": {
                 "schema": {

@@ -4,7 +4,7 @@ from fastapi import APIRouter
 
 from app import mocks
 from app.db import ConnDep
-from app.deps import CurrentUserDep, SettingsDep
+from app.deps import SettingsDep
 from app.errors import AppError, error_responses
 from app.repositories import catalog
 from app.schemas.common import ErrorCode
@@ -16,10 +16,10 @@ router = APIRouter(tags=["careers"])
 @router.get(
     "/careers/{career_id}/market",
     response_model=CareerMarket,
-    responses=error_responses(401, 404, 422),
-    summary="Demand and salary by region for one career",
+    responses=error_responses(404, 422),
+    summary="Demand and salary by region for one career (public reference data; no sign-in needed)",
 )
-def career_market(career_id: UUID, _user: CurrentUserDep, settings: SettingsDep, conn: ConnDep) -> CareerMarket:
+def career_market(career_id: UUID, settings: SettingsDep, conn: ConnDep) -> CareerMarket:
     if settings.use_mocks:
         markets = mocks.load("careers_market", dict[UUID, CareerMarket])
         if career_id not in markets:

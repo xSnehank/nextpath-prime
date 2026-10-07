@@ -152,7 +152,7 @@ def test_career_market(data: str) -> None:
     client = live_client(data)
     student = sign_up(data, "student")
     career_id = "c1000000-0000-4000-8000-000000000001"
-    market = client.get(f"/careers/{career_id}/market", headers=as_user(student)).json()
+    market = client.get(f"/careers/{career_id}/market").json()  # public: no sign-in needed
     assert market["career"] == "Software Engineer" and market["domain"] == "Engineering / Technology"
     assert market["national"]["region"] == "India"
     missing = "00000000-0000-4000-8000-000000000000"

@@ -30,7 +30,7 @@ def test_wrong_method(client: TestClient) -> None:
 def test_validation_error_lists_fields_but_never_echoes_values(client: TestClient) -> None:
     response = client.put("/profile", headers=AS_PARENT, json=PARENT_PROFILE | {"savings": -987654321})
     details = assert_error(response, 422, "VALIDATION_ERROR")
-    assert [f["field"] for f in details["fields"]] == ["parent.savings"]
+    assert [f["field"] for f in details["fields"]] == ["savings"]  # the union's role tag is dropped
     assert details["fields"][0]["location"] == "body"
     assert "987654321" not in response.text
 

@@ -15,7 +15,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import InterfaceError, OperationalError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.schemas.common import ErrorBody, ErrorCode, ErrorDetail
+from app.schemas.common import ErrorBody, ErrorCode, ErrorDetail, Role
 
 logger = logging.getLogger("prism.errors")
 
@@ -51,6 +51,7 @@ _HTTP_STATUS_CODES: dict[int, ErrorCode] = {
 }
 
 _LOCATIONS = {"body", "query", "path", "header", "cookie"}
+_ROLE_TAGS = {role.value for role in Role}
 
 
 class AppError(Exception):
@@ -84,6 +85,10 @@ def _field_errors(errors: Sequence[Any]) -> list[dict[str, Any]]:
     for error in errors:
         loc = list(error.get("loc", ()))
         location = loc.pop(0) if loc and loc[0] in _LOCATIONS else None
+        # PUT /profile is a union picked by "role"; Pydantic puts that tag in the path ("student.risk_appetite").
+        # The frontend's form fields are just "risk_appetite", so the tag is dropped.
+        if location == "body" and len(loc) > 1 and loc[0] in _ROLE_TAGS:
+            loc.pop(0)
         fields.append({"field": ".".join(str(part) for part in loc), "location": location, "issue": error.get("msg", "")})
     return fields
 
