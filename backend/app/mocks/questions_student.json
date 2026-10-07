@@ -1,0 +1,759 @@
+{
+  "audience": "student",
+  "questions": [
+    {
+      "id": "a0000000-0000-4000-8000-000000000001",
+      "group": "aptitude",
+      "dimension": "logical",
+      "text": "I enjoy puzzles that need step-by-step reasoning.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000002",
+      "group": "aptitude",
+      "dimension": "logical",
+      "text": "I can usually spot the flaw in an argument.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000003",
+      "group": "aptitude",
+      "dimension": "numerical",
+      "text": "I am comfortable working with numbers, percentages and graphs.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000004",
+      "group": "aptitude",
+      "dimension": "numerical",
+      "text": "Mental maths comes easily to me.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000005",
+      "group": "aptitude",
+      "dimension": "verbal",
+      "text": "I can explain complicated ideas clearly in writing.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000006",
+      "group": "aptitude",
+      "dimension": "verbal",
+      "text": "I enjoy reading and learning new words.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000007",
+      "group": "aptitude",
+      "dimension": "spatial",
+      "text": "I can picture how an object looks from a different angle.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000008",
+      "group": "aptitude",
+      "dimension": "spatial",
+      "text": "I find maps and diagrams easy to follow.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000009",
+      "group": "aptitude",
+      "dimension": "creative",
+      "text": "I often come up with unusual ideas.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000010",
+      "group": "aptitude",
+      "dimension": "creative",
+      "text": "I like making things that did not exist before, such as drawings, stories or apps.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000011",
+      "group": "interest",
+      "dimension": "realistic",
+      "text": "I like working with tools, machines or my hands.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000012",
+      "group": "interest",
+      "dimension": "realistic",
+      "text": "I would enjoy a job where I build or repair things.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000013",
+      "group": "interest",
+      "dimension": "investigative",
+      "text": "I like finding out how and why things work.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000014",
+      "group": "interest",
+      "dimension": "investigative",
+      "text": "I would enjoy doing experiments or research.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000015",
+      "group": "interest",
+      "dimension": "artistic",
+      "text": "I like expressing myself through art, music, writing or design.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000016",
+      "group": "interest",
+      "dimension": "artistic",
+      "text": "I would enjoy a job with a lot of creative freedom.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000017",
+      "group": "interest",
+      "dimension": "social",
+      "text": "I like helping people with their problems.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000018",
+      "group": "interest",
+      "dimension": "social",
+      "text": "I would enjoy teaching, caring for or counselling others.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000019",
+      "group": "interest",
+      "dimension": "enterprising",
+      "text": "I like leading a team or persuading people.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000020",
+      "group": "interest",
+      "dimension": "enterprising",
+      "text": "I would enjoy starting my own business one day.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000021",
+      "group": "interest",
+      "dimension": "conventional",
+      "text": "I like organising information and keeping records neat.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000022",
+      "group": "interest",
+      "dimension": "conventional",
+      "text": "I prefer tasks with clear rules and procedures.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000023",
+      "group": "cognitive",
+      "dimension": "analytical",
+      "text": "I make decisions by carefully weighing facts and evidence.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000024",
+      "group": "cognitive",
+      "dimension": "analytical",
+      "text": "I usually go with my gut feeling.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000025",
+      "group": "cognitive",
+      "dimension": "structured",
+      "text": "I like to plan my work in detail before I start.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000026",
+      "group": "cognitive",
+      "dimension": "structured",
+      "text": "I am happy to change plans at the last minute.",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ],
+      "required": true
+    }
+  ]
+}

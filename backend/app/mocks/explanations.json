@@ -1,0 +1,32 @@
+{
+  "c0000000-0000-4000-8000-000000000001": {
+    "career_id": "c0000000-0000-4000-8000-000000000001",
+    "text": "Data Science / AI fits you with a score of 84/100. The estimated family cost is Rs 14,20,000, with a loan need of Rs 0 and a payback time of about 2.3 years. Demand in Karnataka is high (data as of 2026-09-01).",
+    "source": "template"
+  },
+  "c0000000-0000-4000-8000-000000000002": {
+    "career_id": "c0000000-0000-4000-8000-000000000002",
+    "text": "Software Engineering fits you with a score of 80/100. The estimated family cost is Rs 7,60,000, with a loan need of Rs 0 and a payback time of about 1.5 years. Demand in Karnataka is high (data as of 2026-09-01).",
+    "source": "template"
+  },
+  "c0000000-0000-4000-8000-000000000003": {
+    "career_id": "c0000000-0000-4000-8000-000000000003",
+    "text": "Product Design (UX) fits you with a score of 67/100. The estimated family cost is Rs 16,80,000, with a loan need of Rs 80,000 and a payback time of about 4.0 years. Demand in Karnataka is high (data as of 2026-09-01).",
+    "source": "template"
+  },
+  "c0000000-0000-4000-8000-000000000004": {
+    "career_id": "c0000000-0000-4000-8000-000000000004",
+    "text": "Biotechnology fits you with a score of 70/100. The estimated family cost is Rs 11,20,000, with a loan need of Rs 0 and a payback time of about 4.1 years. Demand in India is moderate (data as of 2026-09-01). Market figures are a national estimate because regional data is missing.",
+    "source": "template"
+  },
+  "c0000000-0000-4000-8000-000000000005": {
+    "career_id": "c0000000-0000-4000-8000-000000000005",
+    "text": "Architecture fits you with a score of 66/100. The estimated family cost is Rs 20,00,000, with a loan need of Rs 1,50,000 and a payback time of about 10.0 years. Demand in Karnataka is moderate (data as of 2026-09-01). Caution: this path does not fit the family's limits right now, because paying back the cost would take longer than the family accepts.",
+    "source": "template"
+  },
+  "c0000000-0000-4000-8000-000000000006": {
+    "career_id": "c0000000-0000-4000-8000-000000000006",
+    "text": "MBBS / Medicine fits you with a score of 63/100. The estimated family cost is Rs 83,60,000, with a loan need of Rs 63,85,000 and a payback time of about 19.9 years. Demand in India is moderate (data as of 2026-09-01). Caution: this path does not fit the family's limits right now, because the loan needed is above the family's limit and paying back the cost would take longer than the family accepts.",
+    "source": "template"
+  }
+}

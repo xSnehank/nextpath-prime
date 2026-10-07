@@ -1,0 +1,243 @@
+{
+  "c0000000-0000-4000-8000-000000000001": {
+    "career_id": "c0000000-0000-4000-8000-000000000001",
+    "career": "Data Science / AI",
+    "domain": "Engineering / Technology",
+    "national": {
+      "region": "India",
+      "demand_index": 0.82,
+      "growth_rate": 16.0,
+      "median_salary": 1300000,
+      "entry_salary": 700000,
+      "as_of": "2026-09-01",
+      "source": "MOCK data for frontend development; replace with seed data",
+      "data_quality": "sourced"
+    },
+    "regions": [
+      {
+        "region": "Karnataka",
+        "demand_index": 0.95,
+        "growth_rate": 22.0,
+        "median_salary": 1600000,
+        "entry_salary": 800000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      },
+      {
+        "region": "Telangana",
+        "demand_index": 0.85,
+        "growth_rate": 18.0,
+        "median_salary": 1300000,
+        "entry_salary": 700000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      },
+      {
+        "region": "Maharashtra",
+        "demand_index": 0.8,
+        "growth_rate": 14.0,
+        "median_salary": 1250000,
+        "entry_salary": 650000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      },
+      {
+        "region": "Tamil Nadu",
+        "demand_index": 0.72,
+        "growth_rate": 12.0,
+        "median_salary": 1100000,
+        "entry_salary": 600000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      }
+    ]
+  },
+  "c0000000-0000-4000-8000-000000000002": {
+    "career_id": "c0000000-0000-4000-8000-000000000002",
+    "career": "Software Engineering",
+    "domain": "Engineering / Technology",
+    "national": {
+      "region": "India",
+      "demand_index": 0.84,
+      "growth_rate": 11.0,
+      "median_salary": 1200000,
+      "entry_salary": 650000,
+      "as_of": "2026-09-01",
+      "source": "MOCK data for frontend development; replace with seed data",
+      "data_quality": "sourced"
+    },
+    "regions": [
+      {
+        "region": "Karnataka",
+        "demand_index": 0.92,
+        "growth_rate": 15.0,
+        "median_salary": 1400000,
+        "entry_salary": 700000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      },
+      {
+        "region": "Telangana",
+        "demand_index": 0.88,
+        "growth_rate": 12.0,
+        "median_salary": 1200000,
+        "entry_salary": 650000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      },
+      {
+        "region": "Maharashtra",
+        "demand_index": 0.82,
+        "growth_rate": 10.0,
+        "median_salary": 1100000,
+        "entry_salary": 600000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      },
+      {
+        "region": "Delhi",
+        "demand_index": 0.78,
+        "growth_rate": 8.0,
+        "median_salary": 1050000,
+        "entry_salary": 600000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      }
+    ]
+  },
+  "c0000000-0000-4000-8000-000000000003": {
+    "career_id": "c0000000-0000-4000-8000-000000000003",
+    "career": "Product Design (UX)",
+    "domain": "Arts / Design / Media",
+    "national": {
+      "region": "India",
+      "demand_index": 0.7,
+      "growth_rate": 15.0,
+      "median_salary": 850000,
+      "entry_salary": 500000,
+      "as_of": "2026-09-01",
+      "source": "MOCK data for frontend development; replace with seed data",
+      "data_quality": "sourced"
+    },
+    "regions": [
+      {
+        "region": "Karnataka",
+        "demand_index": 0.78,
+        "growth_rate": 20.0,
+        "median_salary": 1000000,
+        "entry_salary": 600000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      },
+      {
+        "region": "Maharashtra",
+        "demand_index": 0.72,
+        "growth_rate": 16.0,
+        "median_salary": 900000,
+        "entry_salary": 550000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      }
+    ]
+  },
+  "c0000000-0000-4000-8000-000000000004": {
+    "career_id": "c0000000-0000-4000-8000-000000000004",
+    "career": "Biotechnology",
+    "domain": "Sciences / Research",
+    "national": {
+      "region": "India",
+      "demand_index": 0.58,
+      "growth_rate": 6.0,
+      "median_salary": 580000,
+      "entry_salary": 430000,
+      "as_of": "2026-09-01",
+      "source": "MOCK data for frontend development; replace with seed data",
+      "data_quality": "sourced"
+    },
+    "regions": [
+      {
+        "region": "Telangana",
+        "demand_index": 0.65,
+        "growth_rate": 8.0,
+        "median_salary": 650000,
+        "entry_salary": 480000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      },
+      {
+        "region": "Maharashtra",
+        "demand_index": 0.55,
+        "growth_rate": 5.0,
+        "median_salary": 550000,
+        "entry_salary": 420000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      }
+    ]
+  },
+  "c0000000-0000-4000-8000-000000000005": {
+    "career_id": "c0000000-0000-4000-8000-000000000005",
+    "career": "Architecture",
+    "domain": "Arts / Design / Media",
+    "national": {
+      "region": "India",
+      "demand_index": 0.56,
+      "growth_rate": 4.0,
+      "median_salary": 700000,
+      "entry_salary": 380000,
+      "as_of": "2026-09-01",
+      "source": "MOCK data for frontend development; replace with seed data",
+      "data_quality": "sourced"
+    },
+    "regions": [
+      {
+        "region": "Karnataka",
+        "demand_index": 0.55,
+        "growth_rate": 4.0,
+        "median_salary": 700000,
+        "entry_salary": 380000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      },
+      {
+        "region": "Maharashtra",
+        "demand_index": 0.6,
+        "growth_rate": 5.0,
+        "median_salary": 750000,
+        "entry_salary": 400000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      }
+    ]
+  },
+  "c0000000-0000-4000-8000-000000000006": {
+    "career_id": "c0000000-0000-4000-8000-000000000006",
+    "career": "MBBS / Medicine",
+    "domain": "Medicine / Healthcare",
+    "national": {
+      "region": "India",
+      "demand_index": 0.7,
+      "growth_rate": 4.0,
+      "median_salary": 720000,
+      "entry_salary": 600000,
+      "as_of": "2026-09-01",
+      "source": "MOCK data for frontend development; replace with seed data",
+      "data_quality": "sourced"
+    },
+    "regions": []
+  }
+}
