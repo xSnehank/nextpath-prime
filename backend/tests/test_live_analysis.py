@@ -169,3 +169,15 @@ def test_the_demo_needs_the_demo_family(data: str) -> None:
     result = client.get(f"/results/{demo['result_id']}")  # no sign-in needed for the demo family
     assert result.status_code == 200
     assert_analyze_invariants(AnalyzeResponse.model_validate(result.json()))
+
+
+def test_an_eligible_family_gets_scholarships_and_a_lower_cost(data: str) -> None:
+    """Income up to Rs 4.5 lakh: the Central Sector Scheme (Rs 12,000 a year) applies to every seeded career."""
+    client = live_client(data)
+    student, parent = _ready_pair(client, data)
+    client.put("/profile", headers=as_user(student), json=STUDENT_PROFILE | {"category": "obc", "percentage": 91})
+    client.put("/profile", headers=as_user(parent), json=PARENT_PROFILE | {"annual_income": 420000})
+    result = AnalyzeResponse.model_validate(_analyze(client, student, parent, student).json())
+    names = {s.name for item in result.roadmap for s in item.scholarships}
+    assert "Central Sector Scheme of Scholarship for College and University Students" in names
+    assert all(s.matched_rule for item in result.roadmap for s in item.scholarships)
