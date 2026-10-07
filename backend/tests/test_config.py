@@ -25,3 +25,8 @@ def test_secrets_are_hidden_when_printed() -> None:
     assert "very-secret" not in repr(settings)
     assert "pw-secret" not in str(settings)
     assert settings.gemini_api_key is not None and settings.gemini_api_key.get_secret_value() == "AIza-very-secret"
+
+
+def test_live_mode_refuses_to_start_without_its_settings() -> None:
+    with pytest.raises(ValidationError, match="DATABASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY"):
+        Settings(_env_file=None, use_mocks=False)

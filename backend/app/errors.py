@@ -12,9 +12,10 @@ from typing import Any
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import InterfaceError, OperationalError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.schemas.common import ErrorBody, ErrorCode, ErrorDetail
+from app.schemas.common import ErrorBody, ErrorCode, ErrorDetail, Role
 
 logger = logging.getLogger("prism.errors")
 
@@ -39,7 +40,7 @@ _DESCRIPTIONS: dict[int, str] = {
     409: "ASSESSMENT_INCOMPLETE or CONSENT_REQUIRED",
     422: "VALIDATION_ERROR or INVALID_WEIGHTS: details.fields lists what is wrong",
     500: "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
-    503: "UPSTREAM_UNAVAILABLE: the database cannot be reached",
+    503: "UPSTREAM_UNAVAILABLE: the database or the sign-in service cannot be reached",
 }
 
 _HTTP_STATUS_CODES: dict[int, ErrorCode] = {
@@ -50,6 +51,7 @@ _HTTP_STATUS_CODES: dict[int, ErrorCode] = {
 }
 
 _LOCATIONS = {"body", "query", "path", "header", "cookie"}
+_ROLE_TAGS = {role.value for role in Role}
 
 
 class AppError(Exception):
@@ -60,15 +62,6 @@ class AppError(Exception):
         self.code = code
         self.message = message
         self.details = details or {}
-
-
-def not_implemented(branch: str) -> AppError:
-    """For live mode on endpoints whose real code has not landed yet."""
-    return AppError(
-        ErrorCode.NOT_IMPLEMENTED,
-        f"Only mock mode works here so far; the real version arrives in {branch}.",
-        {"branch": branch},
-    )
 
 
 def error_response(
@@ -92,6 +85,10 @@ def _field_errors(errors: Sequence[Any]) -> list[dict[str, Any]]:
     for error in errors:
         loc = list(error.get("loc", ()))
         location = loc.pop(0) if loc and loc[0] in _LOCATIONS else None
+        # PUT /profile is a union picked by "role"; Pydantic puts that tag in the path ("student.risk_appetite").
+        # The frontend's form fields are just "risk_appetite", so the tag is dropped.
+        if location == "body" and len(loc) > 1 and loc[0] in _ROLE_TAGS:
+            loc.pop(0)
         fields.append({"field": ".".join(str(part) for part in loc), "location": location, "issue": error.get("msg", "")})
     return fields
 
@@ -133,8 +130,16 @@ async def _on_response_validation_error(request: Request, exc: ResponseValidatio
     return error_response(ErrorCode.INTERNAL_ERROR, "Something went wrong on our side.")
 
 
+async def _on_database_unavailable(request: Request, exc: Exception) -> JSONResponse:
+    # The message can contain the host name; log only the kind of failure.
+    logger.error("database unavailable on %s %s: %s", request.method, request.url.path, type(exc).__name__)
+    return error_response(ErrorCode.UPSTREAM_UNAVAILABLE, "The database can't be reached right now. Try again shortly.")
+
+
 def register_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(AppError, _on_app_error)
     app.add_exception_handler(RequestValidationError, _on_validation_error)
     app.add_exception_handler(ResponseValidationError, _on_response_validation_error)
     app.add_exception_handler(StarletteHTTPException, _on_http_error)
+    app.add_exception_handler(OperationalError, _on_database_unavailable)
+    app.add_exception_handler(InterfaceError, _on_database_unavailable)

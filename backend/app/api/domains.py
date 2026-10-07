@@ -1,8 +1,10 @@
 from fastapi import APIRouter
 
 from app import mocks
+from app.db import ConnDep
 from app.deps import CurrentUserDep, SettingsDep
-from app.errors import error_responses, not_implemented
+from app.errors import error_responses
+from app.repositories import catalog
 from app.schemas.domains import Domain
 
 router = APIRouter(tags=["careers"])
@@ -14,7 +16,7 @@ router = APIRouter(tags=["careers"])
     responses=error_responses(401),
     summary="Career domains, for the parent's top-3 picker",
 )
-def list_domains(_user: CurrentUserDep, settings: SettingsDep) -> list[Domain]:
+def list_domains(_user: CurrentUserDep, settings: SettingsDep, conn: ConnDep) -> list[Domain]:
     if settings.use_mocks:
         return mocks.load("domains", list[Domain])
-    raise not_implemented("feat/be-B-responses-api")
+    return [Domain(id=row.id, name=row.name, description=row.description) for row in catalog.list_domains(conn)]
