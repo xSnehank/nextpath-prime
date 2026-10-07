@@ -108,3 +108,11 @@ def test_custom_weights_are_accepted_in_mock_mode() -> None:
 def test_withdrawing_consent() -> None:
     response = make_client().post("/consent", headers=AS_STUDENT, json={"agree": False})
     assert response.json() == {"consented": False, "consented_at": None, "both_consented": False}
+
+
+def test_partner_name_is_the_other_persons_own_name() -> None:
+    client = make_client()
+    student = client.get("/me", headers=AS_STUDENT).json()
+    parent = client.get("/me", headers=AS_PARENT).json()
+    assert student["partner"]["full_name"] == parent["full_name"]
+    assert parent["partner"]["full_name"] == student["full_name"]
