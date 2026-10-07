@@ -3,7 +3,6 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { DemoFamilyButton } from "./DemoFamilyButton";
 import { Compass, Menu, X, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -62,7 +61,12 @@ export function Navbar() {
 
         {/* CTA & Demo Button */}
         <div className="hidden sm:flex items-center gap-3">
-          <DemoFamilyButton size="sm" />
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] text-xs font-semibold tracking-tight transition-all"
+          >
+            <span>Live Demo</span>
+          </Link>
         </div>
 
         {/* Mobile menu trigger */}
@@ -97,7 +101,13 @@ export function Navbar() {
           </div>
 
           <div className="pt-2 border-t border-white/10">
-            <DemoFamilyButton size="sm" className="w-full justify-center" />
+            <Link
+              href="/dashboard"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center justify-center p-2.5 rounded-xl bg-[#d4ff3a] text-[#08090a] font-semibold text-xs"
+            >
+              <span>Live Demo</span>
+            </Link>
           </div>
         </div>
       )}

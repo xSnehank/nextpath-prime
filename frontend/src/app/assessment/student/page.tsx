@@ -6,8 +6,40 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { DEMO_DATA } from "@/mocks";
 import type { Question } from "@/types/api";
+
+const STUDENT_QUESTIONS: Question[] = [
+  { id: "s1", audience: "student", category: "aptitude", text: "I enjoy solving puzzles and logical problems.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s2", audience: "student", category: "aptitude", text: "I can easily understand graphs and data charts.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s3", audience: "student", category: "aptitude", text: "I am comfortable working with numbers and calculations.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s4", audience: "student", category: "aptitude", text: "I can explain complex ideas clearly to others.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s5", audience: "student", category: "aptitude", text: "I enjoy writing essays or stories.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s6", audience: "student", category: "aptitude", text: "I pay close attention to details in my work.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s7", audience: "student", category: "aptitude", text: "I can quickly spot patterns in information.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s8", audience: "student", category: "aptitude", text: "I am comfortable using computers and software.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s9", audience: "student", category: "aptitude", text: "I like working with my hands — building or fixing things.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s10", audience: "student", category: "aptitude", text: "I enjoy performing, presenting, or being on stage.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s11", audience: "student", category: "interest", text: "Which subject excites you the most?", type: "choice", options: ["Mathematics", "Science", "English / Languages", "Social Studies", "Computer Science", "Arts & Design", "Commerce", "Physical Education"] },
+  { id: "s12", audience: "student", category: "interest", text: "I would rather spend a free hour…", type: "choice", options: ["Coding a small project", "Drawing or designing", "Reading about current events", "Conducting a science experiment", "Playing a sport", "Writing a blog post", "Learning about money and markets", "Volunteering for a cause"] },
+  { id: "s13", audience: "student", category: "interest", text: "I enjoy learning about how businesses work.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s14", audience: "student", category: "interest", text: "I am curious about how the human body works.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s15", audience: "student", category: "interest", text: "I like exploring new places and cultures.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s16", audience: "student", category: "interest", text: "I want to build things that people use every day.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s17", audience: "student", category: "interest", text: "I follow news about technology and startups.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s18", audience: "student", category: "interest", text: "I enjoy teaching or mentoring younger students.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s19", audience: "student", category: "interest", text: "I am interested in law, policy, or governance.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s20", audience: "student", category: "interest", text: "I want to create visual content — videos, animations, or graphics.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s21", audience: "student", category: "thinking_style", text: "When solving a problem, I prefer to…", type: "choice", options: ["Break it into small logical steps", "Visualise the big picture first", "Discuss it with others", "Experiment and learn from mistakes"] },
+  { id: "s22", audience: "student", category: "thinking_style", text: "I am more motivated by…", type: "choice", options: ["Achieving a personal goal", "Helping others succeed", "Being recognised by peers", "Learning something new"] },
+  { id: "s23", audience: "student", category: "thinking_style", text: "I prefer working…", type: "choice", options: ["Alone with full focus", "In a small team", "In a large group", "Alternating solo and team"] },
+  { id: "s24", audience: "student", category: "thinking_style", text: "When I hit a dead-end, I usually…", type: "choice", options: ["Try a completely new approach", "Research more before trying again", "Ask someone for help", "Take a break and revisit later"] },
+  { id: "s25", audience: "student", category: "thinking_style", text: "I handle pressure by…", type: "choice", options: ["Making a to-do list", "Staying calm and adapting", "Seeking support from friends/family", "Channeling it into harder work"] },
+  { id: "s26", audience: "student", category: "thinking_style", text: "I am comfortable with taking risks on new ideas.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s27", audience: "student", category: "thinking_style", text: "I prefer tasks with clear right/wrong answers over open-ended ones.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s28", audience: "student", category: "thinking_style", text: "I can stay focused on one task for a long time.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s29", audience: "student", category: "thinking_style", text: "I enjoy competitions and challenges.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+  { id: "s30", audience: "student", category: "thinking_style", text: "I often come up with creative or unusual solutions.", type: "likert", options: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] },
+];
 import {
   ArrowLeft,
   ArrowRight,
@@ -22,7 +54,7 @@ import {
 
 export default function StudentAssessmentPage() {
   const router = useRouter();
-  const questions: Question[] = DEMO_DATA.studentQuestions;
+  const questions: Question[] = STUDENT_QUESTIONS;
   const totalQuestions = questions.length;
 
   const [currentIndex, setCurrentIndex] = React.useState(0);

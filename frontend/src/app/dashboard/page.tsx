@@ -12,9 +12,137 @@ import { MarketDemandCard } from "@/components/MarketDemandCard";
 import { WhatIfSliders, type WeightVector } from "@/components/WhatIfSliders";
 import { SwotMatrix } from "@/components/SwotMatrix";
 import { PdfExportButton } from "@/components/PdfExportButton";
-import { DemoFamilyButton } from "@/components/DemoFamilyButton";
-import { DEMO_DATA } from "@/mocks";
 import type { AnalyzeResponse, CareerPath } from "@/types/api";
+
+const INITIAL_ANALYSIS: AnalyzeResponse = {
+  studentId: "student-001",
+  parentId: "parent-001",
+  generatedAt: "2026-03-30T10:00:00Z",
+  domainScores: [
+    { domain: "Engineering / Technology", aptitude: 90, interest: 92, cognitiveFit: 88, composite: 86.2 },
+    { domain: "Sciences / Research", aptitude: 78, interest: 80, cognitiveFit: 74, composite: 76.4 },
+    { domain: "Arts / Design / Media", aptitude: 62, interest: 70, cognitiveFit: 65, composite: 64.8 },
+    { domain: "Business / Management", aptitude: 55, interest: 60, cognitiveFit: 58, composite: 58.1 },
+    { domain: "Medicine / Healthcare", aptitude: 50, interest: 55, cognitiveFit: 52, composite: 52.3 },
+    { domain: "Law / Civil Services", aptitude: 40, interest: 45, cognitiveFit: 42, composite: 41.7 },
+  ],
+  conflict: {
+    index: 38,
+    label: "moderate",
+    topDisagreements: [
+      { area: "Budget Tolerance", studentValue: 85, parentValue: 50, gap: 35 },
+      { area: "Location Mobility", studentValue: 90, parentValue: 60, gap: 30 },
+      { area: "Branch Stability", studentValue: 80, parentValue: 70, gap: 10 },
+    ],
+  },
+  finance: [
+    { careerId: "c1", careerName: "Software Engineering & Systems", totalCost4Year: 1150000, familyShare: 800000, loanNeeded: 350000, expectedStartingSalary: 950000, breakEvenYears: 1.1, isViable: true },
+    { careerId: "c2", careerName: "Data Science & AI Engineering", totalCost4Year: 1200000, familyShare: 800000, loanNeeded: 400000, expectedStartingSalary: 900000, breakEvenYears: 1.2, isViable: true },
+    { careerId: "c3", careerName: "Product & Interaction Design (UX)", totalCost4Year: 950000, familyShare: 800000, loanNeeded: 150000, expectedStartingSalary: 750000, breakEvenYears: 1.2, isViable: true },
+  ],
+  market: [
+    {
+      careerId: "c1",
+      careerName: "Software Engineering & Systems",
+      regions: [
+        { region: "Bengaluru", demandIndex: 94, medianSalary: 1250000, growth: "+18%" },
+        { region: "Hyderabad", demandIndex: 88, medianSalary: 1100000, growth: "+16%" },
+        { region: "Pune", demandIndex: 82, medianSalary: 950000, growth: "+14%" },
+        { region: "NCR", demandIndex: 85, medianSalary: 1050000, growth: "+15%" },
+      ],
+      source: "NASSCOM Tech Talent Report & Live Regional Indices",
+      asOf: "Q1 2026",
+    },
+  ],
+  roadmap: [
+    {
+      id: "c1",
+      rank: 1,
+      domain: "Engineering / Technology",
+      title: "Software Engineering & Systems",
+      finalScore: 88.6,
+      compositeScore: 92.0,
+      financialViability: 84,
+      marketDemand: 88,
+      exams: [
+        { name: "JEE Main", date: "Jan / Apr 2026", registrationDeadline: "Nov 2025" },
+        { name: "BITSAT", date: "May 2026", registrationDeadline: "Apr 2026" },
+      ],
+      colleges: [
+        { name: "IIT Bombay", location: "Mumbai", ranking: 1 },
+        { name: "BITS Pilani", location: "Pilani", ranking: 8 },
+        { name: "COEP Tech", location: "Pune", ranking: 35 },
+      ],
+      scholarships: [
+        { name: "INSPIRE Scholarship", amount: "₹80,000/year", eligibility: "Top 1% in 12th Board", deadline: "Dec 2025" },
+        { name: "Reliance Foundation Undergraduate", amount: "Up to ₹2,00,000", eligibility: "Merit-cum-means (>60% in 12th)", deadline: "Oct 2025" },
+      ],
+      timeline: "4-year B.Tech (CS/AI) → Tier-1 Campus Placement",
+    },
+    {
+      id: "c2",
+      rank: 2,
+      domain: "Engineering / Technology",
+      title: "Data Science & AI Engineering",
+      finalScore: 84.2,
+      compositeScore: 87.5,
+      financialViability: 80,
+      marketDemand: 91,
+      exams: [
+        { name: "JEE Main", date: "Jan / Apr 2026" },
+      ],
+      colleges: [
+        { name: "IIT Madras", location: "Chennai", ranking: 2 },
+        { name: "IIIT Hyderabad", location: "Hyderabad", ranking: 12 },
+      ],
+      scholarships: [
+        { name: "AICTE Pragati Scholarship", amount: "₹50,000/year", eligibility: "Girls admitted to AICTE degree", deadline: "Dec 2025" },
+      ],
+      timeline: "4-year B.Tech (AI/DS) → Specialized Systems Engineer",
+    },
+    {
+      id: "c3",
+      rank: 3,
+      domain: "Arts / Design / Media",
+      title: "Product & Interaction Design (UX)",
+      finalScore: 78.4,
+      compositeScore: 74.0,
+      financialViability: 85,
+      marketDemand: 82,
+      exams: [
+        { name: "UCEED", date: "Jan 2026" },
+        { name: "NID DAT", date: "Jan 2026" },
+      ],
+      colleges: [
+        { name: "NID Ahmedabad", location: "Ahmedabad", ranking: 1 },
+        { name: "IDC IIT Bombay", location: "Mumbai", ranking: 3 },
+      ],
+      scholarships: [
+        { name: "NID Merit Scholarship", amount: "Full tuition waiver", eligibility: "Top rank in NID DAT", deadline: "Jul 2026" },
+      ],
+      timeline: "4-year B.Des → UX/UI Systems Design",
+    },
+  ],
+  swot: {
+    strengths: [
+      { text: "Strong logical reasoning and pattern recognition", relatedDomain: "Engineering / Technology", score: 88 },
+      { text: "High technical curiosity in software & automated systems", relatedDomain: "Engineering / Technology", score: 92 },
+      { text: "Disciplined quantitative problem solving under exam conditions", relatedDomain: "Engineering / Technology", score: 84 },
+    ],
+    weaknesses: [
+      { text: "Lower affinity for non-technical administrative paperwork", relatedDomain: "Law / Civil Services", score: 42 },
+      { text: "Preference for individual deep work over public presentations", relatedDomain: "Business / Management", score: 55 },
+    ],
+    opportunities: [
+      { text: "High hiring demand in Indian cloud & AI infrastructure (+18% CAGR)", relatedDomain: "Engineering / Technology" },
+      { text: "Government non-debt scholarship opportunities for top STEM percentiles", relatedDomain: "Engineering / Technology" },
+    ],
+    threats: [
+      { text: "Uncalibrated private college loans create unnecessary family debt burden", relatedDomain: "General" },
+      { text: "Obsolete college curricula require supplementary project work", relatedDomain: "Engineering / Technology" },
+    ],
+  },
+};
 import {
   Sparkles,
   GraduationCap,
@@ -36,7 +164,7 @@ import {
 } from "lucide-react";
 
 export default function DashboardPage() {
-  const [data, setData] = React.useState<AnalyzeResponse>(DEMO_DATA.analyzeResponse);
+  const [data, setData] = React.useState<AnalyzeResponse>(INITIAL_ANALYSIS);
   const [studentName, setStudentName] = React.useState("Aarav Sharma");
   const [parentName, setParentName] = React.useState("Rajesh Sharma");
 
@@ -182,7 +310,6 @@ export default function DashboardPage() {
             studentName={studentName}
             parentName={parentName}
           />
-          <DemoFamilyButton variant="outline" size="sm" label="Reload Demo State" />
         </div>
       </div>
 

@@ -22,10 +22,6 @@ import type { BackendAnalyzeResponse, BackendCareerItem } from "@/types/backend"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
 
-/** When API_BASE is empty we serve from mock data. */
-export const IS_MOCK = !API_BASE;
-
-// Helper to get auth headers
 function getHeaders(extra?: HeadersInit): Headers {
   const headers = new Headers({
     "Content-Type": "application/json",
@@ -42,13 +38,7 @@ function getHeaders(extra?: HeadersInit): Headers {
   return headers;
 }
 
-// Generic fetcher
 async function fetcher<T>(path: string, options?: RequestInit): Promise<T> {
-  if (IS_MOCK) {
-    const mocks = await import("@/mocks");
-    return mocks.resolve<T>(path, options);
-  }
-
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: getHeaders(options?.headers),
