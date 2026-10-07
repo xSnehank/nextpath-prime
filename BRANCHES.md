@@ -5,6 +5,7 @@ develop   = integration branch. All feature branches PR into it (merge at least 
 
 Naming: <type>/<layer>-<story-id>-<short-name>
 Layers: fe = Member 1 (Frontend), be = Member 2 (Backend), db = Member 3 (Database + deploy)
+Since 2026-10-07 (Joel left), Member 2 (Snehank) also owns db.
 
 ## Phase 1 — Contract (first 10%)
 - chore/be-openapi-contract       Member 2: OpenAPI spec + mock responses
@@ -37,14 +38,17 @@ Layers: fe = Member 1 (Frontend), be = Member 2 (Backend), db = Member 3 (Databa
 - feat/be-E3-template-explanations   E3, F9 (P1) — Gemini explanations, cached, Jinja2 template fallback
 - feat/be-E5-alternate-paths         E5  (P2)
 
-## Member 3 — Database + data + deploy
-- feat/db-questions-bank             B1-B3 question bank (P0)
-- feat/db-careers-courses            careers, exams_colleges (P0)
-- feat/db-market-data-seed           D2 market_data, 10-15 careers (P0)
+## Member 3 — Database + data + deploy (Snehank since 2026-10-07)
+- chore/db-schema-and-seed           schema + seed runner (merged, #1)
+- feat/db-questions-bank             B1-B3 question bank (merged, #6)
+- feat/db-careers-courses            careers, exams_colleges (merged, #5)
+- fix/db-schema-review               review fixes for #1/#5/#6, RLS, db tests (P0; replaces feat/db-rls-policies)
+- feat/db-career-trait-weights       trait weights per career, from O*NET (P0)
+- feat/db-market-data-seed           D2 market_data + regional living costs (P0)
 - feat/db-scholarships               E2 scholarships (P0)
-- feat/db-rls-policies               row-level security, consent (P0)
-- chore/db-deploy-pipeline           Vercel + Render/Railway + Supabase env (P0)
+- fix/db-verify-college-data         official fees and ranks, 3 UG routes per career (P0)
 - feat/db-demo-family-seed           F1 sample student + parent (P0)
+- chore/db-deploy-pipeline           Supabase + Render + Vercel env, CI (P0)
 - feat/db-E5-local-steam-ideas       E5 regional idea data (P2)
 
 ## Rules
