@@ -32,7 +32,16 @@ BEGIN
                        WHERE NOT EXISTS (SELECT 1 FROM courses co WHERE co.career_id = c.id AND co.level = 'UG')),
            'every career has an undergraduate course';
     ASSERT NOT EXISTS (SELECT 1 FROM careers WHERE trait_weights IS NULL), 'every career has O*NET trait weights';
-    ASSERT (SELECT count(*) FROM exams_colleges) = 38, 'all 37 draft routes plus NDA (a mistyped course drops a row)';
+    ASSERT NOT EXISTS (SELECT 1 FROM careers c WHERE NOT EXISTS (
+        SELECT 1 FROM market_data m WHERE m.career_id = c.id AND m.region = 'India' AND m.entry_salary IS NOT NULL)),
+           'every career has a national market row with a starting salary';
+    ASSERT NOT EXISTS (SELECT 1 FROM careers c WHERE NOT EXISTS (
+        SELECT 1 FROM courses co JOIN exams_colleges ec ON ec.course_id = co.id
+        WHERE co.career_id = c.id AND co.level = 'UG' AND ec.annual_fee IS NOT NULL)),
+           'every career has an undergraduate route with a known fee, so the solver can cost it';
+    ASSERT EXISTS (SELECT 1 FROM regions WHERE name = 'India'), 'the national living cost is loaded';
+    ASSERT (SELECT count(*) FROM scholarships) = 3 AND (SELECT count(*) FROM scholarship_careers) = 23, 'scholarships';
+    ASSERT (SELECT count(*) FROM exams_colleges) = 40, '37 draft routes, 2 added routes and NDA (a mistyped course drops a row)';
     ASSERT NOT EXISTS (SELECT 1 FROM exams_colleges WHERE source = 'Unverified draft' AND NOT estimated),
            'unverified figures are marked estimated';
 END $$;

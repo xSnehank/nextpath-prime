@@ -10,3 +10,6 @@
 \ir 01_questions.sql
 \ir 02_careers_courses.sql
 \ir 03_trait_weights.sql
+\ir 04_market_data.sql
+\ir 05_scholarships.sql
+\ir 06_demo_family.sql

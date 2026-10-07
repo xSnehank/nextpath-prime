@@ -85,6 +85,7 @@ FROM (VALUES
     ('UX/UI Designer', 'Master of Design (M.Des in User Experience)', 'PG', 2.0),
     ('Educational Policy Specialist', 'B.A. in Social Sciences & Education', 'UG', 3.0),
     ('Educational Policy Specialist', 'M.A. in Public Policy & Education', 'PG', 2.0),
+    ('Educational Policy Specialist', 'B.A. (Hons), four-year', 'UG', 4.0),
     ('Agricultural Scientist', 'B.Sc (Hons) Agriculture', 'UG', 4.0),
     ('Agricultural Scientist', 'M.Sc in Agronomy & Soil Science', 'PG', 2.0),
     ('Corporate Lawyer', 'Integrated B.A. LL.B. (Honours)', 'UG', 5.0),
@@ -199,6 +200,29 @@ ON CONFLICT (course_id, college, exam) DO UPDATE SET
     rank_source = EXCLUDED.rank_source,
     source      = EXCLUDED.source,
     estimated   = EXCLUDED.estimated;
+
+-- ---------- exam + college routes: from secondary sources, not yet checked against the official page ----------
+-- Each career needs at least one undergraduate route the solver can cost; these two fill the gaps.
+INSERT INTO exams_colleges
+    (course_id, exam, college, city, state, annual_fee, annual_living_cost, source, source_url, as_of, estimated)
+SELECT co.id, v.exam, v.college, v.city, v.state, v.annual_fee, v.living, v.source, v.url, CAST(v.as_of AS date), true
+FROM (VALUES
+    ('Biotechnology Researcher', 'B.Tech in Biotechnology', 'JEE Advanced',
+     'Indian Institute of Technology (IIT) Madras (B.Tech Biological Engineering)', 'Chennai', 'Tamil Nadu',
+     230804, NULL,
+     'IIT Madras fee circular for 2026 admission: semester fee Rs 1,15,402 x 2 (General/OBC-NCL/EWS, family income above Rs 5 lakh; figures from Cracku''s summary, not yet checked against the PDF)',
+     'https://fees.iitm.ac.in/assets/circular/fees_structure_2026_admission_ug_pg.pdf', '2026-10-07'),
+    ('Educational Policy Specialist', 'B.A. (Hons), four-year', 'Azim Premji University National Entrance Test',
+     'Azim Premji University Bengaluru', 'Bengaluru', 'Karnataka', 332500, 80000,
+     'Careers360, Azim Premji University fees: B.A. (Hons) Rs 13.30 lakh for 4 years; accommodation Rs 80,000 a year',
+     'https://www.careers360.com/university/azim-premji-university-bangalore/fees', '2026-10-07')
+) AS v(career, course, exam, college, city, state, annual_fee, living, source, url, as_of)
+JOIN careers c ON c.name = v.career
+JOIN courses co ON co.career_id = c.id AND co.name = v.course
+ON CONFLICT (course_id, college, exam) DO UPDATE SET
+    city = EXCLUDED.city, state = EXCLUDED.state, annual_fee = EXCLUDED.annual_fee,
+    annual_living_cost = EXCLUDED.annual_living_cost, source = EXCLUDED.source, source_url = EXCLUDED.source_url,
+    as_of = EXCLUDED.as_of, estimated = EXCLUDED.estimated;
 
 -- ---------- exam + college routes: sourced ----------
 -- UPSC, NDA & NA Examination (II) 2026 notice (20 May 2026): training, accommodation, books, uniforms,

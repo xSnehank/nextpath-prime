@@ -33,7 +33,7 @@ def data(db_url: str) -> str:
         SELECT id, 'India', 40 + (row_number() OVER (ORDER BY id)) * 4, 400000 + (row_number() OVER (ORDER BY id)) * 30000,
                700000 + (row_number() OVER (ORDER BY id)) * 50000, 5 + (row_number() OVER (ORDER BY id)), 'TEST DATA',
                DATE '2026-01-01', true
-        FROM careers
+        FROM careers WHERE NOT EXISTS (SELECT 1 FROM market_data m WHERE m.career_id = careers.id)
         ON CONFLICT DO NOTHING
         """,
     )
