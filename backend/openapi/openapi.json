@@ -1,0 +1,2908 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PRISM Engine API",
+    "description": "\nCareer-guidance API for PRISM Engine (DataQuest 3.0, problem DQNM).\n\n* Send `Authorization: Bearer <Supabase access token>` on every endpoint except `/health` and `/demo/run`.\n* Every error has the shape `{\"error\": {\"code\", \"message\", \"details\"}}`; quote the `X-Request-ID`\n  response header when reporting a bug.\n* Mock mode (`USE_MOCKS=true`) answers from fixed demo data and needs no token. Act as the demo\n  parent by sending `X-Dev-User: 22222222-2222-4222-8222-222222222222`.\n",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Liveness and database check",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "UPSTREAM_UNAVAILABLE: the database cannot be reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/invite": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Student creates an invite code for their parent",
+        "operationId": "create_invite_auth_invite_post",
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InviteResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN: signed in, but not allowed to do this",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/auth/link": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Parent redeems the invite code, linking the two accounts",
+        "operationId": "link_accounts_auth_link_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN: signed in, but not allowed to do this",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR or INVALID_WEIGHTS: details.fields lists what is wrong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": [
+          "me"
+        ],
+        "summary": "Who am I: role, linked pair, progress and consent flags",
+        "operationId": "read_me_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/profile": {
+      "get": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Your saved profile",
+        "operationId": "read_profile_profile_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ParentProfile"
+                    },
+                    {
+                      "$ref": "#/components/schemas/StudentProfile"
+                    }
+                  ],
+                  "title": "Response Read Profile Profile Get",
+                  "discriminator": {
+                    "propertyName": "role",
+                    "mapping": {
+                      "parent": "#/components/schemas/ParentProfile",
+                      "student": "#/components/schemas/StudentProfile"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Save your profile: a parent's finances and hopes, or a student's preferences",
+        "operationId": "save_profile_profile_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ParentProfile"
+                  },
+                  {
+                    "$ref": "#/components/schemas/StudentProfile"
+                  }
+                ],
+                "title": "Body",
+                "discriminator": {
+                  "propertyName": "role",
+                  "mapping": {
+                    "parent": "#/components/schemas/ParentProfile",
+                    "student": "#/components/schemas/StudentProfile"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ParentProfile"
+                    },
+                    {
+                      "$ref": "#/components/schemas/StudentProfile"
+                    }
+                  ],
+                  "title": "Response Save Profile Profile Put",
+                  "discriminator": {
+                    "propertyName": "role",
+                    "mapping": {
+                      "parent": "#/components/schemas/ParentProfile",
+                      "student": "#/components/schemas/StudentProfile"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN: signed in, but not allowed to do this",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR or INVALID_WEIGHTS: details.fields lists what is wrong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/domains": {
+      "get": {
+        "tags": [
+          "careers"
+        ],
+        "summary": "Career domains, for the parent's top-3 picker",
+        "operationId": "list_domains_domains_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Domain"
+                  },
+                  "type": "array",
+                  "title": "Response List Domains Domains Get"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/questions": {
+      "get": {
+        "tags": [
+          "assessment"
+        ],
+        "summary": "The question set for students or parents",
+        "operationId": "get_questions_questions_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "audience",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Role"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionSet"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR or INVALID_WEIGHTS: details.fields lists what is wrong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/responses": {
+      "post": {
+        "tags": [
+          "assessment"
+        ],
+        "summary": "Save your answers (batch; re-sending a question overwrites it)",
+        "description": "Mock mode stores nothing, so \"answered\" counts only the questions in this request.",
+        "operationId": "save_responses_responses_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResponsesBatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponsesSaved"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR or INVALID_WEIGHTS: details.fields lists what is wrong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/consent": {
+      "post": {
+        "tags": [
+          "assessment"
+        ],
+        "summary": "Agree (or stop agreeing) to the parent-student comparison",
+        "operationId": "give_consent_consent_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR or INVALID_WEIGHTS: details.fields lists what is wrong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/analyze": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Run the whole pipeline for a linked pair and return the roadmap",
+        "description": "Mock mode returns the saved demo result. Custom weights are validated\nbut only change the ranking once feat/be-E1-E2-roadmap-endpoint lands.",
+        "operationId": "analyze_analyze_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyzeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyzeResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN: signed in, but not allowed to do this",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ASSESSMENT_INCOMPLETE or CONSENT_REQUIRED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR or INVALID_WEIGHTS: details.fields lists what is wrong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/results/{result_id}": {
+      "get": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "A saved roadmap",
+        "operationId": "get_result_results__result_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "result_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Result Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyzeResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN: signed in, but not allowed to do this",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR or INVALID_WEIGHTS: details.fields lists what is wrong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/explain": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Plain-language explanation of one career in a result",
+        "operationId": "explain_explain_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExplainRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExplainResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN: signed in, but not allowed to do this",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR or INVALID_WEIGHTS: details.fields lists what is wrong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/careers/{career_id}/market": {
+      "get": {
+        "tags": [
+          "careers"
+        ],
+        "summary": "Demand and salary by region for one career",
+        "operationId": "career_market_careers__career_id__market_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "career_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Career Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CareerMarket"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR or INVALID_WEIGHTS: details.fields lists what is wrong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/demo/run": {
+      "post": {
+        "tags": [
+          "demo"
+        ],
+        "summary": "Load the demo family and return its result id (only when DEMO_ENABLED=true; no login)",
+        "operationId": "run_demo_demo_run_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoRunResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AnalyzeRequest": {
+        "properties": {
+          "student_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Student Id"
+          },
+          "parent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Parent Id"
+          },
+          "weights": {
+            "$ref": "#/components/schemas/Weights",
+            "description": "Must sum to 1, otherwise INVALID_WEIGHTS",
+            "default": {
+              "fit": 0.45,
+              "finance": 0.3,
+              "market": 0.25
+            }
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "student_id",
+          "parent_id"
+        ],
+        "title": "AnalyzeRequest"
+      },
+      "AnalyzeResponse": {
+        "properties": {
+          "result_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Result Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "weights": {
+            "$ref": "#/components/schemas/Weights"
+          },
+          "conflict": {
+            "$ref": "#/components/schemas/Conflict"
+          },
+          "swot": {
+            "$ref": "#/components/schemas/Swot"
+          },
+          "traits": {
+            "items": {
+              "$ref": "#/components/schemas/Trait"
+            },
+            "type": "array",
+            "title": "Traits"
+          },
+          "domain_scores": {
+            "items": {
+              "$ref": "#/components/schemas/DomainScore"
+            },
+            "type": "array",
+            "title": "Domain Scores",
+            "description": "Best fit first"
+          },
+          "roadmap": {
+            "items": {
+              "$ref": "#/components/schemas/RoadmapItem"
+            },
+            "type": "array",
+            "maxItems": 5,
+            "title": "Roadmap",
+            "description": "Viable paths first, by final score; filled with non-viable ones (finance.viable = false) when fewer than 5 are viable"
+          },
+          "rejected": {
+            "items": {
+              "$ref": "#/components/schemas/RejectedCareer"
+            },
+            "type": "array",
+            "title": "Rejected",
+            "description": "Non-viable careers that did not make the roadmap"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "result_id",
+          "created_at",
+          "weights",
+          "conflict",
+          "swot",
+          "traits",
+          "domain_scores",
+          "roadmap",
+          "rejected"
+        ],
+        "title": "AnalyzeResponse"
+      },
+      "Answer": {
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Question Id"
+          },
+          "value": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Value",
+            "description": "1 = strongly disagree ... 5 = strongly agree"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question_id",
+          "value"
+        ],
+        "title": "Answer"
+      },
+      "AnswerOption": {
+        "properties": {
+          "value": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Value"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "value",
+          "label"
+        ],
+        "title": "AnswerOption"
+      },
+      "CareerMarket": {
+        "properties": {
+          "career_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Career Id"
+          },
+          "career": {
+            "type": "string",
+            "title": "Career"
+          },
+          "domain": {
+            "type": "string",
+            "title": "Domain"
+          },
+          "national": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RegionMarket"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "regions": {
+            "items": {
+              "$ref": "#/components/schemas/RegionMarket"
+            },
+            "type": "array",
+            "title": "Regions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "career_id",
+          "career",
+          "domain",
+          "national",
+          "regions"
+        ],
+        "title": "CareerMarket"
+      },
+      "College": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "annual_fee": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Annual Fee",
+            "description": "Whole rupees"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "annual_fee"
+        ],
+        "title": "College"
+      },
+      "Conflict": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Index",
+            "description": "100 x the mean of the four gaps"
+          },
+          "label": {
+            "type": "string",
+            "enum": [
+              "low",
+              "moderate",
+              "high"
+            ],
+            "title": "Label",
+            "description": "under 30 low, 30-60 moderate, above 60 high"
+          },
+          "top_gaps": {
+            "items": {
+              "$ref": "#/components/schemas/Gap"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "title": "Top Gaps",
+            "description": "The three largest gaps, largest first"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/Gap"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "title": "Gaps",
+            "description": "All four gaps, largest first"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "index",
+          "label",
+          "top_gaps",
+          "gaps"
+        ],
+        "title": "Conflict"
+      },
+      "ConsentRequest": {
+        "properties": {
+          "agree": {
+            "type": "boolean",
+            "title": "Agree",
+            "description": "true to allow the parent-student comparison, false to withdraw"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "agree"
+        ],
+        "title": "ConsentRequest"
+      },
+      "ConsentResponse": {
+        "properties": {
+          "consented": {
+            "type": "boolean",
+            "title": "Consented"
+          },
+          "consented_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consented At"
+          },
+          "both_consented": {
+            "type": "boolean",
+            "title": "Both Consented",
+            "description": "True when the linked partner has agreed too"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "consented",
+          "consented_at",
+          "both_consented"
+        ],
+        "title": "ConsentResponse"
+      },
+      "DemoRunResponse": {
+        "properties": {
+          "result_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Result Id"
+          },
+          "student_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Student Id"
+          },
+          "parent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Parent Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "result_id",
+          "student_id",
+          "parent_id"
+        ],
+        "title": "DemoRunResponse"
+      },
+      "Dimension": {
+        "type": "string",
+        "enum": [
+          "logical",
+          "numerical",
+          "verbal",
+          "spatial",
+          "creative",
+          "realistic",
+          "investigative",
+          "artistic",
+          "social",
+          "enterprising",
+          "conventional",
+          "analytical",
+          "structured"
+        ],
+        "title": "Dimension",
+        "description": "The 13 trait dimensions. Question dimensions and careers.trait_weights keys use exactly these values."
+      },
+      "Domain": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description"
+        ],
+        "title": "Domain"
+      },
+      "DomainScore": {
+        "properties": {
+          "domain_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Domain Id"
+          },
+          "domain": {
+            "type": "string",
+            "title": "Domain"
+          },
+          "fit": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Fit",
+            "description": "0..1"
+          },
+          "aptitude": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Aptitude",
+            "description": "0..1"
+          },
+          "interest": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Interest",
+            "description": "0..1"
+          },
+          "cognitive": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Cognitive",
+            "description": "0..1"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "domain_id",
+          "domain",
+          "fit",
+          "aptitude",
+          "interest",
+          "cognitive"
+        ],
+        "title": "DomainScore",
+        "description": "Mean of the scores of the careers in this domain."
+      },
+      "EducationPath": {
+        "properties": {
+          "education": {
+            "type": "string",
+            "title": "Education"
+          },
+          "exams": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Exams"
+          },
+          "colleges": {
+            "items": {
+              "$ref": "#/components/schemas/College"
+            },
+            "type": "array",
+            "title": "Colleges",
+            "description": "The finance check uses the first college"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "education",
+          "exams",
+          "colleges"
+        ],
+        "title": "EducationPath"
+      },
+      "ErrorBody": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "title": "ErrorBody",
+        "description": "Every error response has this shape."
+      },
+      "ErrorCode": {
+        "type": "string",
+        "enum": [
+          "UNAUTHENTICATED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "METHOD_NOT_ALLOWED",
+          "ASSESSMENT_INCOMPLETE",
+          "CONSENT_REQUIRED",
+          "INVALID_WEIGHTS",
+          "VALIDATION_ERROR",
+          "INTERNAL_ERROR",
+          "NOT_IMPLEMENTED",
+          "UPSTREAM_UNAVAILABLE"
+        ],
+        "title": "ErrorCode"
+      },
+      "ErrorDetail": {
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ErrorCode"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "details": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Details"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "details"
+        ],
+        "title": "ErrorDetail"
+      },
+      "ExplainRequest": {
+        "properties": {
+          "result_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Result Id"
+          },
+          "career_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Career Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "result_id",
+          "career_id"
+        ],
+        "title": "ExplainRequest"
+      },
+      "ExplainResponse": {
+        "properties": {
+          "career_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Career Id"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text",
+            "description": "Under 150 words, built only from the numbers in the result"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "cache",
+              "gemini",
+              "template"
+            ],
+            "title": "Source",
+            "description": "Lets the UI tag AI-written vs template text"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "career_id",
+          "text",
+          "source"
+        ],
+        "title": "ExplainResponse"
+      },
+      "FinanceCheck": {
+        "properties": {
+          "viable": {
+            "type": "boolean",
+            "title": "Viable"
+          },
+          "total_cost": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total Cost",
+            "description": "(annual fee + living cost) x duration - matched scholarship"
+          },
+          "capacity": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Capacity",
+            "description": "What the family can pay over the course without a loan"
+          },
+          "loan_needed": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Loan Needed",
+            "description": "max(0, total_cost - capacity)"
+          },
+          "starting_salary": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Starting Salary",
+            "description": "Whole rupees"
+          },
+          "breakeven_years": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Breakeven Years",
+            "description": "total_cost / (starting salary - yearly living costs)"
+          },
+          "duration_years": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Duration Years"
+          },
+          "reasons": {
+            "items": {
+              "$ref": "#/components/schemas/FinanceReason"
+            },
+            "type": "array",
+            "title": "Reasons",
+            "description": "Why the path is not viable; empty when viable"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "viable",
+          "total_cost",
+          "capacity",
+          "loan_needed",
+          "starting_salary",
+          "breakeven_years",
+          "duration_years",
+          "reasons"
+        ],
+        "title": "FinanceCheck"
+      },
+      "FinanceParts": {
+        "properties": {
+          "capacity_ratio": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Capacity Ratio",
+            "description": "min(1, capacity / total_cost)"
+          },
+          "loan": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Loan",
+            "description": "1 when the loan is within the family's limit, lower the further above it"
+          },
+          "payback": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Payback",
+            "description": "1 - breakeven / (2 x the family's tolerance), clamped to 0..1"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "capacity_ratio",
+          "loan",
+          "payback"
+        ],
+        "title": "FinanceParts",
+        "description": "finance = 0.5 x capacity_ratio + 0.3 x loan + 0.2 x payback"
+      },
+      "FinanceReason": {
+        "type": "string",
+        "enum": [
+          "LOAN_EXCEEDS_LIMIT",
+          "BREAKEVEN_TOO_LONG",
+          "COST_EXCEEDS_CAPACITY"
+        ],
+        "title": "FinanceReason"
+      },
+      "FitParts": {
+        "properties": {
+          "aptitude": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Aptitude",
+            "description": "0..1"
+          },
+          "interest": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Interest",
+            "description": "0..1"
+          },
+          "cognitive": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Cognitive",
+            "description": "0..1"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "aptitude",
+          "interest",
+          "cognitive"
+        ],
+        "title": "FitParts",
+        "description": "fit = 0.5 x aptitude + 0.3 x interest + 0.2 x cognitive"
+      },
+      "Gap": {
+        "properties": {
+          "dimension": {
+            "type": "string",
+            "enum": [
+              "domain",
+              "risk",
+              "location",
+              "budget"
+            ],
+            "title": "Dimension"
+          },
+          "gap": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Gap",
+            "description": "0 = agree ... 1 = fully disagree"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "student_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Value",
+            "description": "The student's side, for display"
+          },
+          "parent_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Value",
+            "description": "The parent's side, for display"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "dimension",
+          "gap",
+          "text",
+          "student_value",
+          "parent_value"
+        ],
+        "title": "Gap"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status"
+          },
+          "database": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "unavailable",
+              "skipped"
+            ],
+            "title": "Database",
+            "description": "'skipped' until the database check lands"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "mock",
+              "live"
+            ],
+            "title": "Mode"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "database",
+          "mode",
+          "version"
+        ],
+        "title": "HealthResponse"
+      },
+      "IndianState": {
+        "type": "string",
+        "enum": [
+          "Andhra Pradesh",
+          "Arunachal Pradesh",
+          "Assam",
+          "Bihar",
+          "Chhattisgarh",
+          "Goa",
+          "Gujarat",
+          "Haryana",
+          "Himachal Pradesh",
+          "Jharkhand",
+          "Karnataka",
+          "Kerala",
+          "Madhya Pradesh",
+          "Maharashtra",
+          "Manipur",
+          "Meghalaya",
+          "Mizoram",
+          "Nagaland",
+          "Odisha",
+          "Punjab",
+          "Rajasthan",
+          "Sikkim",
+          "Tamil Nadu",
+          "Telangana",
+          "Tripura",
+          "Uttar Pradesh",
+          "Uttarakhand",
+          "West Bengal",
+          "Andaman and Nicobar Islands",
+          "Chandigarh",
+          "Dadra and Nagar Haveli and Daman and Diu",
+          "Delhi",
+          "Jammu and Kashmir",
+          "Ladakh",
+          "Lakshadweep",
+          "Puducherry"
+        ],
+        "title": "IndianState",
+        "description": "States and union territories, spelled exactly like this everywhere (profiles, market data)."
+      },
+      "InviteResponse": {
+        "properties": {
+          "invite_code": {
+            "type": "string",
+            "title": "Invite Code",
+            "description": "Short code the student shares with their parent; single use"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "invite_code",
+          "expires_at"
+        ],
+        "title": "InviteResponse"
+      },
+      "LinkRequest": {
+        "properties": {
+          "invite_code": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 6,
+            "title": "Invite Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "invite_code"
+        ],
+        "title": "LinkRequest"
+      },
+      "LinkResponse": {
+        "properties": {
+          "student_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Student Id"
+          },
+          "parent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Parent Id"
+          },
+          "linked_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Linked At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "student_id",
+          "parent_id",
+          "linked_at"
+        ],
+        "title": "LinkResponse"
+      },
+      "MarketParts": {
+        "properties": {
+          "demand": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Demand",
+            "description": "0..1"
+          },
+          "growth": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Growth",
+            "description": "0..1"
+          },
+          "salary_percentile": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Salary Percentile",
+            "description": "0..1"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "demand",
+          "growth",
+          "salary_percentile"
+        ],
+        "title": "MarketParts",
+        "description": "market = 0.5 x demand + 0.3 x growth + 0.2 x salary_percentile, each min-max scaled across careers"
+      },
+      "MatchedScholarship": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Amount",
+            "description": "Whole rupees"
+          },
+          "deadline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline"
+          },
+          "matched_rule": {
+            "type": "string",
+            "title": "Matched Rule",
+            "description": "The eligibility rule the family met, e.g. 'percentage >= 85'"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "amount",
+          "deadline",
+          "matched_rule"
+        ],
+        "title": "MatchedScholarship"
+      },
+      "MeResponse": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "pair": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Pair"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null until the parent redeems the invite code"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/Progress"
+          },
+          "consented": {
+            "type": "boolean",
+            "title": "Consented"
+          },
+          "partner": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PartnerStatus"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null until linked"
+          },
+          "latest_result_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Result Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "user_id",
+          "role",
+          "email",
+          "full_name",
+          "pair",
+          "progress",
+          "consented",
+          "partner",
+          "latest_result_id"
+        ],
+        "title": "MeResponse"
+      },
+      "Pair": {
+        "properties": {
+          "student_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Student Id"
+          },
+          "parent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Parent Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "student_id",
+          "parent_id"
+        ],
+        "title": "Pair"
+      },
+      "ParentProfile": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "const": "parent",
+            "title": "Role"
+          },
+          "annual_education_budget": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Annual Education Budget",
+            "description": "What the family can spend on education each year"
+          },
+          "savings": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Savings",
+            "description": "Savings set aside for education"
+          },
+          "max_loan": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Max Loan",
+            "description": "Largest education loan the family will take"
+          },
+          "annual_income": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0,
+                "description": "Whole rupees"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Annual Income",
+            "description": "Optional; used only to match scholarship income limits"
+          },
+          "risk_appetite": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Risk Appetite",
+            "description": "1 = avoids risk ... 5 = very comfortable with risk"
+          },
+          "breakeven_tolerance_years": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Breakeven Tolerance Years",
+            "description": "Years of salary the family accepts to recover the cost"
+          },
+          "preferred_state": {
+            "$ref": "#/components/schemas/IndianState"
+          },
+          "open_to_abroad": {
+            "type": "boolean",
+            "title": "Open To Abroad"
+          },
+          "top_domain_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Top Domain Ids",
+            "description": "The parent's top 3 domains (ids from GET /domains), first choice first"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "role",
+          "annual_education_budget",
+          "savings",
+          "max_loan",
+          "risk_appetite",
+          "breakeven_tolerance_years",
+          "preferred_state",
+          "open_to_abroad",
+          "top_domain_ids"
+        ],
+        "title": "ParentProfile"
+      },
+      "PartnerStatus": {
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "assessment_complete": {
+            "type": "boolean",
+            "title": "Assessment Complete"
+          },
+          "consented": {
+            "type": "boolean",
+            "title": "Consented"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "role",
+          "assessment_complete",
+          "consented"
+        ],
+        "title": "PartnerStatus",
+        "description": "Only status flags about the linked partner; never their answers."
+      },
+      "Progress": {
+        "properties": {
+          "questions_answered": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Questions Answered"
+          },
+          "questions_required": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Questions Required",
+            "description": "0 for parents: their assessment is the profile form"
+          },
+          "profile_complete": {
+            "type": "boolean",
+            "title": "Profile Complete"
+          },
+          "assessment_complete": {
+            "type": "boolean",
+            "title": "Assessment Complete",
+            "description": "All required questions answered and the profile saved"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "questions_answered",
+          "questions_required",
+          "profile_complete",
+          "assessment_complete"
+        ],
+        "title": "Progress"
+      },
+      "Question": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "group": {
+            "$ref": "#/components/schemas/TraitGroup"
+          },
+          "dimension": {
+            "$ref": "#/components/schemas/Dimension"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/AnswerOption"
+            },
+            "type": "array",
+            "title": "Options"
+          },
+          "required": {
+            "type": "boolean",
+            "title": "Required"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "group",
+          "dimension",
+          "text",
+          "options",
+          "required"
+        ],
+        "title": "Question",
+        "description": "One 1-5 statement. Whether it is reverse-scored stays on the server."
+      },
+      "QuestionSet": {
+        "properties": {
+          "audience": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            },
+            "type": "array",
+            "title": "Questions",
+            "description": "In display order. Empty for parents: their assessment is the profile form (PUT /profile)."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "audience",
+          "questions"
+        ],
+        "title": "QuestionSet"
+      },
+      "RegionMarket": {
+        "properties": {
+          "region": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IndianState"
+              },
+              {
+                "type": "string",
+                "const": "India"
+              }
+            ],
+            "title": "Region"
+          },
+          "demand_index": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Demand Index",
+            "description": "0..1"
+          },
+          "growth_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Growth Rate",
+            "description": "Yearly growth in percent, as published by the source"
+          },
+          "median_salary": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0,
+                "description": "Whole rupees"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Salary"
+          },
+          "entry_salary": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0,
+                "description": "Whole rupees"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entry Salary",
+            "description": "Typical starting salary for a fresher"
+          },
+          "as_of": {
+            "type": "string",
+            "format": "date",
+            "title": "As Of"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "data_quality": {
+            "type": "string",
+            "enum": [
+              "sourced",
+              "estimated"
+            ],
+            "title": "Data Quality",
+            "description": "'estimated' when the figure is an estimate or the national figure stands in for missing regional data"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "region",
+          "demand_index",
+          "growth_rate",
+          "median_salary",
+          "entry_salary",
+          "as_of",
+          "source",
+          "data_quality"
+        ],
+        "title": "RegionMarket",
+        "description": "Market figures for one career in one region (or \"India\" for the national figure)."
+      },
+      "RejectedCareer": {
+        "properties": {
+          "career_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Career Id"
+          },
+          "career": {
+            "type": "string",
+            "title": "Career"
+          },
+          "reasons": {
+            "items": {
+              "$ref": "#/components/schemas/FinanceReason"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Reasons"
+          },
+          "cheaper_alternative": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cheaper Alternative"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "career_id",
+          "career",
+          "reasons",
+          "cheaper_alternative"
+        ],
+        "title": "RejectedCareer"
+      },
+      "ResponsesBatch": {
+        "properties": {
+          "answers": {
+            "items": {
+              "$ref": "#/components/schemas/Answer"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "minItems": 1,
+            "title": "Answers"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "answers"
+        ],
+        "title": "ResponsesBatch"
+      },
+      "ResponsesSaved": {
+        "properties": {
+          "saved": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Saved",
+            "description": "Questions stored by this request; re-sending a question overwrites it"
+          },
+          "answered": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Answered",
+            "description": "Questions this user has answered so far"
+          },
+          "required": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Required"
+          },
+          "complete": {
+            "type": "boolean",
+            "title": "Complete"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "saved",
+          "answered",
+          "required",
+          "complete"
+        ],
+        "title": "ResponsesSaved"
+      },
+      "RoadmapItem": {
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Rank"
+          },
+          "career_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Career Id"
+          },
+          "career": {
+            "type": "string",
+            "title": "Career"
+          },
+          "domain": {
+            "type": "string",
+            "title": "Domain"
+          },
+          "scores": {
+            "$ref": "#/components/schemas/Scores"
+          },
+          "finance": {
+            "$ref": "#/components/schemas/FinanceCheck"
+          },
+          "market": {
+            "$ref": "#/components/schemas/RegionMarket"
+          },
+          "path": {
+            "$ref": "#/components/schemas/EducationPath"
+          },
+          "scholarships": {
+            "items": {
+              "$ref": "#/components/schemas/MatchedScholarship"
+            },
+            "type": "array",
+            "title": "Scholarships"
+          },
+          "cheaper_alternative": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cheaper Alternative"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rank",
+          "career_id",
+          "career",
+          "domain",
+          "scores",
+          "finance",
+          "market",
+          "path",
+          "scholarships",
+          "cheaper_alternative"
+        ],
+        "title": "RoadmapItem"
+      },
+      "Role": {
+        "type": "string",
+        "enum": [
+          "student",
+          "parent"
+        ],
+        "title": "Role"
+      },
+      "Scores": {
+        "properties": {
+          "fit": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Fit",
+            "description": "0..1"
+          },
+          "finance": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Finance",
+            "description": "0..1"
+          },
+          "market": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Market",
+            "description": "0..1"
+          },
+          "final": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Final",
+            "description": "weights.fit x fit + weights.finance x finance + weights.market x market"
+          },
+          "final_100": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Final 100",
+            "description": "0..100, for display"
+          },
+          "fit_parts": {
+            "$ref": "#/components/schemas/FitParts"
+          },
+          "finance_parts": {
+            "$ref": "#/components/schemas/FinanceParts"
+          },
+          "market_parts": {
+            "$ref": "#/components/schemas/MarketParts"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "fit",
+          "finance",
+          "market",
+          "final",
+          "final_100",
+          "fit_parts",
+          "finance_parts",
+          "market_parts"
+        ],
+        "title": "Scores"
+      },
+      "StudentProfile": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "const": "student",
+            "title": "Role"
+          },
+          "risk_appetite": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Risk Appetite",
+            "description": "1 = avoids risk ... 5 = very comfortable with risk"
+          },
+          "preferred_state": {
+            "$ref": "#/components/schemas/IndianState",
+            "description": "Where the student would like to study and work"
+          },
+          "open_to_abroad": {
+            "type": "boolean",
+            "title": "Open To Abroad"
+          },
+          "home_state": {
+            "$ref": "#/components/schemas/IndianState",
+            "description": "State of residence; used for state scholarships"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "general",
+                  "obc",
+                  "sc",
+                  "st",
+                  "ews"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category",
+            "description": "Optional; used only for scholarship rules"
+          },
+          "percentage": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentage",
+            "description": "Latest board exam percentage; optional, used for merit scholarships"
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "female",
+                  "male",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender",
+            "description": "Optional; some scholarships are for girls only"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "role",
+          "risk_appetite",
+          "preferred_state",
+          "open_to_abroad",
+          "home_state"
+        ],
+        "title": "StudentProfile"
+      },
+      "Swot": {
+        "properties": {
+          "strengths": {
+            "items": {
+              "$ref": "#/components/schemas/SwotItem"
+            },
+            "type": "array",
+            "title": "Strengths"
+          },
+          "weaknesses": {
+            "items": {
+              "$ref": "#/components/schemas/SwotItem"
+            },
+            "type": "array",
+            "title": "Weaknesses"
+          },
+          "opportunities": {
+            "items": {
+              "$ref": "#/components/schemas/SwotItem"
+            },
+            "type": "array",
+            "title": "Opportunities"
+          },
+          "threats": {
+            "items": {
+              "$ref": "#/components/schemas/SwotItem"
+            },
+            "type": "array",
+            "title": "Threats"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "strengths",
+          "weaknesses",
+          "opportunities",
+          "threats"
+        ],
+        "title": "Swot"
+      },
+      "SwotItem": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value",
+            "description": "The number that produced this item: a trait score, demand score, years or rupees"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "value"
+        ],
+        "title": "SwotItem"
+      },
+      "Trait": {
+        "properties": {
+          "dimension": {
+            "$ref": "#/components/schemas/Dimension"
+          },
+          "group": {
+            "$ref": "#/components/schemas/TraitGroup"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "description": "0..1"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value",
+            "description": "Null when the student answered no questions for this dimension"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "dimension",
+          "group",
+          "value"
+        ],
+        "title": "Trait"
+      },
+      "TraitGroup": {
+        "type": "string",
+        "enum": [
+          "aptitude",
+          "interest",
+          "cognitive"
+        ],
+        "title": "TraitGroup"
+      },
+      "Weights": {
+        "properties": {
+          "fit": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Fit"
+          },
+          "finance": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Finance"
+          },
+          "market": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Market"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "fit",
+          "finance",
+          "market"
+        ],
+        "title": "Weights",
+        "description": "Weights for the final ranking R = fit*S + finance*F + market*M (backend guide, section 4, step 5)."
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "description": "Supabase access token",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
