@@ -21,7 +21,7 @@ def test_every_error_response_uses_error_body() -> None:
                     assert schema == {"$ref": "#/components/schemas/ErrorBody"}, (method, path, status)
 
 
-def test_only_health_and_demo_are_public() -> None:
+def test_only_health_demo_and_market_data_are_public() -> None:
     spec = current_spec()
     public = {
         (method.upper(), path)
@@ -29,4 +29,4 @@ def test_only_health_and_demo_are_public() -> None:
         for method, operation in operations.items()
         if "security" not in operation
     }
-    assert public == {("GET", "/health"), ("POST", "/demo/run")}
+    assert public == {("GET", "/health"), ("POST", "/demo/run"), ("GET", "/careers/{career_id}/market")}

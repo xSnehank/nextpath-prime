@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+/* `dark:` utilities follow the .dark class on <html> (set by ThemeToggle), not the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* =========================================================================
+   Theme colours. Light is the default; .dark on <html> switches every token.
+   Use them as Tailwind classes: bg-background, text-foreground, bg-card, border-border,
+   text-muted-foreground, bg-primary text-primary-foreground, text-accent, text-success, ...
+   ========================================================================= */
+:root {
+  --background: #f7f7f3;
+  --foreground: #16181b;
+  --card: #ffffff;
+  --muted: #efefe9;
+  --muted-foreground: #5d5e57;
+  --border: #e2e2da;
+  --input: #d6d6cd;
+  /* Brand lime on buttons, with dark text in both themes */
+  --primary: #d4ff3a;
+  --primary-hover: #c2ef1f;
+  --primary-foreground: #0d0e10;
+  /* Accent for text and icons: the lime is unreadable on white, so a deep olive in light mode */
+  --accent: #4b6a00;
+  --ring: #8fb31a;
+  --success: #15803d;
+  --success-soft: #dcfce7;
+  --warning: #b45309;
+  --warning-soft: #fef3c7;
+  --danger: #be123c;
+  --danger-soft: #ffe4e6;
+  --chart-grid: #d9d9d0;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #08090a;
+  --foreground: #eeeee8;
+  --card: #121316;
+  --muted: #1b1d21;
+  --muted-foreground: #9c9d95;
+  --border: #26282d;
+  --input: #30333a;
+  --primary: #d4ff3a;
+  --primary-hover: #e2ff6e;
+  --primary-foreground: #08090a;
+  --accent: #d4ff3a;
+  --ring: #d4ff3a;
+  --success: #4ade80;
+  --success-soft: rgba(74, 222, 128, 0.12);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.12);
+  --danger: #fb7185;
+  --danger-soft: rgba(251, 113, 133, 0.12);
+  --chart-grid: #2c2f35;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-outfit), var(--font-inter), system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--input);
+  border-radius: 3px;
+}

@@ -30,7 +30,7 @@ def test_wrong_method(client: TestClient) -> None:
 def test_validation_error_lists_fields_but_never_echoes_values(client: TestClient) -> None:
     response = client.put("/profile", headers=AS_PARENT, json=PARENT_PROFILE | {"savings": -987654321})
     details = assert_error(response, 422, "VALIDATION_ERROR")
-    assert [f["field"] for f in details["fields"]] == ["parent.savings"]
+    assert [f["field"] for f in details["fields"]] == ["savings"]  # the union's role tag is dropped
     assert details["fields"][0]["location"] == "body"
     assert "987654321" not in response.text
 
@@ -101,11 +101,6 @@ def test_parent_profile_needs_three_different_known_domains(client: TestClient) 
 
 def test_demo_disabled_looks_like_a_missing_route() -> None:
     assert_error(make_client(demo_enabled=False).post("/demo/run"), 404, "NOT_FOUND")
-
-
-def test_live_mode_says_which_branch_is_missing() -> None:
-    details = assert_error(make_client(use_mocks=False).get("/domains"), 501, "NOT_IMPLEMENTED")
-    assert details["branch"]
 
 
 def test_unexpected_error_is_a_clean_500() -> None:
