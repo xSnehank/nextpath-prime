@@ -34,7 +34,7 @@ Layers: fe = Member 1 (Frontend), be = Member 2 (Backend), db = Member 3 (Databa
 - feat/be-D2-market-blend            D2, ranking R_d (P0)
 - feat/be-E1-E2-roadmap-endpoint     POST /analyze, E1, E2 (P0)
 - feat/be-C3-swot-logic              C3  (P1)
-- feat/be-E3-template-explanations   E3, F9 (P1) — Jinja2 templates, optional Ollama
+- feat/be-E3-template-explanations   E3, F9 (P1) — Gemini explanations, cached, Jinja2 template fallback
 - feat/be-E5-alternate-paths         E5  (P2)
 
 ## Member 3 — Database + data + deploy

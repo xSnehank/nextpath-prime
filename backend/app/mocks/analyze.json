@@ -1,0 +1,565 @@
+{
+  "result_id": "33333333-3333-4333-8333-333333333333",
+  "created_at": "2026-10-07T09:00:00Z",
+  "weights": {
+    "fit": 0.45,
+    "finance": 0.3,
+    "market": 0.25
+  },
+  "conflict": {
+    "index": 50,
+    "label": "moderate",
+    "top_gaps": [
+      {
+        "dimension": "location",
+        "gap": 1.0,
+        "text": "The student prefers Karnataka and is open to studying abroad; the parent prefers Maharashtra and staying in India.",
+        "student_value": "Karnataka, open to abroad",
+        "parent_value": "Maharashtra, India only"
+      },
+      {
+        "dimension": "domain",
+        "gap": 0.5025,
+        "text": "Parent's first choice is Medicine / Healthcare; the student's best fit is Engineering / Technology.",
+        "student_value": "Engineering / Technology",
+        "parent_value": "Medicine / Healthcare"
+      },
+      {
+        "dimension": "risk",
+        "gap": 0.5,
+        "text": "The student is more comfortable with risk (4/5) than the parent (2/5).",
+        "student_value": "4/5",
+        "parent_value": "2/5"
+      }
+    ],
+    "gaps": [
+      {
+        "dimension": "location",
+        "gap": 1.0,
+        "text": "The student prefers Karnataka and is open to studying abroad; the parent prefers Maharashtra and staying in India.",
+        "student_value": "Karnataka, open to abroad",
+        "parent_value": "Maharashtra, India only"
+      },
+      {
+        "dimension": "domain",
+        "gap": 0.5025,
+        "text": "Parent's first choice is Medicine / Healthcare; the student's best fit is Engineering / Technology.",
+        "student_value": "Engineering / Technology",
+        "parent_value": "Medicine / Healthcare"
+      },
+      {
+        "dimension": "risk",
+        "gap": 0.5,
+        "text": "The student is more comfortable with risk (4/5) than the parent (2/5).",
+        "student_value": "4/5",
+        "parent_value": "2/5"
+      },
+      {
+        "dimension": "budget",
+        "gap": 0.0,
+        "text": "The top-ranked path (Data Science / AI) fits within what the family can pay without a loan.",
+        "student_value": "₹14.2 lakh total cost",
+        "parent_value": "₹16.0 lakh capacity"
+      }
+    ]
+  },
+  "swot": {
+    "strengths": [
+      {
+        "text": "Strong curiosity about how things work (investigative interest)",
+        "value": 0.88
+      },
+      {
+        "text": "Strong logical reasoning",
+        "value": 0.86
+      },
+      {
+        "text": "Analytical, evidence-based thinking style",
+        "value": 0.82
+      },
+      {
+        "text": "Strong numerical ability",
+        "value": 0.8
+      },
+      {
+        "text": "Creative ability",
+        "value": 0.72
+      }
+    ],
+    "weaknesses": [
+      {
+        "text": "Low interest in routine, rule-based work",
+        "value": 0.36
+      }
+    ],
+    "opportunities": [
+      {
+        "text": "Data Science / AI: strong demand in Karnataka",
+        "value": 1.0
+      },
+      {
+        "text": "Software Engineering: strong demand in Karnataka",
+        "value": 0.8058
+      },
+      {
+        "text": "Product Design (UX): strong demand in Karnataka",
+        "value": 0.6742
+      }
+    ],
+    "threats": [
+      {
+        "text": "Architecture: paying back the cost would take about 10 years, longer than the family accepts",
+        "value": 10.0
+      },
+      {
+        "text": "MBBS / Medicine: the loan needed is far above the family's limit",
+        "value": 6385000
+      }
+    ]
+  },
+  "traits": [
+    {
+      "dimension": "logical",
+      "group": "aptitude",
+      "value": 0.86
+    },
+    {
+      "dimension": "numerical",
+      "group": "aptitude",
+      "value": 0.8
+    },
+    {
+      "dimension": "verbal",
+      "group": "aptitude",
+      "value": 0.58
+    },
+    {
+      "dimension": "spatial",
+      "group": "aptitude",
+      "value": 0.66
+    },
+    {
+      "dimension": "creative",
+      "group": "aptitude",
+      "value": 0.72
+    },
+    {
+      "dimension": "realistic",
+      "group": "interest",
+      "value": 0.42
+    },
+    {
+      "dimension": "investigative",
+      "group": "interest",
+      "value": 0.88
+    },
+    {
+      "dimension": "artistic",
+      "group": "interest",
+      "value": 0.68
+    },
+    {
+      "dimension": "social",
+      "group": "interest",
+      "value": 0.46
+    },
+    {
+      "dimension": "enterprising",
+      "group": "interest",
+      "value": 0.55
+    },
+    {
+      "dimension": "conventional",
+      "group": "interest",
+      "value": 0.36
+    },
+    {
+      "dimension": "analytical",
+      "group": "cognitive",
+      "value": 0.82
+    },
+    {
+      "dimension": "structured",
+      "group": "cognitive",
+      "value": 0.62
+    }
+  ],
+  "domain_scores": [
+    {
+      "domain_id": "d0000000-0000-4000-8000-000000000001",
+      "domain": "Engineering / Technology",
+      "fit": 0.82,
+      "aptitude": 0.83,
+      "interest": 0.83,
+      "cognitive": 0.78
+    },
+    {
+      "domain_id": "d0000000-0000-4000-8000-000000000002",
+      "domain": "Sciences / Research",
+      "fit": 0.696,
+      "aptitude": 0.7,
+      "interest": 0.66,
+      "cognitive": 0.74
+    },
+    {
+      "domain_id": "d0000000-0000-4000-8000-000000000005",
+      "domain": "Arts / Design / Media",
+      "fit": 0.668,
+      "aptitude": 0.64,
+      "interest": 0.74,
+      "cognitive": 0.63
+    },
+    {
+      "domain_id": "d0000000-0000-4000-8000-000000000004",
+      "domain": "Medicine / Healthcare",
+      "fit": 0.628,
+      "aptitude": 0.64,
+      "interest": 0.56,
+      "cognitive": 0.7
+    }
+  ],
+  "roadmap": [
+    {
+      "rank": 1,
+      "career_id": "c0000000-0000-4000-8000-000000000001",
+      "career": "Data Science / AI",
+      "domain": "Engineering / Technology",
+      "scores": {
+        "fit": 0.838,
+        "finance": 0.9542,
+        "market": 1.0,
+        "final": 0.9134,
+        "final_100": 91,
+        "fit_parts": {
+          "aptitude": 0.84,
+          "interest": 0.86,
+          "cognitive": 0.8
+        },
+        "finance_parts": {
+          "capacity_ratio": 1.0,
+          "loan": 1.0,
+          "payback": 0.771
+        },
+        "market_parts": {
+          "demand": 1.0,
+          "growth": 1.0,
+          "salary_percentile": 1.0
+        }
+      },
+      "finance": {
+        "viable": true,
+        "total_cost": 1420000,
+        "capacity": 1600000,
+        "loan_needed": 0,
+        "starting_salary": 800000,
+        "breakeven_years": 2.29,
+        "duration_years": 4.0,
+        "reasons": []
+      },
+      "market": {
+        "region": "Karnataka",
+        "demand_index": 0.95,
+        "growth_rate": 22.0,
+        "median_salary": 1600000,
+        "entry_salary": 800000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      },
+      "path": {
+        "education": "B.Tech in Artificial Intelligence and Data Science (4 years)",
+        "exams": [
+          "JEE Main",
+          "KCET"
+        ],
+        "colleges": [
+          {
+            "name": "Sample Institute of Technology, Bengaluru",
+            "annual_fee": 250000
+          }
+        ]
+      },
+      "scholarships": [
+        {
+          "name": "Sample Merit Scholarship (MOCK)",
+          "amount": 60000,
+          "deadline": "2026-12-31",
+          "matched_rule": "percentage >= 85"
+        }
+      ],
+      "cheaper_alternative": null
+    },
+    {
+      "rank": 2,
+      "career_id": "c0000000-0000-4000-8000-000000000002",
+      "career": "Software Engineering",
+      "domain": "Engineering / Technology",
+      "scores": {
+        "fit": 0.802,
+        "finance": 0.9708,
+        "market": 0.8058,
+        "final": 0.8536,
+        "final_100": 85,
+        "fit_parts": {
+          "aptitude": 0.82,
+          "interest": 0.8,
+          "cognitive": 0.76
+        },
+        "finance_parts": {
+          "capacity_ratio": 1.0,
+          "loan": 1.0,
+          "payback": 0.8538
+        },
+        "market_parts": {
+          "demand": 0.925,
+          "growth": 0.6111,
+          "salary_percentile": 0.8
+        }
+      },
+      "finance": {
+        "viable": true,
+        "total_cost": 760000,
+        "capacity": 1600000,
+        "loan_needed": 0,
+        "starting_salary": 700000,
+        "breakeven_years": 1.46,
+        "duration_years": 4.0,
+        "reasons": []
+      },
+      "market": {
+        "region": "Karnataka",
+        "demand_index": 0.92,
+        "growth_rate": 15.0,
+        "median_salary": 1400000,
+        "entry_salary": 700000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      },
+      "path": {
+        "education": "B.Tech in Computer Science and Engineering (4 years)",
+        "exams": [
+          "JEE Main",
+          "MHT CET"
+        ],
+        "colleges": [
+          {
+            "name": "Sample Government Engineering College, Pune",
+            "annual_fee": 100000
+          }
+        ]
+      },
+      "scholarships": [
+        {
+          "name": "Sample State Technical Scholarship (MOCK)",
+          "amount": 40000,
+          "deadline": "2027-01-15",
+          "matched_rule": "home_state = Maharashtra"
+        }
+      ],
+      "cheaper_alternative": null
+    },
+    {
+      "rank": 3,
+      "career_id": "c0000000-0000-4000-8000-000000000003",
+      "career": "Product Design (UX)",
+      "domain": "Arts / Design / Media",
+      "scores": {
+        "fit": 0.672,
+        "finance": 0.8962,
+        "market": 0.6742,
+        "final": 0.7398,
+        "final_100": 74,
+        "fit_parts": {
+          "aptitude": 0.62,
+          "interest": 0.78,
+          "cognitive": 0.64
+        },
+        "finance_parts": {
+          "capacity_ratio": 0.9524,
+          "loan": 1.0,
+          "payback": 0.6
+        },
+        "market_parts": {
+          "demand": 0.575,
+          "growth": 0.8889,
+          "salary_percentile": 0.6
+        }
+      },
+      "finance": {
+        "viable": true,
+        "total_cost": 1680000,
+        "capacity": 1600000,
+        "loan_needed": 80000,
+        "starting_salary": 600000,
+        "breakeven_years": 4.0,
+        "duration_years": 4.0,
+        "reasons": []
+      },
+      "market": {
+        "region": "Karnataka",
+        "demand_index": 0.78,
+        "growth_rate": 20.0,
+        "median_salary": 1000000,
+        "entry_salary": 600000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      },
+      "path": {
+        "education": "B.Des in Interaction or Product Design (4 years)",
+        "exams": [
+          "UCEED",
+          "NID DAT"
+        ],
+        "colleges": [
+          {
+            "name": "Sample School of Design, Bengaluru",
+            "annual_fee": 300000
+          }
+        ]
+      },
+      "scholarships": [],
+      "cheaper_alternative": null
+    },
+    {
+      "rank": 4,
+      "career_id": "c0000000-0000-4000-8000-000000000004",
+      "career": "Biotechnology",
+      "domain": "Sciences / Research",
+      "scores": {
+        "fit": 0.696,
+        "finance": 0.917,
+        "market": 0.0708,
+        "final": 0.606,
+        "final_100": 61,
+        "fit_parts": {
+          "aptitude": 0.7,
+          "interest": 0.66,
+          "cognitive": 0.74
+        },
+        "finance_parts": {
+          "capacity_ratio": 1.0,
+          "loan": 1.0,
+          "payback": 0.5852
+        },
+        "market_parts": {
+          "demand": 0.075,
+          "growth": 0.1111,
+          "salary_percentile": 0.0
+        }
+      },
+      "finance": {
+        "viable": true,
+        "total_cost": 1120000,
+        "capacity": 1600000,
+        "loan_needed": 0,
+        "starting_salary": 450000,
+        "breakeven_years": 4.15,
+        "duration_years": 4.0,
+        "reasons": []
+      },
+      "market": {
+        "region": "India",
+        "demand_index": 0.58,
+        "growth_rate": 6.0,
+        "median_salary": 580000,
+        "entry_salary": 430000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "estimated"
+      },
+      "path": {
+        "education": "B.Tech in Biotechnology (4 years)",
+        "exams": [
+          "JEE Main",
+          "MHT CET"
+        ],
+        "colleges": [
+          {
+            "name": "Sample Institute of Biosciences, Pune",
+            "annual_fee": 180000
+          }
+        ]
+      },
+      "scholarships": [],
+      "cheaper_alternative": null
+    },
+    {
+      "rank": 5,
+      "career_id": "c0000000-0000-4000-8000-000000000005",
+      "career": "Architecture",
+      "domain": "Arts / Design / Media",
+      "scores": {
+        "fit": 0.664,
+        "finance": 0.7625,
+        "market": 0.04,
+        "final": 0.5375,
+        "final_100": 54,
+        "fit_parts": {
+          "aptitude": 0.66,
+          "interest": 0.7,
+          "cognitive": 0.62
+        },
+        "finance_parts": {
+          "capacity_ratio": 0.925,
+          "loan": 1.0,
+          "payback": 0.0
+        },
+        "market_parts": {
+          "demand": 0.0,
+          "growth": 0.0,
+          "salary_percentile": 0.2
+        }
+      },
+      "finance": {
+        "viable": false,
+        "total_cost": 2000000,
+        "capacity": 1850000,
+        "loan_needed": 150000,
+        "starting_salary": 380000,
+        "breakeven_years": 10.0,
+        "duration_years": 5.0,
+        "reasons": [
+          "BREAKEVEN_TOO_LONG"
+        ]
+      },
+      "market": {
+        "region": "Karnataka",
+        "demand_index": 0.55,
+        "growth_rate": 4.0,
+        "median_salary": 700000,
+        "entry_salary": 380000,
+        "as_of": "2026-09-01",
+        "source": "MOCK data for frontend development; replace with seed data",
+        "data_quality": "sourced"
+      },
+      "path": {
+        "education": "B.Arch (5 years)",
+        "exams": [
+          "NATA",
+          "JEE Main Paper 2"
+        ],
+        "colleges": [
+          {
+            "name": "Sample School of Architecture, Mumbai",
+            "annual_fee": 280000
+          }
+        ]
+      },
+      "scholarships": [],
+      "cheaper_alternative": "Product Design (UX)"
+    }
+  ],
+  "rejected": [
+    {
+      "career_id": "c0000000-0000-4000-8000-000000000006",
+      "career": "MBBS / Medicine",
+      "reasons": [
+        "LOAN_EXCEEDS_LIMIT",
+        "BREAKEVEN_TOO_LONG"
+      ],
+      "cheaper_alternative": "MBBS at a government medical college (needs a high NEET UG rank)"
+    }
+  ]
+}

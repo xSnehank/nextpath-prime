@@ -1,0 +1,42 @@
+[
+  {
+    "id": "d0000000-0000-4000-8000-000000000001",
+    "name": "Engineering / Technology",
+    "description": "Software, data, electronics and core engineering."
+  },
+  {
+    "id": "d0000000-0000-4000-8000-000000000002",
+    "name": "Sciences / Research",
+    "description": "Pure and applied sciences, research and biotechnology."
+  },
+  {
+    "id": "d0000000-0000-4000-8000-000000000003",
+    "name": "Business / Management",
+    "description": "Commerce, finance, management and entrepreneurship."
+  },
+  {
+    "id": "d0000000-0000-4000-8000-000000000004",
+    "name": "Medicine / Healthcare",
+    "description": "Medicine, nursing, pharmacy and allied health."
+  },
+  {
+    "id": "d0000000-0000-4000-8000-000000000005",
+    "name": "Arts / Design / Media",
+    "description": "Design, architecture, fine arts and media."
+  },
+  {
+    "id": "d0000000-0000-4000-8000-000000000006",
+    "name": "Law / Civil Services",
+    "description": "Law, public policy and government services."
+  },
+  {
+    "id": "d0000000-0000-4000-8000-000000000007",
+    "name": "Education / Teaching",
+    "description": "Teaching, training and educational research."
+  },
+  {
+    "id": "d0000000-0000-4000-8000-000000000008",
+    "name": "Defence / Sports",
+    "description": "Armed forces, sports and physical education."
+  }
+]
