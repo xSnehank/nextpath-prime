@@ -7,6 +7,7 @@ Run from backend/:
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -14,6 +15,9 @@ from typing import Any
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 SPEC_PATH = BACKEND_DIR / "openapi" / "openapi.json"
 sys.path.insert(0, str(BACKEND_DIR))
+# Importing app.main also builds the app uvicorn serves, from your .env. Mock mode keeps that from needing a
+# database (an environment variable beats .env).
+os.environ["USE_MOCKS"] = "true"
 
 
 def current_spec() -> dict[str, Any]:

@@ -1,0 +1,3 @@
+# SQL keeps Unix line endings on every machine: PostgreSQL stores function bodies byte for byte, so Windows
+# line endings would change db/schema.sql (and the hosted functions) depending on who applied a migration.
+*.sql text eol=lf

@@ -1,3 +1,9 @@
+import os
+
+# Before anything imports app.main (which builds the app uvicorn serves from your .env): tests never use your
+# local settings or database. An environment variable beats .env. Each test builds its own app via make_client.
+os.environ["USE_MOCKS"] = "true"
+
 import pytest
 from fastapi.testclient import TestClient
 
