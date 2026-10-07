@@ -1,203 +1,112 @@
 @import "tailwindcss";
 
+/* `dark:` utilities follow the .dark class on <html> (set by ThemeToggle), not the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* =========================================================================
-   NEXTPATH — Reachwise Editorial Aesthetic Design Tokens
-   Obsidian black ground, crisp bone surfaces, and electric volt (#d4ff3a)
+   Theme colours. Light is the default; .dark on <html> switches every token.
+   Use them as Tailwind classes: bg-background, text-foreground, bg-card, border-border,
+   text-muted-foreground, bg-primary text-primary-foreground, text-accent, text-success, ...
    ========================================================================= */
-
-@theme inline {
-  /* Brand palette inspired by joyful-studies-761814 */
-  --color-volt: #d4ff3a;           /* Electric volt / cyber lime signature */
-  --color-volt-hover: #bcf01a;
-  --color-bone: #eeeee8;           /* Warm chalk off-white */
-  --color-night: #08090a;          /* Deepest obsidian black */
-  --color-ink: #0d0e10;            /* Rich dark charcoal body */
-  --color-pine: #16181b;           /* Dark card surface */
-  --color-pine-light: #1f2227;     /* Hover surface */
-  --color-stone: #75766f;          /* Muted body text */
-  --color-fog: #dcdcd3;            /* Subtle secondary text */
-
-  /* Fonts */
-  --font-display: 'Funnel Display', 'Inter', -apple-system, sans-serif;
-  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
-  --font-sans: 'Inter', -apple-system, sans-serif;
+:root {
+  --background: #f7f7f3;
+  --foreground: #16181b;
+  --card: #ffffff;
+  --muted: #efefe9;
+  --muted-foreground: #5d5e57;
+  --border: #e2e2da;
+  --input: #d6d6cd;
+  /* Brand lime on buttons, with dark text in both themes */
+  --primary: #d4ff3a;
+  --primary-hover: #c2ef1f;
+  --primary-foreground: #0d0e10;
+  /* Accent for text and icons: the lime is unreadable on white, so a deep olive in light mode */
+  --accent: #4b6a00;
+  --ring: #8fb31a;
+  --success: #15803d;
+  --success-soft: #dcfce7;
+  --warning: #b45309;
+  --warning-soft: #fef3c7;
+  --danger: #be123c;
+  --danger-soft: #ffe4e6;
+  --chart-grid: #d9d9d0;
+  color-scheme: light;
 }
 
-/* =========================================================================
-   Base HTML & Typography
-   ========================================================================= */
+.dark {
+  --background: #08090a;
+  --foreground: #eeeee8;
+  --card: #121316;
+  --muted: #1b1d21;
+  --muted-foreground: #9c9d95;
+  --border: #26282d;
+  --input: #30333a;
+  --primary: #d4ff3a;
+  --primary-hover: #e2ff6e;
+  --primary-foreground: #08090a;
+  --accent: #d4ff3a;
+  --ring: #d4ff3a;
+  --success: #4ade80;
+  --success-soft: rgba(74, 222, 128, 0.12);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.12);
+  --danger: #fb7185;
+  --danger-soft: rgba(251, 113, 133, 0.12);
+  --chart-grid: #2c2f35;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-outfit), var(--font-inter), system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #08090a;
-  color: #eeeee8;
-  font-family: var(--font-sans);
 }
 
 body {
-  background-color: #08090a;
-  color: #eeeee8;
+  background-color: var(--background);
+  color: var(--foreground);
   min-height: 100dvh;
   overflow-x: clip;
 }
 
-/* Monospace technical styling */
-.font-mono-tag {
-  font-family: var(--font-mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 
-.font-display-hero {
-  font-family: var(--font-display);
-  letter-spacing: -0.04em;
-  line-height: 0.95;
-}
-
-/* =========================================================================
-   Reachwise-style Components & Micro-Interactions
-   ========================================================================= */
-
-/* Pulsing radar ping */
-.ping-dot {
-  position: relative;
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background-color: #d4ff3a;
-}
-
-.ping-dot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  box-shadow: 0 0 0 1.5px #d4ff3a;
-  animation: ping-wave 1.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
-}
-
-@keyframes ping-wave {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(3.2);
-  }
-}
-
-/* Reachwise signature pill button */
-.rw-pill-btn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 6px 8px 6px 24px;
-  min-height: 52px;
-  border-radius: 9999px;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  cursor: pointer;
-  text-decoration: none;
-  user-select: none;
-}
-
-.rw-pill-solid {
-  background-color: #d4ff3a;
-  color: #08090a;
-}
-
-.rw-pill-solid:hover {
-  background-color: #e5ff75;
-  transform: translateY(-1px);
-  box-shadow: 0 12px 24px -6px rgba(212, 255, 58, 0.25);
-}
-
-.rw-pill-ghost {
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #eeeee8;
-}
-
-.rw-pill-ghost:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
-}
-
-/* Circular arrow chip inside pill */
-.rw-arrow-chip {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: #08090a;
-  color: #d4ff3a;
-  transition: transform 0.3s ease, background-color 0.3s ease;
-}
-
-.rw-pill-solid:hover .rw-arrow-chip {
-  transform: rotate(45deg);
-}
-
-.rw-pill-ghost .rw-arrow-chip {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-.rw-pill-ghost:hover .rw-arrow-chip {
-  background-color: #d4ff3a;
-  color: #08090a;
-  transform: rotate(45deg);
-}
-
-/* Hairline card styling */
-.editorial-card {
-  background-color: #121316;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1.5rem;
-  transition: border-color 0.25s ease, background-color 0.25s ease;
-}
-
-.editorial-card:hover {
-  border-color: rgba(212, 255, 58, 0.3);
-  background-color: #16181b;
-}
-
-/* Sub-grid dividers */
-.hairline-b {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.hairline-r {
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #08090a;
+  background: var(--background);
 }
 ::-webkit-scrollbar-thumb {
-  background: #282a30;
+  background: var(--input);
   border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #d4ff3a;
-}
-
-::selection {
-  background: #d4ff3a;
-  color: #08090a;
 }

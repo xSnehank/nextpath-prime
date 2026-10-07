@@ -191,15 +191,14 @@ export function PdfExportButton({
       size="sm"
       onClick={generatePdf}
       disabled={exporting}
-      className="flex items-center gap-2 border-white/20 text-slate-200 hover:text-white"
       id="export-pdf-button"
     >
       {exporting ? (
-        <Loader2 className="h-4 w-4 animate-spin text-cyan-400" />
+        <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
-        <Download className="h-4 w-4 text-cyan-400" />
+        <Download className="h-4 w-4" />
       )}
-      <span>{exporting ? "Generating PDF..." : "Export PDF Summary"}</span>
+      <span>{exporting ? "Preparing…" : "Download PDF"}</span>
     </Button>
   );
 }

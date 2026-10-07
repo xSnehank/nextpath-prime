@@ -2,611 +2,248 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { ArrowDown, ArrowUp, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import {
-  Banknote,
-  Scale,
-  Sparkles,
-  ArrowRight,
-  XCircle,
-  Loader2,
-  Globe2,
-  MapPin,
-} from "lucide-react";
-import { api, ApiError } from "@/lib/api";
 import { ConsentStep } from "@/components/ConsentStep";
+import { Field, RiskPicker, StateSelect, YesNo, fieldErrorMap } from "@/components/ChoiceFields";
+import { Notice, PageShell } from "@/components/PageShell";
+import { api, ApiError } from "@/lib/api";
+import { HINTS } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import type { DomainItem, IndianState, ParentProfile } from "@/types/api";
 
-const INDIAN_STATES: IndianState[] = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa",
-  "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala",
-  "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland",
-  "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
-  "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands",
-  "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi",
-  "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
-];
+/** "2,50,000" or "250000" -> 250000; anything else -> null. Money is whole rupees. */
+function rupees(text: string): number | null {
+  const clean = text.replace(/,/g, "").trim();
+  return /^\d+$/.test(clean) ? parseInt(clean, 10) : null;
+}
 
+function MoneyInput({ id, value, onChange, placeholder }: { id: string; value: string; onChange: (v: string) => void; placeholder: string }) {
+  return (
+    <div className="relative">
+      <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">₹</span>
+      <Input id={id} inputMode="numeric" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="pl-8" />
+    </div>
+  );
+}
+
+/** The parent's budget, limits and hopes (PUT /profile), then the consent step. */
 export default function ParentAssessmentPage() {
   const router = useRouter();
-
-  // Dynamic domains fetched from GET /domains (Comment 8/14 & 10/14)
-  const [availableDomains, setAvailableDomains] = React.useState<DomainItem[]>([]);
+  const [domains, setDomains] = React.useState<DomainItem[]>([]);
   const [loadingDomains, setLoadingDomains] = React.useState(true);
 
-  // Financial inputs start EMPTY (Comment 10/14: no demo money!)
-  const [annualBudget, setAnnualBudget] = React.useState<string>("");
-  const [savings, setSavings] = React.useState<string>("");
-  const [maxLoan, setMaxLoan] = React.useState<string>("");
-  const [annualIncome, setAnnualIncome] = React.useState<string>("");
+  const [budget, setBudget] = React.useState("");
+  const [savings, setSavings] = React.useState("");
+  const [maxLoan, setMaxLoan] = React.useState("");
+  const [income, setIncome] = React.useState("");
+  const [risk, setRisk] = React.useState<number | null>(null);
+  const [breakeven, setBreakeven] = React.useState("");
+  const [preferredState, setPreferredState] = React.useState<IndianState | "">("");
+  const [abroad, setAbroad] = React.useState<boolean | null>(null);
+  const [picked, setPicked] = React.useState<string[]>([]); // domain ids, first choice first
 
-  // Risk & ROI parameters
-  const [riskAppetite, setRiskAppetite] = React.useState<number>(3); // 1-5 scale
-  const [breakevenYears, setBreakevenYears] = React.useState<number>(5); // 1-20 scale
-  const [preferredState, setPreferredState] = React.useState<IndianState>("Maharashtra");
-  const [openToAbroad, setOpenToAbroad] = React.useState<boolean>(false);
-
-  // Exactly 3 ranked domain IDs (UUIDs from GET /domains)
-  const [selectedDomainIds, setSelectedDomainIds] = React.useState<string[]>([]);
-
-  const [loading, setLoading] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState("");
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
-  const [showConsentStep, setShowConsentStep] = React.useState(false);
-  const [userConsented, setUserConsented] = React.useState<boolean>(false);
+  const [showConsent, setShowConsent] = React.useState(false);
+  const [consented, setConsented] = React.useState(false);
   const [partnerConsented, setPartnerConsented] = React.useState<boolean | undefined>(undefined);
 
-  // Fetch real domains and check parent pairing status
   React.useEffect(() => {
     let active = true;
-
-    async function loadData() {
-      setLoadingDomains(true);
-      try {
-        const [domains, me] = await Promise.all([
-          api.getDomains(),
-          api.getMe().catch(() => null),
-        ]);
-        if (active) {
-          if (me?.role === "parent") {
-            if (!me.pair) {
-              router.replace("/parent/join");
-              return;
-            }
-            if (me.progress?.assessment_complete) {
-              router.replace("/dashboard");
-              return;
-            }
-            setUserConsented(Boolean(me.consented));
-            setPartnerConsented(me.partner?.consented);
-          }
-          setAvailableDomains(domains);
+    Promise.all([api.getDomains(), api.getMe().catch(() => null)])
+      .then(([list, me]) => {
+        if (!active) return;
+        if (me?.role === "parent") {
+          if (!me.pair) return router.replace("/parent/join");
+          if (me.progress.assessment_complete) return router.replace("/dashboard");
+          setConsented(Boolean(me.consented));
+          setPartnerConsented(me.partner?.consented);
         }
-      } catch (err) {
-        if (active) {
-          console.error("Failed to load career domains:", err);
-          setError("Failed to load domains from backend.");
-        }
-      } finally {
-        if (active) setLoadingDomains(false);
-      }
-    }
-
-    loadData();
+        setDomains(list);
+      })
+      .catch(() => active && setError("Couldn't load the career areas. Please refresh."))
+      .finally(() => active && setLoadingDomains(false));
     return () => {
       active = false;
     };
   }, [router]);
 
-  const handleToggleDomain = (domainId: string) => {
-    if (selectedDomainIds.includes(domainId)) {
-      setSelectedDomainIds(selectedDomainIds.filter((id) => id !== domainId));
-      setError("");
-    } else {
-      if (selectedDomainIds.length >= 3) {
-        setError("You must select exactly 3 preferred domains. Deselect one first to replace it.");
-        return;
-      }
-      setError("");
-      setSelectedDomainIds([...selectedDomainIds, domainId]);
-    }
+  const togglePick = (id: string) => {
+    setError("");
+    if (picked.includes(id)) setPicked(picked.filter((x) => x !== id));
+    else if (picked.length < 3) setPicked([...picked, id]);
+    else setError("You've picked 3. Remove one to choose another.");
   };
-
-  const handleMoveDomainRank = (index: number, direction: "up" | "down") => {
-    const newDomains = [...selectedDomainIds];
-    const targetIdx = direction === "up" ? index - 1 : index + 1;
-    if (targetIdx < 0 || targetIdx >= newDomains.length) return;
-    const temp = newDomains[index];
-    newDomains[index] = newDomains[targetIdx];
-    newDomains[targetIdx] = temp;
-    setSelectedDomainIds(newDomains);
+  const move = (index: number, by: -1 | 1) => {
+    const next = [...picked];
+    const target = index + by;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]];
+    setPicked(next);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setFieldErrors({});
+    const annual = rupees(budget);
+    const saved = rupees(savings);
+    const loan = rupees(maxLoan);
+    const yearly = income.trim() ? rupees(income) : null;
+    const years = parseInt(breakeven, 10);
+    if (annual === null || saved === null || loan === null) return setError("Enter the budget, savings and loan in whole rupees.");
+    if (income.trim() && yearly === null) return setError("Enter your income in whole rupees, or leave it empty.");
+    if (!(years >= 1 && years <= 20)) return setError("Years to recover the cost must be between 1 and 20.");
+    if (risk === null || !preferredState || abroad === null) return setError("Please answer every question.");
+    if (picked.length !== 3) return setError("Pick exactly 3 career areas.");
 
-    // Validate money fields (Item 10: remove commas, require digits only, send parseInt)
-    const cleanBudget = annualBudget.replace(/,/g, "").trim();
-    const cleanSavings = savings.replace(/,/g, "").trim();
-    const cleanMaxLoan = maxLoan.replace(/,/g, "").trim();
-    const cleanIncome = annualIncome.replace(/,/g, "").trim();
-
-    if (!cleanBudget || !/^\d+$/.test(cleanBudget)) {
-      setError("Please enter a valid Annual Education Budget in whole Rupees (digits only).");
-      return;
-    }
-    if (!cleanSavings || !/^\d+$/.test(cleanSavings)) {
-      setError("Please enter valid Education Savings in whole Rupees (digits only).");
-      return;
-    }
-    if (!cleanMaxLoan || !/^\d+$/.test(cleanMaxLoan)) {
-      setError("Please enter a valid Maximum Education Loan in whole Rupees (digits only).");
-      return;
-    }
-    if (cleanIncome && !/^\d+$/.test(cleanIncome)) {
-      setError("Please enter Gross Annual Income in whole Rupees (digits only).");
-      return;
-    }
-
-    const parsedBudget = parseInt(cleanBudget, 10);
-    const parsedSavings = parseInt(cleanSavings, 10);
-    const parsedMaxLoan = parseInt(cleanMaxLoan, 10);
-    const parsedIncome = cleanIncome ? parseInt(cleanIncome, 10) : null;
-
-    if (parsedBudget < 0 || parsedSavings < 0 || parsedMaxLoan < 0) {
-      setError("Monetary values cannot be negative.");
-      return;
-    }
-
-    // Require exactly 3 domains
-    if (selectedDomainIds.length !== 3) {
-      setError(`Please select exactly 3 preferred domains for your child (currently ${selectedDomainIds.length} selected).`);
-      return;
-    }
-
-    setLoading(true);
-
+    const profile: ParentProfile = {
+      role: "parent",
+      annual_education_budget: annual,
+      savings: saved,
+      max_loan: loan,
+      annual_income: yearly,
+      risk_appetite: risk,
+      breakeven_tolerance_years: years,
+      preferred_state: preferredState,
+      open_to_abroad: abroad,
+      top_domain_ids: picked,
+    };
+    setSaving(true);
     try {
-      const profilePayload: ParentProfile = {
-        role: "parent",
-        annual_education_budget: parsedBudget,
-        savings: parsedSavings,
-        max_loan: parsedMaxLoan,
-        annual_income: parsedIncome,
-        risk_appetite: riskAppetite,
-        breakeven_tolerance_years: breakevenYears,
-        preferred_state: preferredState,
-        open_to_abroad: openToAbroad,
-        top_domain_ids: selectedDomainIds,
-      };
-
-      // 1. Submit PUT /profile (Item 1f: no devUser parameter)
-      await api.updateProfile(profilePayload);
-
-      // Transition to explicit Consent Step (Item 2b)
-      setShowConsentStep(true);
+      await api.updateProfile(profile);
+      setShowConsent(true);
     } catch (err) {
-      console.error("Failed to save parent profile:", err);
       if (err instanceof ApiError) {
         setError(err.message);
-        const detailsObj = err.details as { fields?: Array<{ field?: string; issue?: string }> } | undefined;
-        if (detailsObj && Array.isArray(detailsObj.fields)) {
-          const map: Record<string, string> = {};
-          for (const f of detailsObj.fields) {
-            if (f.field && f.issue) {
-              map[f.field] = f.issue;
-            }
-          }
-          setFieldErrors(map);
-        }
+        setFieldErrors(fieldErrorMap(err.details));
       } else {
-        setError("Failed to save profile. Please check your inputs and try again.");
+        setError("Couldn't save. Please try again.");
       }
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
-  if (showConsentStep) {
+  if (showConsent) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 relative">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <PageShell title="Saved" subtitle="One last step." width="md">
         <ConsentStep
           role="parent"
-          consented={userConsented}
+          consented={consented}
           partnerConsented={partnerConsented}
-          onConsentGranted={() => {
-            router.push("/dashboard");
-          }}
-          onSkip={() => {
-            router.push("/dashboard");
-          }}
+          onConsentGranted={() => router.push("/dashboard")}
+          onSkip={() => router.push("/dashboard")}
         />
-      </div>
+      </PageShell>
     );
   }
 
+  const domainName = (id: string) => domains.find((d) => d.id === id)?.name ?? "";
+
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 relative">
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none" />
+    <PageShell title="Your budget and hopes" subtitle="Hover over a label to see how it's used. Only the comparison is shared, never your numbers." width="lg">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {error && <Notice>{error}</Notice>}
 
-      <div className="w-full max-w-3xl space-y-4 relative z-10">
-        <Card className="border-white/10 bg-slate-900/80 backdrop-blur-2xl shadow-2xl">
-          <CardHeader className="space-y-1">
-            <div className="flex items-center justify-between">
-              <Badge variant="cyan">Parent Financial &amp; Aspirational Calibration</Badge>
-              <span className="text-xs text-slate-400">Collaborative Alignment</span>
-            </div>
-            <CardTitle className="text-2xl pt-2">Family Constraint &amp; Expectation Calibration</CardTitle>
-            <CardDescription className="text-xs text-slate-400 leading-relaxed">
-              Your inputs power the Financial Constraint Solver (tuition, debt-tolerance, break-even years)
-              and allow NextPath to calculate the Parent-Student Conflict Index. All fields are kept confidential.
-            </CardDescription>
-          </CardHeader>
+        <section className="grid gap-5 sm:grid-cols-2">
+          <Field id="budget" label="Yearly education budget" hint={HINTS.budget} error={fieldErrors.annual_education_budget}>
+            <MoneyInput id="budget" value={budget} onChange={setBudget} placeholder="2,50,000" />
+          </Field>
+          <Field id="savings" label="Savings for education" hint={HINTS.savings} error={fieldErrors.savings}>
+            <MoneyInput id="savings" value={savings} onChange={setSavings} placeholder="6,00,000" />
+          </Field>
+          <Field id="max_loan" label="Largest loan you'd take" hint={HINTS.maxLoan} error={fieldErrors.max_loan}>
+            <MoneyInput id="max_loan" value={maxLoan} onChange={setMaxLoan} placeholder="8,00,000" />
+          </Field>
+          <Field id="breakeven" label="Years to recover the cost" hint={HINTS.breakeven} error={fieldErrors.breakeven_tolerance_years}>
+            <Input id="breakeven" type="number" min={1} max={20} value={breakeven} onChange={(e) => setBreakeven(e.target.value)} placeholder="e.g. 5" />
+          </Field>
+        </section>
 
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-6">
-              {error && (
-                <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-                  <XCircle className="h-4 w-4 shrink-0 text-rose-400" />
-                  <span>{error}</span>
-                </div>
-              )}
+        <section className="space-y-5">
+          <Field label="Comfort with risk" hint={HINTS.parentRisk} error={fieldErrors.risk_appetite}>
+            <RiskPicker value={risk} onChange={setRisk} />
+          </Field>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field id="parent_state" label="Where they should study" hint={HINTS.parentState} error={fieldErrors.preferred_state}>
+              <StateSelect id="parent_state" value={preferredState} onChange={setPreferredState} />
+            </Field>
+            <Field label="Open to studying abroad?" hint={HINTS.parentAbroad} error={fieldErrors.open_to_abroad}>
+              <YesNo value={abroad} onChange={setAbroad} label="Open to studying abroad" />
+            </Field>
+          </div>
+        </section>
 
-              {/* SECTION 1: FINANCIAL PARAMETERS (Comment 10/14) */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-sm font-bold text-white border-b border-white/5 pb-2">
-                  <Banknote className="h-4 w-4 text-emerald-400" />
-                  <span>1. Household Affordability &amp; Education Budget (in ₹ INR)</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Annual Budget */}
-                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                    <label className="text-xs font-semibold text-slate-200">
-                      Annual Education Budget *
-                    </label>
-                    <p className="text-[11px] text-slate-400">
-                      Amount your family can spend each year out of regular income.
-                    </p>
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      placeholder="e.g. 250000"
-                      value={annualBudget}
-                      onChange={(e) => setAnnualBudget(e.target.value)}
-                      required
-                      className="font-mono text-emerald-300 text-sm"
-                    />
-                    {fieldErrors["annual_education_budget"] && (
-                      <p className="text-[11px] text-rose-400 font-medium">{fieldErrors["annual_education_budget"]}</p>
-                    )}
-                  </div>
-
-                  {/* Savings */}
-                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                    <label className="text-xs font-semibold text-slate-200">
-                      Education Savings Pool *
-                    </label>
-                    <p className="text-[11px] text-slate-400">
-                      Lump-sum savings set aside specifically for higher education.
-                    </p>
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      placeholder="e.g. 600000"
-                      value={savings}
-                      onChange={(e) => setSavings(e.target.value)}
-                      required
-                      className="font-mono text-emerald-300 text-sm"
-                    />
-                    {fieldErrors["savings"] && (
-                      <p className="text-[11px] text-rose-400 font-medium">{fieldErrors["savings"]}</p>
-                    )}
-                  </div>
-
-                  {/* Max Loan */}
-                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                    <label className="text-xs font-semibold text-slate-200">
-                      Maximum Education Loan Limit *
-                    </label>
-                    <p className="text-[11px] text-slate-400">
-                      Largest total debt your family is willing to take across 4 years.
-                    </p>
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      placeholder="e.g. 800000"
-                      value={maxLoan}
-                      onChange={(e) => setMaxLoan(e.target.value)}
-                      required
-                      className="font-mono text-amber-300 text-sm"
-                    />
-                    {fieldErrors["max_loan"] && (
-                      <p className="text-[11px] text-rose-400 font-medium">{fieldErrors["max_loan"]}</p>
-                    )}
-                  </div>
-
-                  {/* Annual Income (Optional) */}
-                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                    <label className="text-xs font-semibold text-slate-200">
-                      Gross Household Annual Income (Optional)
-                    </label>
-                    <p className="text-[11px] text-slate-400">
-                      Used strictly for matching income-based merit scholarships.
-                    </p>
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      placeholder="e.g. 1200000 (optional)"
-                      value={annualIncome}
-                      onChange={(e) => setAnnualIncome(e.target.value)}
-                      className="font-mono text-slate-300 text-sm"
-                    />
-                    {fieldErrors["annual_income"] && (
-                      <p className="text-[11px] text-rose-400 font-medium">{fieldErrors["annual_income"]}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* SECTION 2: RISK, ROI & LOCATION */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-sm font-bold text-white border-b border-white/5 pb-2">
-                  <Scale className="h-4 w-4 text-violet-400" />
-                  <span>2. Risk Appetite, Break-Even Horizon &amp; Location</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Risk Appetite */}
-                  <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="font-semibold text-slate-200">
-                        Career Risk Appetite (1–5)
-                      </span>
-                      <span className="font-mono font-bold text-violet-300 bg-violet-500/20 px-2 py-0.5 rounded">
-                        Level {riskAppetite} / 5
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min="1"
-                      max="5"
-                      step="1"
-                      value={riskAppetite}
-                      onChange={(e) => setRiskAppetite(parseInt(e.target.value, 10))}
-                      className="w-full accent-violet-500 cursor-pointer"
-                    />
-                    <div className="flex justify-between text-[10px] text-slate-500">
-                      <span>1: Security &amp; PSU/Govt</span>
-                      <span>5: High-upside Startups</span>
-                    </div>
-                  </div>
-
-                  {/* Break-Even Tolerance Years */}
-                  <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="font-semibold text-slate-200">
-                        Break-Even Tolerance Window
-                      </span>
-                      <span className="font-mono font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded">
-                        {breakevenYears} Years
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min="1"
-                      max="15"
-                      step="1"
-                      value={breakevenYears}
-                      onChange={(e) => setBreakevenYears(parseInt(e.target.value, 10))}
-                      className="w-full accent-cyan-500 cursor-pointer"
-                    />
-                    <div className="flex justify-between text-[10px] text-slate-500">
-                      <span>1 Year (Fast ROI)</span>
-                      <span>15 Years (Long term)</span>
-                    </div>
-                  </div>
-
-                  {/* Preferred State */}
-                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                    <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
-                      <MapPin className="h-3.5 w-3.5 text-cyan-400" />
-                      <span>Preferred Study/Work State *</span>
-                    </label>
-                    <select
-                      value={preferredState}
-                      onChange={(e) => setPreferredState(e.target.value as IndianState)}
-                      className="w-full p-2.5 rounded-xl bg-slate-900 border border-white/10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500"
+        <section className="space-y-3">
+          <Field label="Top 3 career areas" hint={HINTS.domains} error={fieldErrors.top_domain_ids}>
+            {loadingDomains ? (
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {domains.map((d) => {
+                  const rank = picked.indexOf(d.id);
+                  return (
+                    <button
+                      key={d.id}
+                      type="button"
+                      onClick={() => togglePick(d.id)}
+                      aria-pressed={rank >= 0}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm transition-colors",
+                        rank >= 0 ? "border-primary bg-primary text-primary-foreground font-medium" : "border-border bg-card text-muted-foreground hover:text-foreground"
+                      )}
                     >
-                      {INDIAN_STATES.map((st) => (
-                        <option key={st} value={st}>
-                          {st}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Open To Abroad */}
-                  <div className="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col justify-between">
-                    <div>
-                      <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
-                        <Globe2 className="h-3.5 w-3.5 text-violet-400" />
-                        <span>Open to Studying Abroad?</span>
-                      </label>
-                      <p className="text-[11px] text-slate-400 mt-1">
-                        Permits recommendations including global university pathways.
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 pt-2">
-                      <button
-                        type="button"
-                        onClick={() => setOpenToAbroad(false)}
-                        className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium border transition-colors ${
-                          !openToAbroad
-                            ? "bg-violet-600 border-violet-500 text-white"
-                            : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
-                        }`}
-                      >
-                        India Only
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setOpenToAbroad(true)}
-                        className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium border transition-colors ${
-                          openToAbroad
-                            ? "bg-violet-600 border-violet-500 text-white"
-                            : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
-                        }`}
-                      >
-                        Open to Abroad
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                      {rank >= 0 && <span className="font-mono text-xs">{rank + 1}</span>}
+                      {d.name}
+                    </button>
+                  );
+                })}
               </div>
-
-              {/* SECTION 3: TOP 3 DOMAINS PICKER (Comment 10/14) */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <div className="flex items-center gap-2 text-sm font-bold text-white">
-                    <Sparkles className="h-4 w-4 text-amber-400" />
-                    <span>3. Top 3 Hoped-For Career Domains (Pick exactly 3)</span>
-                  </div>
-                  <span className="text-xs font-mono text-cyan-400">
-                    {selectedDomainIds.length} of 3 selected
+            )}
+          </Field>
+          {picked.length > 0 && (
+            <ol className="space-y-1.5">
+              {picked.map((id, index) => (
+                <li key={id} className="flex items-center justify-between rounded-xl border border-border bg-card px-3 py-2 text-sm">
+                  <span>
+                    <span className="mr-2 font-mono text-xs text-muted-foreground">{index + 1}</span>
+                    {domainName(id)}
                   </span>
-                </div>
+                  <span className="flex gap-1">
+                    <Button type="button" variant="ghost" size="icon" className="h-7 w-7" aria-label="Move up" onClick={() => move(index, -1)} disabled={index === 0}>
+                      <ArrowUp className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" className="h-7 w-7" aria-label="Move down" onClick={() => move(index, 1)} disabled={index === picked.length - 1}>
+                      <ArrowDown className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" className="h-7 w-7" aria-label="Remove" onClick={() => togglePick(id)}>
+                      <X className="h-3.5 w-3.5" />
+                    </Button>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </section>
 
-                {loadingDomains ? (
-                  <div className="flex items-center gap-2 text-xs text-slate-400 py-4 justify-center">
-                    <Loader2 className="h-4 w-4 animate-spin text-cyan-400" />
-                    Loading available domains from catalog...
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {availableDomains.map((domain) => {
-                      const isSelected = selectedDomainIds.includes(domain.id);
-                      const rankIndex = selectedDomainIds.indexOf(domain.id);
-                      return (
-                        <button
-                          key={domain.id}
-                          type="button"
-                          onClick={() => handleToggleDomain(domain.id)}
-                          className={`p-3 rounded-xl border text-left text-xs transition-all flex items-start justify-between gap-2 ${
-                            isSelected
-                              ? "bg-cyan-500/15 border-cyan-400 text-white shadow-md shadow-cyan-950/40"
-                              : "bg-white/[0.02] border-white/5 text-slate-300 hover:bg-white/[0.06] hover:border-white/15"
-                          }`}
-                        >
-                          <div className="space-y-1">
-                            <span className="font-semibold block text-white">
-                              {domain.name}
-                            </span>
-                            {domain.description && (
-                              <p className="text-[11px] text-slate-400 line-clamp-2">
-                                {domain.description}
-                              </p>
-                            )}
-                          </div>
-                          {isSelected && (
-                            <span className="shrink-0 h-5 px-1.5 rounded-full bg-cyan-400 text-slate-950 font-bold text-[10px] flex items-center justify-center">
-                              #{rankIndex + 1}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+        <details className="rounded-xl border border-border bg-card px-4 py-3">
+          <summary className="cursor-pointer text-sm font-medium">Optional (for scholarships)</summary>
+          <div className="mt-4 max-w-sm">
+            <Field id="income" label="Yearly family income" hint={HINTS.income} error={fieldErrors.annual_income}>
+              <MoneyInput id="income" value={income} onChange={setIncome} placeholder="Leave empty to skip" />
+            </Field>
+          </div>
+        </details>
 
-                {fieldErrors["top_domain_ids"] && (
-                  <p className="text-[11px] text-rose-400 font-medium">{fieldErrors["top_domain_ids"]}</p>
-                )}
-
-                {/* Ranked Order Controller */}
-                {selectedDomainIds.length > 0 && (
-                  <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 space-y-2 mt-2">
-                    <span className="text-xs font-semibold text-slate-300">
-                      Preference Priority (1st Choice to 3rd Choice):
-                    </span>
-                    <div className="space-y-1.5">
-                      {selectedDomainIds.map((domainId, idx) => {
-                        const domainObj = availableDomains.find((d) => d.id === domainId);
-                        return (
-                          <div
-                            key={domainId}
-                            className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5 text-xs text-white"
-                          >
-                            <span className="flex items-center gap-2">
-                              <span className="font-mono font-bold text-cyan-400">
-                                Choice #{idx + 1}:
-                              </span>
-                              <span>{domainObj?.name || domainId}</span>
-                            </span>
-                            <div className="flex gap-1">
-                              {idx > 0 && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleMoveDomainRank(idx, "up")}
-                                  className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px]"
-                                >
-                                  ▲ Up
-                                </button>
-                              )}
-                              {idx < selectedDomainIds.length - 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleMoveDomainRank(idx, "down")}
-                                  className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px]"
-                                >
-                                  ▼ Down
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-
-            <CardFooter className="pt-4 border-t border-white/5 flex items-center justify-between">
-              <span className="text-xs text-slate-500">
-                Data used strictly for deterministic solver constraints.
-              </span>
-              <Button
-                type="submit"
-                disabled={loading || selectedDomainIds.length !== 3}
-                className="bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-950/50"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Saving Parameters &amp; Consenting...
-                  </>
-                ) : (
-                  <>
-                    Save Constraints &amp; Launch Dashboard
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </form>
-        </Card>
-      </div>
-    </div>
+        <Button type="submit" className="w-full" disabled={saving}>
+          {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+          Save
+        </Button>
+      </form>
+    </PageShell>
   );
 }
