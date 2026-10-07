@@ -1153,7 +1153,7 @@
             "maximum": 5.0,
             "minimum": 1.0,
             "title": "Value",
-            "description": "1 = strongly disagree ... 5 = strongly agree"
+            "description": "likert: 1 = strongly disagree ... 5 = strongly agree; choice: the picked option's value (1-4 = A-D)"
           }
         },
         "additionalProperties": false,
@@ -1170,7 +1170,8 @@
             "type": "integer",
             "maximum": 5.0,
             "minimum": 1.0,
-            "title": "Value"
+            "title": "Value",
+            "description": "likert: 1-5; choice: 1-4 for options A-D"
           },
           "label": {
             "type": "string",
@@ -2233,6 +2234,18 @@
           "role": {
             "$ref": "#/components/schemas/Role"
           },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name",
+            "description": "So the UI can say who is linked; null if they gave no name"
+          },
           "assessment_complete": {
             "type": "boolean",
             "title": "Assessment Complete"
@@ -2246,11 +2259,12 @@
         "type": "object",
         "required": [
           "role",
+          "full_name",
           "assessment_complete",
           "consented"
         ],
         "title": "PartnerStatus",
-        "description": "Only status flags about the linked partner; never their answers."
+        "description": "The linked partner's name and status flags; never their answers."
       },
       "Progress": {
         "properties": {
@@ -2292,6 +2306,15 @@
             "format": "uuid",
             "title": "Id"
           },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "likert",
+              "choice"
+            ],
+            "title": "Kind",
+            "description": "likert: rate a statement from 1 to 5. choice: pick the one correct option; the server grades it"
+          },
           "group": {
             "$ref": "#/components/schemas/TraitGroup"
           },
@@ -2318,6 +2341,7 @@
         "type": "object",
         "required": [
           "id",
+          "kind",
           "group",
           "dimension",
           "text",
@@ -2325,7 +2349,7 @@
           "required"
         ],
         "title": "Question",
-        "description": "One 1-5 statement. Whether it is reverse-scored stays on the server."
+        "description": "One question. Whether a statement is reverse-scored, and which option is correct, stay on the server."
       },
       "QuestionSet": {
         "properties": {

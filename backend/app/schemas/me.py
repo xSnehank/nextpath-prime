@@ -18,9 +18,10 @@ class Progress(StrictModel):
 
 
 class PartnerStatus(StrictModel):
-    """Only status flags about the linked partner; never their answers."""
+    """The linked partner's name and status flags; never their answers."""
 
     role: Role
+    full_name: str | None = Field(description="So the UI can say who is linked; null if they gave no name")
     assessment_complete: bool
     consented: bool
 
