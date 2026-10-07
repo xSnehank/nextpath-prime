@@ -5,19 +5,20 @@
 --
 -- Table Owners & Descriptions:
 -- 1. users                  - Snehank (Auth/Identity), Joel (Data model)
--- 2. questions              - Joel (Seed data/Questions bank)
--- 3. responses              - Snehank (Assessment scoring), Aayush (Assessment UI)
--- 4. profiles               - Snehank (Solver/Conflict Engine), Aayush (Profile UI)
--- 5. domains [NEW]          - Snehank (Domain scoring), Joel (Taxonomy)
--- 6. parent_domain_prefs [NEW]- Snehank (Conflict Index), Aayush (Parent ranking UI)
--- 7. careers                - Snehank (Career scoring & matching), Aayush (Roadmap UI)
--- 8. courses [NEW]          - Snehank (Financial solver), Aayush (Roadmap details)
--- 9. market_data            - Snehank (Market blending algorithm), Joel (Data curation)
--- 10. exams_colleges        - Snehank (Roadmap generator), Aayush (College cards)
--- 11. scholarships          - Snehank (Financial solver eligibility matching)
--- 12. scholarship_careers [NEW]- Snehank (Scholarship queries), Joel (Data linkage)
--- 13. results               - Snehank (Engine outputs), Aayush (Dashboard & PDF)
--- 14. explanations [NEW]    - Snehank (Gemini response cache)
+-- 2. pairs [NEW]            - Snehank (Auth linking), Joel (Relationship model)
+-- 3. questions              - Joel (Seed data/Questions bank)
+-- 4. responses              - Snehank (Assessment scoring), Aayush (Assessment UI)
+-- 5. profiles               - Snehank (Solver/Conflict Engine), Aayush (Profile UI)
+-- 6. domains                - Snehank (Domain scoring), Joel (Taxonomy)
+-- 7. parent_domain_prefs    - Snehank (Conflict Index), Aayush (Parent ranking UI)
+-- 8. careers                - Snehank (Career scoring & matching), Aayush (Roadmap UI)
+-- 9. courses                - Snehank (Financial solver), Aayush (Roadmap details)
+-- 10. market_data           - Snehank (Market blending algorithm), Joel (Data curation)
+-- 11. exams_colleges        - Snehank (Roadmap generator), Aayush (College cards)
+-- 12. scholarships          - Snehank (Financial solver eligibility matching)
+-- 13. scholarship_careers   - Snehank (Scholarship queries), Joel (Data linkage)
+-- 14. results               - Snehank (Engine outputs), Aayush (Dashboard & PDF)
+-- 15. explanations [NEW]    - Snehank (Gemini response cache)
 --
 -- Views:
 -- 1. v_careers              - Joins careers with domain names for easy API querying
@@ -33,12 +34,12 @@ CREATE TABLE IF NOT EXISTS users (
     full_name TEXT,
     linked_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
     invite_token TEXT UNIQUE,
+    invite_token_hash TEXT UNIQUE,
     invite_expires_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_linked_user_id ON users(linked_user_id);
-CREATE INDEX IF NOT EXISTS idx_users_invite_token ON users(invite_token);
 
 -- Trigger for syncing Supabase auth.users to public.users
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -68,7 +69,16 @@ BEGIN
     END IF;
 END $$;
 
--- 2. QUESTIONS TABLE
+-- 2. PAIRS TABLE [NEW]
+CREATE TABLE IF NOT EXISTS pairs (
+    student_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    parent_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    linked_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_pairs_parent_id ON pairs(parent_id);
+
+-- 3. QUESTIONS TABLE
 CREATE TABLE IF NOT EXISTS questions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     audience TEXT NOT NULL CHECK (audience IN ('student', 'parent')),
@@ -81,11 +91,8 @@ CREATE TABLE IF NOT EXISTS questions (
     CONSTRAINT uq_questions_audience_position UNIQUE (audience, position)
 );
 
-CREATE INDEX IF NOT EXISTS idx_questions_audience_position ON questions(audience, position);
-
--- 3. RESPONSES TABLE
--- Value choice justification: JSONB is selected because student responses may be option IDs/strings/arrays,
--- while parent responses may be numerical sliders, budgets, or rank arrays. JSONB handles both flexibly.
+-- 4. RESPONSES TABLE
+-- Value choice justification: JSONB handles option IDs, strings, sliders, budgets, or rank arrays.
 CREATE TABLE IF NOT EXISTS responses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -95,10 +102,9 @@ CREATE TABLE IF NOT EXISTS responses (
     CONSTRAINT uq_responses_user_question UNIQUE (user_id, question_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_responses_user_id ON responses(user_id);
 CREATE INDEX IF NOT EXISTS idx_responses_question_id ON responses(question_id);
 
--- 4. PROFILES TABLE
+-- 5. PROFILES TABLE
 CREATE TABLE IF NOT EXISTS profiles (
     user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     trait_vector JSONB,
@@ -120,7 +126,20 @@ CREATE TABLE IF NOT EXISTS profiles (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 5. DOMAINS TABLE [NEW]
+-- updated_at trigger for profiles
+CREATE OR REPLACE FUNCTION set_updated_at() RETURNS trigger AS $$
+BEGIN
+    NEW.updated_at := now();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_profiles_updated_at ON profiles;
+CREATE TRIGGER trg_profiles_updated_at
+    BEFORE UPDATE ON profiles
+    FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- 6. DOMAINS TABLE
 CREATE TABLE IF NOT EXISTS domains (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT UNIQUE NOT NULL,
@@ -128,7 +147,7 @@ CREATE TABLE IF NOT EXISTS domains (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 6. PARENT DOMAIN PREFERENCES TABLE [NEW]
+-- 7. PARENT DOMAIN PREFERENCES TABLE
 CREATE TABLE IF NOT EXISTS parent_domain_prefs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     parent_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -139,10 +158,9 @@ CREATE TABLE IF NOT EXISTS parent_domain_prefs (
     CONSTRAINT uq_parent_domain_prefs_parent_domain UNIQUE (parent_id, domain_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_parent_domain_prefs_parent_id ON parent_domain_prefs(parent_id);
 CREATE INDEX IF NOT EXISTS idx_parent_domain_prefs_domain_id ON parent_domain_prefs(domain_id);
 
--- 7. CAREERS TABLE
+-- 8. CAREERS TABLE
 CREATE TABLE IF NOT EXISTS careers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT UNIQUE NOT NULL,
@@ -156,7 +174,7 @@ CREATE TABLE IF NOT EXISTS careers (
 CREATE INDEX IF NOT EXISTS idx_careers_domain_id ON careers(domain_id);
 
 -- View: v_careers for API convenience
-CREATE OR REPLACE VIEW v_careers AS
+CREATE OR REPLACE VIEW v_careers WITH (security_invoker = true) AS
 SELECT 
     c.id,
     c.name,
@@ -170,11 +188,12 @@ SELECT
 FROM careers c
 JOIN domains d ON c.domain_id = d.id;
 
--- 8. COURSES TABLE [NEW]
+-- 9. COURSES TABLE
 CREATE TABLE IF NOT EXISTS courses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     career_id UUID NOT NULL REFERENCES careers(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
+    level TEXT CHECK (level IS NULL OR level IN ('UG', 'PG')),
     duration_years NUMERIC(3,1) CHECK (duration_years IS NULL OR duration_years > 0),
     total_cost NUMERIC(12,2) CHECK (total_cost IS NULL OR total_cost >= 0),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -182,13 +201,24 @@ CREATE TABLE IF NOT EXISTS courses (
 
 CREATE INDEX IF NOT EXISTS idx_courses_career_id ON courses(career_id);
 
--- 9. MARKET DATA TABLE
+-- 10. MARKET DATA TABLE
 CREATE TABLE IF NOT EXISTS market_data (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     career_id UUID NOT NULL REFERENCES careers(id) ON DELETE CASCADE,
-    region TEXT NOT NULL,
+    region TEXT NOT NULL CHECK (
+        region IN (
+            'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 
+            'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 
+            'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 
+            'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 
+            'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 'Chandigarh', 
+            'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 
+            'Ladakh', 'Lakshadweep', 'Puducherry', 'India'
+        )
+    ),
     demand_index NUMERIC(5,2) CHECK (demand_index IS NULL OR (demand_index BETWEEN 0 AND 100)),
     median_salary NUMERIC(12,2) CHECK (median_salary IS NULL OR median_salary >= 0),
+    entry_salary NUMERIC(12,2) CHECK (entry_salary IS NULL OR entry_salary >= 0),
     growth_rate NUMERIC(5,2),
     as_of DATE NOT NULL,
     source TEXT NOT NULL,
@@ -198,21 +228,22 @@ CREATE TABLE IF NOT EXISTS market_data (
     CONSTRAINT uq_market_data_career_region_asof UNIQUE (career_id, region, as_of)
 );
 
-CREATE INDEX IF NOT EXISTS idx_market_data_career_id ON market_data(career_id);
-CREATE INDEX IF NOT EXISTS idx_market_data_career_region ON market_data(career_id, region);
-
--- 10. EXAMS & COLLEGES TABLE
+-- 11. EXAMS & COLLEGES TABLE
 CREATE TABLE IF NOT EXISTS exams_colleges (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     career_id UUID NOT NULL REFERENCES careers(id) ON DELETE CASCADE,
     course_id UUID REFERENCES courses(id) ON DELETE CASCADE,
     exam TEXT NOT NULL,
     college TEXT NOT NULL,
+    city TEXT,
+    state TEXT,
     annual_fee NUMERIC(12,2) CHECK (annual_fee IS NULL OR annual_fee >= 0),
+    annual_living_cost NUMERIC(12,2) CHECK (annual_living_cost IS NULL OR annual_living_cost >= 0),
     rank INT CHECK (rank IS NULL OR rank > 0),
     source TEXT NOT NULL DEFAULT 'NIRF 2026 / Official Portal',
     source_url TEXT,
     as_of DATE NOT NULL DEFAULT '2026-09-01',
+    estimated BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT uq_exams_colleges_career_college_exam UNIQUE (career_id, college, exam)
 );
@@ -220,35 +251,36 @@ CREATE TABLE IF NOT EXISTS exams_colleges (
 CREATE INDEX IF NOT EXISTS idx_exams_colleges_career_id ON exams_colleges(career_id);
 CREATE INDEX IF NOT EXISTS idx_exams_colleges_course_id ON exams_colleges(course_id);
 
--- 11. SCHOLARSHIPS TABLE
+-- 12. SCHOLARSHIPS TABLE
 CREATE TABLE IF NOT EXISTS scholarships (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     amount NUMERIC(12,2) CHECK (amount IS NULL OR amount >= 0),
+    amount_period TEXT NOT NULL DEFAULT 'one_time' CHECK (amount_period IN ('one_time', 'per_year')),
     deadline DATE,
     provider TEXT,
     source_url TEXT,
+    as_of DATE NOT NULL DEFAULT '2026-09-01',
     estimated BOOLEAN NOT NULL DEFAULT false,
     income_limit NUMERIC(12,2) CHECK (income_limit IS NULL OR income_limit >= 0),
-    category TEXT[],
+    category TEXT[] CONSTRAINT chk_scholarship_category CHECK (category <@ ARRAY['general','obc','sc','st','ews']),
     state TEXT[],
     min_percentage NUMERIC(5,2) CHECK (min_percentage IS NULL OR (min_percentage BETWEEN 0 AND 100)),
-    gender TEXT,
+    gender TEXT CHECK (gender IS NULL OR gender IN ('female','male','other','any')),
     extra_rules JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 12. SCHOLARSHIP CAREERS M2M TABLE [NEW]
+-- 13. SCHOLARSHIP CAREERS M2M TABLE
 CREATE TABLE IF NOT EXISTS scholarship_careers (
     scholarship_id UUID NOT NULL REFERENCES scholarships(id) ON DELETE CASCADE,
     career_id UUID NOT NULL REFERENCES careers(id) ON DELETE CASCADE,
     PRIMARY KEY (scholarship_id, career_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_scholarship_careers_scholarship_id ON scholarship_careers(scholarship_id);
 CREATE INDEX IF NOT EXISTS idx_scholarship_careers_career_id ON scholarship_careers(career_id);
 
--- 13. RESULTS TABLE
+-- 14. RESULTS TABLE
 CREATE TABLE IF NOT EXISTS results (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     student_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -263,7 +295,7 @@ CREATE TABLE IF NOT EXISTS results (
 CREATE INDEX IF NOT EXISTS idx_results_student_id ON results(student_id);
 CREATE INDEX IF NOT EXISTS idx_results_parent_id ON results(parent_id);
 
--- 14. EXPLANATIONS TABLE [NEW]
+-- 15. EXPLANATIONS TABLE
 CREATE TABLE IF NOT EXISTS explanations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     result_id UUID NOT NULL REFERENCES results(id) ON DELETE CASCADE,
@@ -278,3 +310,41 @@ CREATE TABLE IF NOT EXISTS explanations (
 
 CREATE INDEX IF NOT EXISTS idx_explanations_result_id ON explanations(result_id);
 CREATE INDEX IF NOT EXISTS idx_explanations_career_id ON explanations(career_id);
+
+-- 16. ROW-LEVEL SECURITY (RLS) & READ POLICIES FOR CATALOG TABLES
+DO $$ 
+DECLARE t text; 
+BEGIN 
+  FOR t IN SELECT tablename FROM pg_tables WHERE schemaname = 'public' 
+  LOOP 
+    EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t); 
+  END LOOP; 
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'read_catalog_domains') THEN
+        CREATE POLICY read_catalog_domains ON domains FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'read_catalog_careers') THEN
+        CREATE POLICY read_catalog_careers ON careers FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'read_catalog_courses') THEN
+        CREATE POLICY read_catalog_courses ON courses FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'read_catalog_exams_colleges') THEN
+        CREATE POLICY read_catalog_exams_colleges ON exams_colleges FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'read_catalog_market_data') THEN
+        CREATE POLICY read_catalog_market_data ON market_data FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'read_catalog_scholarships') THEN
+        CREATE POLICY read_catalog_scholarships ON scholarships FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'read_catalog_scholarship_careers') THEN
+        CREATE POLICY read_catalog_scholarship_careers ON scholarship_careers FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'read_catalog_questions') THEN
+        CREATE POLICY read_catalog_questions ON questions FOR SELECT USING (true);
+    END IF;
+END $$;
