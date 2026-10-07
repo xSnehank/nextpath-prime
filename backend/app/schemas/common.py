@@ -5,7 +5,7 @@ from enum import StrEnum
 from typing import Annotated, Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-from pydantic_core import PydanticCustomError  # noqa: F401  (for the Weights rule below)
+from pydantic_core import PydanticCustomError
 
 
 class StrictModel(BaseModel):
@@ -154,8 +154,9 @@ DataQuality = Literal["sourced", "estimated"]
 # ---------- ranking weights ----------
 
 # How far fit + finance + market may drift from exactly 1 before the weights are rejected.
-# TODO(Snehank): choose this value; the trade-off is explained in Weights._must_sum_to_one.
-WEIGHT_SUM_TOLERANCE: float = 0.0
+# 0.01 accepts what 2-decimal sliders send (0.33 x 3 = 0.99) and float noise (0.1 + 0.2 + 0.7), but rejects
+# 0.98 or 1.05, where every final score would silently shrink or grow by several percent.
+WEIGHT_SUM_TOLERANCE: float = 0.01
 
 
 class Weights(StrictModel):
@@ -169,17 +170,12 @@ class Weights(StrictModel):
     def _must_sum_to_one(self) -> Self:
         """Reject weights whose sum is further than WEIGHT_SUM_TOLERANCE from 1.
 
-        TODO(Snehank): implement this check (about 5 lines).
-          - Add up fit + finance + market.
-          - If the sum is too far from 1, raise
-                PydanticCustomError("invalid_weights", "<your message>", {"sum": <the sum>})
-            app/errors.py turns any error on the request's weights into the INVALID_WEIGHTS code;
-            a {sum} placeholder in your message is filled in from that dict, and the dict is
-            returned to the frontend in error.details.
-          - The trade-off: the what-if sliders send values rounded to 2 decimals, so three equal
-            weights arrive as 0.33 + 0.33 + 0.33 = 0.99. Too strict a tolerance rejects that;
-            too loose lets e.g. 0.90 through, and every final score silently shrinks by 10%.
+        app/errors.py turns this error into INVALID_WEIGHTS; {sum} is filled in from the dict below, which is
+        also returned to the frontend in error.details.
         """
+        total = round(self.fit + self.finance + self.market, 6)
+        if abs(total - 1) > WEIGHT_SUM_TOLERANCE:
+            raise PydanticCustomError("invalid_weights", "The weights add up to {sum}; they must add up to 1.", {"sum": total})
         return self
 
 

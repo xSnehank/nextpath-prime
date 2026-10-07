@@ -21,6 +21,14 @@ BEGIN
     RETURNING id INTO unnamed;
     ASSERT (SELECT full_name FROM users WHERE id = unnamed) IS NULL, 'a blank name is stored as NULL';
 
+    -- a sign-up with no role, or a made-up one, is rejected instead of creating a wrong account
+    PERFORM pg_temp.expect_error($q$INSERT INTO auth.users (email, raw_user_meta_data)
+        VALUES ('norole@test.local', '{"full_name": "No Role"}')$q$, '23514');
+    PERFORM pg_temp.expect_error($q$INSERT INTO auth.users (email, raw_user_meta_data)
+        VALUES ('admin@test.local', '{"role": "admin"}')$q$, '23514');
+    ASSERT NOT EXISTS (SELECT 1 FROM users WHERE email IN ('norole@test.local', 'admin@test.local')),
+           'a rejected sign-up leaves no users row';
+
     DELETE FROM auth.users WHERE id = student;
     ASSERT NOT EXISTS (SELECT 1 FROM users WHERE id = student), 'deleting the account deletes the users row';
 END $$;
