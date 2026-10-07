@@ -1,8 +1,8 @@
 # PRISM Engine backend (FastAPI, Python 3.14; requires >=3.12)
 
 Career-guidance API for DataQuest 3.0 (problem DQNM): student answers + parent finances + market data ->
-ranked, affordable career roadmap. Team: Snehank (backend, repo lead), Joel (db/), Aayush (frontend/),
-Eklavya (docs/ and the PPT; needs real measured numbers).
+ranked, affordable career roadmap. Team: Snehank (backend and db/, repo lead), Aayush (frontend/),
+Eklavya (docs/ and the PPT; needs real measured numbers). Joel left on 2026-10-07; his db/ work is now Snehank's.
 
 ## Working with Snehank
 - He is new to FastAPI, Pydantic, SQLAlchemy and pytest: explain what you will do and why before doing it.
@@ -10,12 +10,13 @@ Eklavya (docs/ and the PPT; needs real measured numbers).
 - Ask instead of inventing data, columns, formulas, salaries or sources.
 - End every task with: what was built, which tests pass, assumptions made, what to check by hand.
 - Keep answers short between steps; don't repeat file contents back.
-- Edit only backend/ (plus docs/, PROMPTS.md and the root CLAUDE.md when asked). Never edit frontend/ or db/.
+- Edit only backend/ and db/ (plus docs/, PROMPTS.md, BRANCHES.md and the root CLAUDE.md when asked).
+  Never edit frontend/. Database rules: db/CLAUDE.md.
 
 ## Rules
 - Scoring logic lives in app/core/ as PURE functions: no database, no network, no randomness.
 - Routers in app/api/ are thin. SQL lives only in app/repositories/. Use only tables and columns in
-  db/schema.sql (Joel's); ask before relying on anything else.
+  db/schema.sql (generated from db/migrations/); schema changes go in a new migration (db/CLAUDE.md).
 - The contract is openapi/openapi.json, generated from app/schemas/. Never rename or remove a field without
   telling Snehank (Aayush builds against it). After any schema change: python scripts/check_contract.py --write
 - Mocks in app/mocks/*.json are validated against the same models; tests enforce it.
@@ -38,4 +39,4 @@ Eklavya (docs/ and the PPT; needs real measured numbers).
 
 ## Git
 - Branch from develop (branch names in BRANCHES.md); PR into develop; one reviewer from another layer.
-- Add the best prompt for each branch to PROMPTS.md, under "## Backend".
+- Add the best prompt for each branch to PROMPTS.md, under "## Backend" (or "## Database" for db/ branches).
