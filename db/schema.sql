@@ -108,15 +108,10 @@ DECLARE
     signup_role TEXT := NEW.raw_user_meta_data ->> 'role';
 BEGIN
     IF signup_role IS NULL OR signup_role NOT IN ('student', 'parent') THEN
-        -- TODO(Snehank): decide what a sign-up without a valid role does (about 3 lines).
-        --   Reject it:          RAISE EXCEPTION 'sign-up needs a role: student or parent';
-        --                       (Supabase then shows the person a generic sign-up error)
-        --   Default to student: signup_role := 'student';
-        --                       (never fails, but a parent could silently become a student)
-        --   Skip the row:       RETURN NEW;
-        --                       (the account exists, but every API call fails until someone fixes it)
-        -- Until you choose, the INSERT below fails the role check, which rejects the sign-up.
-        NULL;
+        RAISE EXCEPTION USING
+            ERRCODE = 'check_violation',
+            MESSAGE = 'Sign-up needs a role: student or parent.',
+            HINT = 'Pass options.data.role to supabase.auth.signUp.';
     END IF;
 
     INSERT INTO public.users (id, role, email, full_name)
