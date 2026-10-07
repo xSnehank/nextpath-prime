@@ -31,6 +31,7 @@ BEGIN
     ASSERT NOT EXISTS (SELECT 1 FROM careers c
                        WHERE NOT EXISTS (SELECT 1 FROM courses co WHERE co.career_id = c.id AND co.level = 'UG')),
            'every career has an undergraduate course';
+    ASSERT NOT EXISTS (SELECT 1 FROM careers WHERE trait_weights IS NULL), 'every career has O*NET trait weights';
     ASSERT (SELECT count(*) FROM exams_colleges) = 38, 'all 37 draft routes plus NDA (a mistyped course drops a row)';
     ASSERT NOT EXISTS (SELECT 1 FROM exams_colleges WHERE source = 'Unverified draft' AND NOT estimated),
            'unverified figures are marked estimated';

@@ -9,3 +9,4 @@
 
 \ir 01_questions.sql
 \ir 02_careers_courses.sql
+\ir 03_trait_weights.sql
