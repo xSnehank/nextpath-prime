@@ -88,7 +88,11 @@ def list_scholarships(conn: Connection) -> list[Row]:
         conn.execute(
             text(
                 """
-                SELECT s.*, coalesce(array_agg(sc.career_id) FILTER (WHERE sc.career_id IS NOT NULL), '{}') AS career_ids
+                SELECT s.name, s.amount, s.amount_period, s.deadline, s.income_limit, s.min_percentage, s.gender,
+                       s.course_level,
+                       -- psycopg doesn't know arrays of our domain types and would return the text '{...}'
+                       CAST(s.categories AS text[]) AS categories, CAST(s.states AS text[]) AS states,
+                       coalesce(array_agg(sc.career_id) FILTER (WHERE sc.career_id IS NOT NULL), '{}') AS career_ids
                 FROM scholarships s LEFT JOIN scholarship_careers sc ON sc.scholarship_id = s.id
                 GROUP BY s.id ORDER BY s.name
                 """
