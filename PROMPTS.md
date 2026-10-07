@@ -119,6 +119,21 @@ database and check that everything works."
 - Real data: trait weights from O*NET 31.0, salaries from PayScale India, demand from ManpowerGroup's
   Q4 2026 survey, growth from Naukri JobSpeak, living cost from MoSPI, three checkable scholarships.
 
+### docs/release-readme-deck (release)
+**Prompt** (plan mode): "Push everything, every change to GitHub along with Vercel deployment. Ensure your
+repository contains: 1. A clear and informative README file 2. A PowerPoint presentation summarizing the project
+3. The GitHub repo does not show Claude as contributor."
+
+**What it produced:**
+- Root `README.md`, the judges' entry point: live links, the 3-step flow, the ranking formula table, privacy,
+  data sources with honest caveats, a Mermaid architecture diagram, local setup, deployment, tests and the team.
+- `docs/PRISM-Engine.pptx`: 14 slides with speaker notes. Every number was read from the live database, the
+  OpenAPI contract or the test run (33 questions, 13 traits, 13 careers, 28 routes, 29 exams, 135 tests). It was
+  rendered with PowerPoint and checked slide by slide.
+- `backend/vercel.json`: the API's Vercel Functions run in `bom1` (Mumbai), next to the Supabase database.
+- Contributor check: no commit on any GitHub branch carries a Claude co-author line, so `main` gets `develop`
+  with an ordinary merge and no history rewrite.
+
 ## Database (Snehank, Claude Code with Opus 5.5)
 
 ### fix/db-schema-review
