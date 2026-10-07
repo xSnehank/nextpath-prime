@@ -539,7 +539,7 @@ export default function StudentAssessmentPage() {
                 {currentQ.group} Battery
               </Badge>
               <span className="text-xs font-mono text-slate-400">
-                Estimated: ~3 mins remaining
+                {currentQ.kind === "choice" ? "Pick the one correct answer" : "How much do you agree?"}
               </span>
             </div>
             <CardTitle className="text-xl sm:text-2xl pt-2 font-medium text-white leading-relaxed">

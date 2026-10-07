@@ -381,7 +381,7 @@ export const api = {
       options: q.options,
       required: q.required,
       audience: res.audience,
-      type: "likert",
+      kind: q.kind,
     }));
   },
 
