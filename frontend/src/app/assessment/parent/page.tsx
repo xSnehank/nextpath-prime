@@ -8,18 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   Banknote,
-  ShieldCheck,
   Scale,
   Sparkles,
   ArrowRight,
-  TrendingUp,
-  Info,
-  CheckCircle2,
   XCircle,
   Loader2,
   Globe2,
   MapPin,
-  Clock,
 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import type { DomainItem, IndianState, ParentProfile } from "@/types/api";

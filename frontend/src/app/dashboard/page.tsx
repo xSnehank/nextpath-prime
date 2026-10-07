@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ConflictGauge } from "@/components/ConflictGauge";
@@ -16,24 +16,15 @@ import { SwotMatrix } from "@/components/SwotMatrix";
 import { PdfExportButton } from "@/components/PdfExportButton";
 import {
   Sparkles,
-  GraduationCap,
   Award,
-  BookOpen,
-  Calendar,
   Building2,
   Brain,
-  Sliders,
   DollarSign,
   TrendingUp,
   RotateCcw,
   Bot,
   Loader2,
-  ChevronRight,
   Layers,
-  ArrowRight,
-  CheckCircle2,
-  AlertCircle,
-  HelpCircle,
   ShieldAlert,
 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
@@ -217,43 +208,51 @@ function DashboardContent() {
     rankedRoadmap.find((c) => c.id === selectedCareerId) || rankedRoadmap[0];
 
   // Request real AI explanation for active career via POST /explain (Comment 4/14)
-  const handleFetchAiExplanation = async (career: CareerPath) => {
-    if (!data || !career) return;
+  React.useEffect(() => {
+    if (!activeCareer || !data) return;
+    const career = activeCareer;
     if (aiExplanations[career.id]) return;
 
-    setLoadingAi(true);
-    try {
-      const res = await api.explain({
-        result_id: data.resultId,
-        career_id: career.id,
-      });
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      setLoadingAi(true);
+      try {
+        const res = await api.explain({
+          result_id: data.resultId,
+          career_id: career.id,
+        });
 
-      setAiExplanations((prev) => ({
-        ...prev,
-        [career.id]: {
-          text: res.text,
-          source: res.source,
-        },
-      }));
-    } catch (err) {
-      console.warn("AI explanation fetch failed:", err);
-      // Fallback only cites deterministic scores
-      setAiExplanations((prev) => ({
-        ...prev,
-        [career.id]: {
-          text: `${career.title} achieves a final score of ${career.finalScore}/100 based on ${career.compositeScore}/100 psychometric affinity and ${career.marketDemand}% regional market demand.`,
-          source: "cache",
-        },
-      }));
-    } finally {
-      setLoadingAi(false);
-    }
-  };
+        if (!cancelled) {
+          setAiExplanations((prev) => ({
+            ...prev,
+            [career.id]: {
+              text: res.text,
+              source: res.source,
+            },
+          }));
+        }
+      } catch (err) {
+        console.warn("AI explanation fetch failed:", err);
+        if (!cancelled) {
+          setAiExplanations((prev) => ({
+            ...prev,
+            [career.id]: {
+              text: `${career.title} achieves a final score of ${career.finalScore}/100 based on ${career.compositeScore}/100 psychometric affinity and ${career.marketDemand}% regional market demand.`,
+              source: "cache",
+            },
+          }));
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingAi(false);
+        }
+      }
+    }, 0);
 
-  React.useEffect(() => {
-    if (activeCareer && data) {
-      handleFetchAiExplanation(activeCareer);
-    }
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [activeCareer?.id, data?.resultId]);
 
   // Loading State

@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, ArrowRight, UserCheck, ShieldCheck, School, MapPin, Loader2 } from "lucide-react";
+import { ArrowRight, ShieldCheck, School, MapPin, Loader2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import type { IndianState, StudentProfile } from "@/types/api";
 

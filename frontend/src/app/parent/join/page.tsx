@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Users, CheckCircle, ArrowRight, Link2, ShieldCheck, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle, ArrowRight, Link2, ShieldCheck, Loader2, AlertCircle } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 
 function ParentJoinContent() {
@@ -85,7 +85,10 @@ function ParentJoinContent() {
   // If code was provided via URL query params on initial load, auto-verify once
   React.useEffect(() => {
     if (initialCode) {
-      handleLinkAccounts(initialCode);
+      const timer = setTimeout(() => {
+        handleLinkAccounts(initialCode);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [initialCode]);
 

@@ -2,20 +2,16 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft,
   ArrowRight,
-  Brain,
   CheckCircle2,
-  Clock,
-  HelpCircle,
   Loader2,
   Share2,
-  Sparkles,
 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import type { Question } from "@/types/api";

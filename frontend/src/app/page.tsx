@@ -8,18 +8,12 @@ import {
   ArrowUpRight,
   Brain,
   Banknote,
-  LayoutDashboard,
-  ShieldAlert,
   TrendingUp,
-  Scale,
   Sparkles,
   ChevronDown,
   ChevronUp,
   Sliders,
-  CheckCircle2,
-  AlertCircle,
   FileText,
-  Compass,
 } from "lucide-react";
 
 // Interactive Demo Personas for Live Simulator
@@ -314,7 +308,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div className="space-y-2">
               <div className="text-xs font-mono uppercase tracking-widest text-[#d4ff3a]">
-                // 01 LIVE SIMULATION ENGINE
+                {"// 01 LIVE SIMULATION ENGINE"}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#eeeee8]">
                 Test the Tri-Vector Equation
@@ -526,7 +520,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl space-y-12">
           <div className="space-y-3">
             <div className="text-xs font-mono uppercase tracking-widest text-[#d4ff3a]">
-              // 02 THE CRISIS
+              {"// 02 THE CRISIS"}
             </div>
             <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#eeeee8]">
               Why Indian Career Decisions Break Down
@@ -581,7 +575,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl space-y-12">
           <div className="space-y-3">
             <div className="text-xs font-mono uppercase tracking-widest text-[#d4ff3a]">
-              // 03 MATHEMATICAL FRAMEWORK
+              {"// 03 MATHEMATICAL FRAMEWORK"}
             </div>
             <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#eeeee8]">
               Deterministic Multi-Vector Synthesis
@@ -679,7 +673,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl space-y-12">
           <div className="space-y-3">
             <div className="text-xs font-mono uppercase tracking-widest text-[#d4ff3a]">
-              // 04 SYSTEM MODULES
+              {"// 04 SYSTEM MODULES"}
             </div>
             <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#eeeee8]">
               Engineered for End-to-End Decision Clarity
@@ -818,7 +812,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-4xl space-y-12">
           <div className="space-y-3">
             <div className="text-xs font-mono uppercase tracking-widest text-[#d4ff3a]">
-              // 05 FREQUENTLY ASKED QUESTIONS
+              {"// 05 FREQUENTLY ASKED QUESTIONS"}
             </div>
             <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#eeeee8]">
               System Specifications & FAQ
@@ -842,7 +836,7 @@ export default function LandingPage() {
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-xs font-mono text-[#d4ff3a]">
-                        // 0{idx + 1}
+                        {`// 0${idx + 1}`}
                       </span>
                       <span className="font-semibold text-sm sm:text-base text-[#eeeee8]">
                         {faq.q}
