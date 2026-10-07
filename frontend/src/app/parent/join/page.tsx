@@ -12,6 +12,8 @@ import { CheckCircle, ArrowRight, Link2, ShieldCheck, Loader2, AlertCircle, KeyR
 import { api, ApiError } from "@/lib/api";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
+const isAlreadyRegistered = (message: string) => /already (been )?registered/i.test(message);
+
 function ParentJoinContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -43,6 +45,7 @@ function ParentJoinContent() {
   const [loading, setLoading] = React.useState(false);
   const [checkingAuth, setCheckingAuth] = React.useState(true);
   const [error, setError] = React.useState("");
+  const [showSignInLink, setShowSignInLink] = React.useState(false);
 
   React.useEffect(() => {
     let active = true;
@@ -96,6 +99,7 @@ function ParentJoinContent() {
 
     setLoading(true);
     setError("");
+    setShowSignInLink(false);
     setEmailNotice("");
 
     try {
@@ -116,7 +120,12 @@ function ParentJoinContent() {
           });
 
           if (authError) {
-            setError(authError.message);
+            if (isAlreadyRegistered(authError.message)) {
+              setError("This email already has an account. Sign in, then enter the invite code again.");
+              setShowSignInLink(true);
+            } else {
+              setError(authError.message);
+            }
             return;
           }
 
@@ -128,6 +137,9 @@ function ParentJoinContent() {
             setEmailNotice("Check your email to confirm your account, then sign in");
             return;
           }
+
+          // Signed in from here on: if linking fails, "Try again" must only retry linking, not sign up again.
+          setAlreadySignedInUser({ role: "parent", full_name: parentName });
         }
       }
 
@@ -252,7 +264,14 @@ function ParentJoinContent() {
               {error && (
                 <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
-                  <span>{error}</span>
+                  <span>
+                    {error}
+                    {showSignInLink && (
+                      <Link href="/signin" className="ml-1 font-semibold underline underline-offset-2 text-rose-200">
+                        Sign in
+                      </Link>
+                    )}
+                  </span>
                 </div>
               )}
 
