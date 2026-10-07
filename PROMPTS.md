@@ -89,6 +89,19 @@ after Joel left: "Joel is no longer working on this, and we have to do the rest.
   server, and the guide documents the grading. The mock's aptitude items have correct answers spread
   over A–D, because Joel's answer key only ever used A, B or C.
 
+### feat/be-A1-A2-auth-linking (live mode, scoring engine, real data)
+**Prompt:** "Merge PR #15 and start the sign-in branch. Merge Aayush's PR and then correct all errors and
+mistakes. Review frontend, backend and database and fix everything. Then connect frontend, backend and
+database and check that everything works."
+
+**What it produced:**
+- Live mode for every endpoint: Supabase token checks, invites and linking, profiles, answers, consent,
+  `/analyze`, results, explanations (template, or Gemini with number checks), market data and the demo run.
+- The scoring engine as pure functions (`app/core`) with 31 hand-computed unit tests, and 24 live-mode tests
+  against a throwaway PostgreSQL built from `db/`.
+- Real data: trait weights from O*NET 31.0, salaries from PayScale India, demand from ManpowerGroup's
+  Q4 2026 survey, growth from Naukri JobSpeak, living cost from MoSPI, three checkable scholarships.
+
 ## Database (Snehank, Claude Code with Opus 5.5)
 
 ### fix/db-schema-review
