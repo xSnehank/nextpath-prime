@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { Compass, Sparkles, Menu, X, ArrowRight, Brain, Banknote, LayoutDashboard } from "lucide-react";
+import { Menu, X, ArrowUpRight, Brain, Banknote, LayoutDashboard, Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
@@ -50,39 +50,40 @@ export function FloatingPillNavbar() {
   return (
     <>
       {/* Floating Pill Fixed Container */}
-      <header className="fixed top-4 sm:top-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+      <header className="fixed top-4 sm:top-5 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
         <motion.div
-          initial={{ y: -30, opacity: 0 }}
+          initial={{ y: -24, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+          transition={{ type: "spring", stiffness: 380, damping: 28 }}
           className={cn(
-            "pointer-events-auto flex items-center justify-between gap-1 sm:gap-3 rounded-full border px-2 sm:px-3 py-1.5 sm:py-2 transition-all duration-300 shadow-2xl",
+            "pointer-events-auto flex items-center justify-between gap-1 sm:gap-2.5 rounded-full border px-2 sm:px-2.5 py-1.5 transition-all duration-300 shadow-2xl",
             scrolled
-              ? "border-white/15 bg-slate-950/85 backdrop-blur-2xl shadow-violet-950/30"
-              : "border-white/10 bg-slate-950/70 backdrop-blur-xl shadow-black/40"
+              ? "border-white/[0.12] bg-[#08090a]/92 backdrop-blur-2xl shadow-black/70"
+              : "border-white/[0.08] bg-[#0d0e10]/85 backdrop-blur-xl shadow-black/50"
           )}
         >
           {/* Brand Mark (Left of Pill) */}
           <Link
             href="/"
-            className="flex items-center gap-2 pl-1.5 pr-2 py-1 rounded-full group select-none"
-            aria-label="PRISM Engine Home"
+            className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full group select-none"
+            aria-label="NextPath Home"
           >
-            <div className="relative flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-gradient-to-tr from-violet-600 via-indigo-500 to-cyan-400 p-[1.5px] shadow-md shadow-violet-500/25 group-hover:scale-105 transition-transform">
-              <div className="flex h-full w-full items-center justify-center rounded-full bg-slate-950">
-                <Compass className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-cyan-300 group-hover:rotate-45 transition-transform duration-500" />
-              </div>
+            <div className="relative flex h-7 w-7 items-center justify-center rounded-full bg-[#16181b] border border-white/10 group-hover:border-[#d4ff3a]/50 transition-colors">
+              <span className="h-2 w-2 rounded-full bg-[#d4ff3a]" />
             </div>
-            <div className="hidden lg:flex flex-col">
-              <span className="text-xs font-black tracking-tight text-white font-[Outfit,sans-serif] leading-none">
-                PRISM<span className="text-cyan-400 font-normal">ENGINE</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs sm:text-sm font-bold tracking-tight text-[#eeeee8] font-sans">
+                Next<span className="text-[#d4ff3a]">Path</span>
+              </span>
+              <span className="hidden lg:inline-flex text-[9px] font-mono uppercase tracking-widest text-[#75766f] border border-white/10 px-1.5 py-0.5 rounded-full">
+                DQNM
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation Links with Framer-style Spring Pill Indicator */}
           <nav
-            className="hidden md:flex items-center gap-1 p-1 rounded-full bg-white/[0.03] border border-white/5 relative"
+            className="hidden md:flex items-center gap-0.5 p-1 rounded-full bg-white/[0.02] border border-white/[0.05] relative"
             onMouseLeave={() => setHoveredItem(null)}
           >
             {NAV_ITEMS.map((item) => {
@@ -96,29 +97,29 @@ export function FloatingPillNavbar() {
                   href={item.href}
                   onMouseEnter={() => setHoveredItem(item.id)}
                   className={cn(
-                    "relative px-3.5 py-1.5 text-xs font-semibold rounded-full transition-colors duration-200 select-none flex items-center gap-1.5 z-10",
-                    isActive ? "text-white" : "text-slate-400 hover:text-slate-200"
+                    "relative px-3.5 py-1.5 text-xs font-medium rounded-full transition-colors duration-200 select-none flex items-center gap-1.5 z-10",
+                    isActive ? "text-[#eeeee8]" : "text-[#75766f] hover:text-[#dcdcd3]"
                   )}
                 >
-                  {/* Framer-style Spring Active Pill Background */}
+                  {/* Active Indicator */}
                   {isActive && (
                     <motion.div
                       layoutId="activePill"
-                      className="absolute inset-0 rounded-full bg-gradient-to-r from-violet-600/90 to-indigo-600/90 shadow-md shadow-violet-600/30 border border-violet-400/30 -z-10"
+                      className="absolute inset-0 rounded-full bg-[#1a1c21] border border-white/10 shadow-sm -z-10"
                       transition={{
                         type: "spring",
-                        stiffness: 500,
-                        damping: 35,
+                        stiffness: 450,
+                        damping: 32,
                         mass: 0.8,
                       }}
                     />
                   )}
 
-                  {/* Hover Pill Highlight */}
+                  {/* Hover Highlight */}
                   {isHovered && !isActive && (
                     <motion.div
                       layoutId="hoverPill"
-                      className="absolute inset-0 rounded-full bg-white/5 -z-10"
+                      className="absolute inset-0 rounded-full bg-white/[0.04] -z-10"
                       transition={{
                         type: "spring",
                         stiffness: 400,
@@ -131,7 +132,7 @@ export function FloatingPillNavbar() {
                     <Icon
                       className={cn(
                         "h-3.5 w-3.5",
-                        isActive ? "text-cyan-300" : "text-slate-500"
+                        isActive ? "text-[#d4ff3a]" : "text-[#75766f]"
                       )}
                     />
                   )}
@@ -142,21 +143,18 @@ export function FloatingPillNavbar() {
           </nav>
 
           {/* Right Action CTA (Pill End) */}
-          <div className="flex items-center gap-2 pl-1 sm:pl-2">
+          <div className="flex items-center gap-1.5 pl-1">
             <Link href="/dashboard" className="hidden sm:inline-block">
-              <button className="relative group overflow-hidden rounded-full p-[1px] font-semibold text-xs transition-all active:scale-95 cursor-pointer">
-                <span className="absolute inset-0 bg-gradient-to-r from-violet-600 via-indigo-500 to-cyan-400 rounded-full group-hover:opacity-100 opacity-80 transition-opacity" />
-                <span className="relative flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full bg-slate-950 text-white text-xs font-semibold group-hover:bg-slate-950/80 transition-colors">
-                  <Sparkles className="h-3 w-3 text-amber-300 animate-pulse" />
-                  <span>1-Click Demo</span>
-                </span>
-              </button>
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] text-xs font-semibold tracking-tight transition-all active:scale-95 cursor-pointer shadow-sm shadow-[#d4ff3a]/20">
+                <span>Live Demo</span>
+                <ArrowUpRight className="h-3 w-3 stroke-[2.5]" />
+              </span>
             </Link>
 
             {/* Mobile Hamburger Trigger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10"
+              className="md:hidden flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.04] text-[#eeeee8] border border-white/10 hover:bg-white/10"
               aria-label="Toggle Mobile Navigation"
             >
               {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -165,7 +163,7 @@ export function FloatingPillNavbar() {
         </motion.div>
       </header>
 
-      {/* Mobile Drawer (Accessible at 375px Viewport) */}
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -173,9 +171,9 @@ export function FloatingPillNavbar() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="fixed top-20 left-4 right-4 z-50 rounded-3xl border border-white/15 bg-slate-950/95 p-4 shadow-2xl backdrop-blur-2xl md:hidden"
+            className="fixed top-20 left-4 right-4 z-50 rounded-2xl border border-white/10 bg-[#0d0e10]/95 p-4 shadow-2xl backdrop-blur-2xl md:hidden"
           >
-            <div className="flex flex-col space-y-1.5">
+            <div className="flex flex-col space-y-1">
               {NAV_ITEMS.map((item) => {
                 const isActive = activeId === item.id;
                 const Icon = item.icon;
@@ -185,32 +183,31 @@ export function FloatingPillNavbar() {
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
                     className={cn(
-                      "flex items-center justify-between p-3 rounded-2xl text-xs font-semibold transition-colors",
+                      "flex items-center justify-between p-3 rounded-xl text-xs font-medium transition-colors",
                       isActive
-                        ? "bg-violet-600/20 text-cyan-300 border border-violet-500/30"
-                        : "text-slate-300 hover:bg-white/5"
+                        ? "bg-[#16181b] text-[#d4ff3a] border border-[#d4ff3a]/20"
+                        : "text-[#75766f] hover:bg-white/[0.03] hover:text-[#eeeee8]"
                     )}
                   >
                     <div className="flex items-center gap-2.5">
-                      {Icon && <Icon className="h-4 w-4 text-violet-400" />}
+                      {Icon && <Icon className="h-4 w-4" />}
                       <span>{item.label}</span>
                     </div>
-                    {isActive && <div className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />}
+                    {isActive && <div className="h-1.5 w-1.5 rounded-full bg-[#d4ff3a]" />}
                   </Link>
                 );
               })}
             </div>
 
-            <div className="pt-3 mt-2 border-t border-white/10">
+            <div className="pt-3 mt-2 border-t border-white/[0.08]">
               <Link
                 href="/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full"
               >
-                <div className="flex items-center justify-center gap-2 p-3 rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white font-semibold text-xs shadow-lg shadow-violet-600/30">
-                  <Sparkles className="h-3.5 w-3.5 text-amber-300" />
+                <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] font-semibold text-xs transition-colors">
                   <span>Launch 1-Click Demo Family</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  <ArrowUpRight className="h-4 w-4 stroke-[2.5]" />
                 </div>
               </Link>
             </div>

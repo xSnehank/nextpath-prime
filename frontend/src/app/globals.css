@@ -1,223 +1,204 @@
+@import url('https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300;400;500;600;700;800&family=Geist+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
-/* ============================================
-   PRISM ENGINE — Design System
-   Dark-first, prismatic gradients, glassmorphism
-   ============================================ */
+/* =========================================================================
+   NEXTPATH — Reachwise Editorial Aesthetic Design Tokens
+   Obsidian black ground, crisp bone surfaces, and electric volt (#d4ff3a)
+   ========================================================================= */
 
 @theme inline {
-  /* Core brand colors */
-  --color-prism-violet: #7c3aed;
-  --color-prism-indigo: #6366f1;
-  --color-prism-cyan: #06b6d4;
-  --color-prism-emerald: #10b981;
-  --color-prism-amber: #f59e0b;
-  --color-prism-rose: #f43f5e;
-
-  /* Surfaces */
-  --color-surface-900: #0a0a0f;
-  --color-surface-800: #111118;
-  --color-surface-700: #1a1a24;
-  --color-surface-600: #24243a;
-  --color-surface-500: #2e2e48;
-
-  /* Text */
-  --color-text-primary: #f1f5f9;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
-
-  /* Conflict gauge */
-  --color-conflict-low: #10b981;
-  --color-conflict-moderate: #f59e0b;
-  --color-conflict-high: #f43f5e;
-
-  /* Spacing scale */
-  --spacing-18: 4.5rem;
-  --spacing-88: 22rem;
-  --spacing-128: 32rem;
+  /* Brand palette inspired by joyful-studies-761814 */
+  --color-volt: #d4ff3a;           /* Electric volt / cyber lime signature */
+  --color-volt-hover: #bcf01a;
+  --color-bone: #eeeee8;           /* Warm chalk off-white */
+  --color-night: #08090a;          /* Deepest obsidian black */
+  --color-ink: #0d0e10;            /* Rich dark charcoal body */
+  --color-pine: #16181b;           /* Dark card surface */
+  --color-pine-light: #1f2227;     /* Hover surface */
+  --color-stone: #75766f;          /* Muted body text */
+  --color-fog: #dcdcd3;            /* Subtle secondary text */
 
   /* Fonts */
-  --font-sans: 'Inter', 'system-ui', sans-serif;
-  --font-display: 'Outfit', 'system-ui', sans-serif;
+  --font-display: 'Funnel Display', 'Inter', -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-sans: 'Inter', -apple-system, sans-serif;
 }
 
-/* ============================================
-   Base styles
-   ============================================ */
+/* =========================================================================
+   Base HTML & Typography
+   ========================================================================= */
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #08090a;
+  color: #eeeee8;
+  font-family: var(--font-sans);
 }
 
 body {
-  background-color: var(--color-surface-900);
-  color: var(--color-text-primary);
-  font-family: var(--font-sans);
+  background-color: #08090a;
+  color: #eeeee8;
   min-height: 100dvh;
+  overflow-x: clip;
 }
 
-/* ============================================
-   Glassmorphism utilities
-   ============================================ */
-.glass {
-  background: rgba(17, 17, 24, 0.6);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* Monospace technical styling */
+.font-mono-tag {
+  font-family: var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-.glass-light {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(12px) saturate(150%);
-  -webkit-backdrop-filter: blur(12px) saturate(150%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+.font-display-hero {
+  font-family: var(--font-display);
+  letter-spacing: -0.04em;
+  line-height: 0.95;
 }
 
-.glass-card {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(6, 182, 212, 0.06));
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
-}
+/* =========================================================================
+   Reachwise-style Components & Micro-Interactions
+   ========================================================================= */
 
-/* ============================================
-   Gradient utilities
-   ============================================ */
-.gradient-prism {
-  background: linear-gradient(135deg, #7c3aed, #6366f1, #06b6d4);
-}
-
-.gradient-prism-text {
-  background: linear-gradient(135deg, #7c3aed, #06b6d4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-warm {
-  background: linear-gradient(135deg, #f43f5e, #f59e0b);
-}
-
-.gradient-cool {
-  background: linear-gradient(135deg, #06b6d4, #10b981);
-}
-
-.gradient-glow {
-  background: radial-gradient(ellipse at 50% 0%, rgba(124, 58, 237, 0.15) 0%, transparent 60%);
-}
-
-/* ============================================
-   Animations
-   ============================================ */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(124, 58, 237, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(124, 58, 237, 0.5); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes fade-in-up {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slide-in-right {
-  0% { opacity: 0; transform: translateX(30px); }
-  100% { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes scale-in {
-  0% { opacity: 0; transform: scale(0.9); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-.animate-float { animation: float 3s ease-in-out infinite; }
-.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-.animate-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-.animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
-.animate-slide-in-right { animation: slide-in-right 0.5s ease-out forwards; }
-.animate-scale-in { animation: scale-in 0.4s ease-out forwards; }
-
-/* Staggered children */
-.stagger-children > * {
-  opacity: 0;
-  animation: fade-in-up 0.5s ease-out forwards;
-}
-.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
-.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
-.stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
-
-/* ============================================
-   Progress bar
-   ============================================ */
-.progress-bar {
-  height: 4px;
-  border-radius: 2px;
-  background: var(--color-surface-600);
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  border-radius: 2px;
-  background: linear-gradient(90deg, var(--color-prism-violet), var(--color-prism-cyan));
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ============================================
-   Conflict gauge (semicircle)
-   ============================================ */
-.gauge-container {
+/* Pulsing radar ping */
+.ping-dot {
   position: relative;
-  width: 200px;
-  height: 110px;
-  overflow: hidden;
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #d4ff3a;
 }
 
-/* ============================================
-   Scrollbar
-   ============================================ */
+.ping-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px #d4ff3a;
+  animation: ping-wave 1.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+@keyframes ping-wave {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(3.2);
+  }
+}
+
+/* Reachwise signature pill button */
+.rw-pill-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 6px 8px 6px 24px;
+  min-height: 52px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  text-decoration: none;
+  user-select: none;
+}
+
+.rw-pill-solid {
+  background-color: #d4ff3a;
+  color: #08090a;
+}
+
+.rw-pill-solid:hover {
+  background-color: #e5ff75;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px -6px rgba(212, 255, 58, 0.25);
+}
+
+.rw-pill-ghost {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #eeeee8;
+}
+
+.rw-pill-ghost:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* Circular arrow chip inside pill */
+.rw-arrow-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #08090a;
+  color: #d4ff3a;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.rw-pill-solid:hover .rw-arrow-chip {
+  transform: rotate(45deg);
+}
+
+.rw-pill-ghost .rw-arrow-chip {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.rw-pill-ghost:hover .rw-arrow-chip {
+  background-color: #d4ff3a;
+  color: #08090a;
+  transform: rotate(45deg);
+}
+
+/* Hairline card styling */
+.editorial-card {
+  background-color: #121316;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.editorial-card:hover {
+  border-color: rgba(212, 255, 58, 0.3);
+  background-color: #16181b;
+}
+
+/* Sub-grid dividers */
+.hairline-b {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hairline-r {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-surface-800);
+  background: #08090a;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-surface-500);
+  background: #282a30;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-prism-violet);
-}
-
-/* ============================================
-   Focus & interaction
-   ============================================ */
-*:focus-visible {
-  outline: 2px solid var(--color-prism-violet);
-  outline-offset: 2px;
+  background: #d4ff3a;
 }
 
 ::selection {
-  background: rgba(124, 58, 237, 0.3);
-  color: white;
+  background: #d4ff3a;
+  color: #08090a;
 }

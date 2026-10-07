@@ -32,7 +32,7 @@ export function PdfExportButton({
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(20);
       doc.setFont("helvetica", "bold");
-      doc.text("PRISM ENGINE - CAREER ROADMAP REPORT", 14, 20);
+      doc.text("NEXTPATH - CAREER ROADMAP REPORT", 14, 20);
 
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
@@ -138,13 +138,13 @@ export function PdfExportButton({
       doc.setFontSize(8);
       doc.setTextColor(148, 163, 184);
       doc.text(
-        "PRISM Engine — Validated via deterministic multi-vector scoring. For official guidance only.",
+        "NextPath Engine — Validated via deterministic multi-vector scoring. For official guidance only.",
         14,
         285
       );
 
       // Save PDF
-      doc.save(`PRISM_Career_Roadmap_${studentName.replace(/\s+/g, "_")}.pdf`);
+      doc.save(`NextPath_Career_Roadmap_${studentName.replace(/\s+/g, "_")}.pdf`);
     } catch (err) {
       console.error("PDF generation failed:", err);
     } finally {

@@ -3,22 +3,24 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 outline-none select-none disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] cursor-pointer",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-all duration-200 outline-none select-none disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] cursor-pointer",
   {
     variants: {
       variant: {
         default:
-          "bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 text-white shadow-lg shadow-violet-600/25 hover:shadow-violet-600/40 hover:brightness-110",
+          "bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] font-semibold shadow-sm shadow-[#d4ff3a]/25",
         secondary:
-          "bg-white/10 hover:bg-white/15 text-slate-100 border border-white/10 backdrop-blur-md",
+          "bg-[#16181b] hover:bg-[#1f2227] text-[#eeeee8] border border-white/10",
         outline:
-          "border border-white/20 bg-transparent hover:bg-white/5 text-slate-200",
+          "border border-white/15 bg-transparent hover:bg-white/[0.05] text-[#eeeee8]",
         ghost:
-          "text-slate-300 hover:text-white hover:bg-white/5",
+          "text-[#75766f] hover:text-[#eeeee8] hover:bg-white/[0.05]",
         destructive:
           "bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/30",
         glow:
-          "relative overflow-hidden bg-gradient-to-r from-violet-600 to-cyan-500 text-white shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40",
+          "bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] font-semibold shadow-lg shadow-[#d4ff3a]/30",
+        volt:
+          "bg-[#d4ff3a] hover:bg-[#bcf01a] text-[#08090a] font-semibold shadow-sm",
       },
       size: {
         default: "h-11 px-5 py-2.5",

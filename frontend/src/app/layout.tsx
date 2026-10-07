@@ -17,13 +17,13 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "PRISM Engine | Multi-Vector Career Guidance & SWOT Analytics",
+  title: "NextPath — The Career Intelligence Engine for Indian Families",
   description:
-    "AI-powered multi-vector career guidance platform harmonizing student psychometric profiles, parental financial realities, and live job-market demand into ranked, affordable roadmaps. Built for DataQuest 3.0 (DQNM).",
+    "NextPath mathematically harmonizes student psychometric profiles, parental financial realities, and live job-market demand into ranked, affordable roadmaps. Built for DataQuest 3.0 (DQNM).",
   keywords: [
-    "PRISM Engine",
+    "NextPath",
     "DataQuest 3.0",
-    "Career Guidance",
+    "Career Intelligence",
     "Student Psychometrics",
     "Financial Constraint Solver",
     "Parent Student Conflict Index",
@@ -49,7 +49,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${outfit.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-[#0a0a0f] text-slate-100 font-sans selection:bg-violet-600/30 selection:text-white">
+      <body className="min-h-full flex flex-col bg-[#08090a] text-[#eeeee8] font-sans selection:bg-[#d4ff3a] selection:text-[#08090a]">
         <FloatingPillNavbar />
         <main className="flex-1 flex flex-col pt-16 sm:pt-20">{children}</main>
         <Footer />

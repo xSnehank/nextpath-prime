@@ -119,7 +119,7 @@ export default function ParentAssessmentPage() {
             <CardTitle className="text-2xl pt-2">Family Constraint &amp; Expectation Vectors</CardTitle>
             <CardDescription className="text-xs text-slate-400 leading-relaxed">
               Your inputs power the Financial Constraint Solver (tuition, debt-tolerance, break-even years)
-              and allow PRISM to calculate the Parent-Student Conflict Index.
+              and allow NextPath to calculate the Parent-Student Conflict Index.
             </CardDescription>
           </CardHeader>
 
@@ -387,7 +387,7 @@ export default function ParentAssessmentPage() {
               <div className="flex items-center gap-2 pt-1 text-[11px] text-slate-400">
                 <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
                 <span>
-                  Both parties have contributed. The PRISM Engine will now normalize the vectors and generate the unified roadmap.
+                  Both parties have contributed. The NextPath Engine will now normalize the vectors and generate the unified roadmap.
                 </span>
               </div>
             </CardContent>

@@ -158,20 +158,20 @@ export default function DashboardPage() {
   return (
     <div className="flex-1 px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto w-full space-y-8">
       {/* Top Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl border border-white/10 bg-slate-900/60 backdrop-blur-2xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl border border-white/[0.08] bg-[#121316]">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <Badge variant="cyan">Multi-Vector Synthesized Results</Badge>
-            <span className="text-xs text-slate-400">
+            <Badge variant="default">MULTI-VECTOR DIAGNOSTIC</Badge>
+            <span className="text-xs font-mono text-[#75766f]">
               Evaluated: {formattedDate}
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-[Outfit,sans-serif]">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#eeeee8] tracking-tight">
             Family Career Command Center
           </h1>
-          <p className="text-xs text-slate-400">
-            Student: <strong className="text-white">{studentName}</strong> • Parent:{" "}
-            <strong className="text-white">{parentName}</strong>
+          <p className="text-xs text-[#75766f]">
+            Student: <strong className="text-[#eeeee8] font-medium">{studentName}</strong> • Parent:{" "}
+            <strong className="text-[#eeeee8] font-medium">{parentName}</strong>
           </p>
         </div>
 
@@ -187,64 +187,64 @@ export default function DashboardPage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-white/10 text-xs sm:text-sm">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-white/[0.08] text-xs font-mono">
         <button
           onClick={() => setActiveTab("roadmap")}
-          className={`px-4 py-2 rounded-xl font-semibold transition-all whitespace-nowrap flex items-center gap-2 ${
+          className={`px-3.5 py-2 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer ${
             activeTab === "roadmap"
-              ? "bg-violet-600 text-white shadow-lg shadow-violet-600/30"
-              : "text-slate-400 hover:text-white hover:bg-white/5"
+              ? "bg-[#16181b] text-[#eeeee8] border border-[#d4ff3a]/40 shadow-sm"
+              : "text-[#75766f] hover:text-[#eeeee8] hover:bg-white/[0.04] border border-transparent"
           }`}
         >
-          <GraduationCap className="h-4 w-4" />
+          <GraduationCap className={`h-3.5 w-3.5 ${activeTab === "roadmap" ? "text-[#d4ff3a]" : ""}`} />
           <span>Ranked Roadmap (E1 &amp; E2)</span>
         </button>
 
         <button
           onClick={() => setActiveTab("alignment")}
-          className={`px-4 py-2 rounded-xl font-semibold transition-all whitespace-nowrap flex items-center gap-2 ${
+          className={`px-3.5 py-2 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer ${
             activeTab === "alignment"
-              ? "bg-violet-600 text-white shadow-lg shadow-violet-600/30"
-              : "text-slate-400 hover:text-white hover:bg-white/5"
+              ? "bg-[#16181b] text-[#eeeee8] border border-[#d4ff3a]/40 shadow-sm"
+              : "text-[#75766f] hover:text-[#eeeee8] hover:bg-white/[0.04] border border-transparent"
           }`}
         >
-          <Brain className="h-4 w-4" />
+          <Brain className={`h-3.5 w-3.5 ${activeTab === "alignment" ? "text-[#d4ff3a]" : ""}`} />
           <span>Conflict &amp; Aptitude (C1 &amp; C2)</span>
         </button>
 
         <button
           onClick={() => setActiveTab("finance")}
-          className={`px-4 py-2 rounded-xl font-semibold transition-all whitespace-nowrap flex items-center gap-2 ${
+          className={`px-3.5 py-2 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer ${
             activeTab === "finance"
-              ? "bg-violet-600 text-white shadow-lg shadow-violet-600/30"
-              : "text-slate-400 hover:text-white hover:bg-white/5"
+              ? "bg-[#16181b] text-[#eeeee8] border border-[#d4ff3a]/40 shadow-sm"
+              : "text-[#75766f] hover:text-[#eeeee8] hover:bg-white/[0.04] border border-transparent"
           }`}
         >
-          <DollarSign className="h-4 w-4" />
-          <span>Financial Constraint Solver (D1)</span>
+          <DollarSign className={`h-3.5 w-3.5 ${activeTab === "finance" ? "text-[#d4ff3a]" : ""}`} />
+          <span>Financial Solver (D1)</span>
         </button>
 
         <button
           onClick={() => setActiveTab("market")}
-          className={`px-4 py-2 rounded-xl font-semibold transition-all whitespace-nowrap flex items-center gap-2 ${
+          className={`px-3.5 py-2 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer ${
             activeTab === "market"
-              ? "bg-violet-600 text-white shadow-lg shadow-violet-600/30"
-              : "text-slate-400 hover:text-white hover:bg-white/5"
+              ? "bg-[#16181b] text-[#eeeee8] border border-[#d4ff3a]/40 shadow-sm"
+              : "text-[#75766f] hover:text-[#eeeee8] hover:bg-white/[0.04] border border-transparent"
           }`}
         >
-          <TrendingUp className="h-4 w-4" />
+          <TrendingUp className={`h-3.5 w-3.5 ${activeTab === "market" ? "text-[#d4ff3a]" : ""}`} />
           <span>Regional Market Signals (D2)</span>
         </button>
 
         <button
           onClick={() => setActiveTab("swot")}
-          className={`px-4 py-2 rounded-xl font-semibold transition-all whitespace-nowrap flex items-center gap-2 ${
+          className={`px-3.5 py-2 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer ${
             activeTab === "swot"
-              ? "bg-violet-600 text-white shadow-lg shadow-violet-600/30"
-              : "text-slate-400 hover:text-white hover:bg-white/5"
+              ? "bg-[#16181b] text-[#eeeee8] border border-[#d4ff3a]/40 shadow-sm"
+              : "text-[#75766f] hover:text-[#eeeee8] hover:bg-white/[0.04] border border-transparent"
           }`}
         >
-          <Layers className="h-4 w-4" />
+          <Layers className={`h-3.5 w-3.5 ${activeTab === "swot" ? "text-[#d4ff3a]" : ""}`} />
           <span>Strategic SWOT Matrix (C3)</span>
         </button>
       </div>
@@ -304,16 +304,16 @@ export default function DashboardPage() {
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="h-7 w-7 rounded-xl bg-violet-600/20 text-violet-300 border border-violet-500/30 flex items-center justify-center font-bold text-xs">
+                          <span className="h-7 w-7 rounded-lg bg-[#16181b] text-[#d4ff3a] border border-[#d4ff3a]/30 flex items-center justify-center font-mono font-bold text-xs">
                             #{rankedRoadmap.indexOf(activeCareer) + 1}
                           </span>
-                          <CardTitle className="text-xl sm:text-2xl text-white">
+                          <CardTitle className="text-xl sm:text-2xl text-[#eeeee8]">
                             {activeCareer.title}
                           </CardTitle>
                         </div>
-                        <p className="text-xs text-slate-400">
-                          Domain: <strong className="text-slate-200">{activeCareer.domain}</strong> • Final PRISM Score:{" "}
-                          <strong className="text-cyan-400">{activeCareer.finalScore}/100</strong>
+                        <p className="text-xs text-[#75766f]">
+                          Domain: <strong className="text-[#eeeee8]">{activeCareer.domain}</strong> • Final NextPath Score:{" "}
+                          <strong className="text-[#d4ff3a] font-mono">{activeCareer.finalScore}/100</strong>
                         </p>
                       </div>
 
