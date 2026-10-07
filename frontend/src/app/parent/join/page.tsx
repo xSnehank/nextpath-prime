@@ -142,8 +142,8 @@ function ParentJoinContent() {
       let partnerLabel = "your child";
       try {
         const me = await api.getMe();
-        if (me.partner && (me.partner as unknown as { full_name?: string }).full_name) {
-          partnerLabel = (me.partner as unknown as { full_name: string }).full_name;
+        if (me.partner?.full_name) {
+          partnerLabel = me.partner.full_name;
         }
       } catch {
         // fallback

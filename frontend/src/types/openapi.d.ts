@@ -830,6 +830,11 @@ export interface components {
          */
         PartnerStatus: {
             role: components["schemas"]["Role"];
+            /**
+             * Full Name
+             * @description So the UI can say who is linked; null if they gave no name
+             */
+            full_name: string | null;
             /** Assessment Complete */
             assessment_complete: boolean;
             /** Consented */
@@ -862,6 +867,12 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /**
+             * Kind
+             * @description likert: rate a statement from 1 to 5. choice: pick the one correct option; the server grades it
+             * @enum {string}
+             */
+            kind: "likert" | "choice";
             group: components["schemas"]["TraitGroup"];
             dimension: components["schemas"]["Dimension"];
             /** Text */

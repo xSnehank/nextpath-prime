@@ -26,7 +26,8 @@ export interface Question {
   options: AnswerOption[];
   required: boolean;
   audience?: Role;
-  type?: "likert";
+  /** likert: rate 1-5. choice: pick the one correct option (graded on the server). */
+  kind: "likert" | "choice";
 }
 
 // ---------- Domain & Domain Scores ----------
