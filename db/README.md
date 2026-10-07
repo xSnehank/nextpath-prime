@@ -33,7 +33,8 @@ deletes it at the end, so your own databases are never touched.
 
 Row-level security is on for every table, with no policies, and the browser roles (`anon`, `authenticated`) have
 no grants. The public anon key therefore can't read or change anything through Supabase's REST API. Only the
-backend can, because it connects as the table owner.
+backend can, because it connects as the table owner. Supabase's security advisor will list "RLS Enabled No
+Policy" for every table (level INFO). That's intended; any WARN or ERROR it shows is not.
 
 ## Local PostgreSQL (optional)
 ```

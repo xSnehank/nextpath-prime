@@ -15,6 +15,11 @@ BEGIN
         WHERE t.schemaname = 'public'
           AND has_table_privilege(r.role, format('public.%I', t.tablename), 'SELECT, INSERT, UPDATE, DELETE')
     ), 'the browser roles have no privileges on any table';
+    ASSERT NOT EXISTS (
+        SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace,
+                      (VALUES ('anon'), ('authenticated')) AS r(role)
+        WHERE n.nspname = 'public' AND p.prosecdef AND has_function_privilege(r.role, p.oid, 'EXECUTE')
+    ), 'the browser roles cannot call any SECURITY DEFINER function';
 END $$;
 
 -- Prove it by trying, as each browser role.
