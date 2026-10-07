@@ -12,13 +12,15 @@ This is the part judges care about, so each function below is deterministic, exp
 
 **Step 1: Normalize answers**
 
-Every question has a dimension and a 1–5 answer. Per dimension, take the mean and scale to 0–1.
+Every question has a dimension and a kind. A `likert` question is a statement answered 1–5. Per dimension, take the mean and scale to 0–1.
 
 ```latex
 t_k = \frac{\bar{x}_k - 1}{4}
 ```
 
-Dimensions: aptitude (logical, numerical, verbal, spatial, creative), interest (six Holland types: realistic, investigative, artistic, social, enterprising, conventional) and cognitive style (analytical vs intuitive, structured vs flexible). Reverse-scored questions are flipped before averaging (`6 - x`). Missing answers are skipped, and a dimension with no answers is flagged `incomplete`.
+A `choice` question has one correct option and is graded: 1 if the student picked it, 0 otherwise. For these dimensions, t_k is the mean of the grades, i.e. the share answered correctly. Each dimension uses only one kind of question, so the two scales are never mixed.
+
+Dimensions: aptitude (logical, numerical, verbal, spatial, creative), interest (six Holland types: realistic, investigative, artistic, social, enterprising, conventional) and cognitive style (analytical vs intuitive, structured vs flexible). Reverse-scored likert questions are flipped before averaging (`6 - x`); choice questions are never reverse-scored. Missing answers are skipped, and a dimension with no answers is flagged `incomplete`.
 
 **Step 2: Student fit per domain**
 
