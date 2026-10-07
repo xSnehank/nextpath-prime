@@ -1,0 +1,203 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   NEXTPATH — Reachwise Editorial Aesthetic Design Tokens
+   Obsidian black ground, crisp bone surfaces, and electric volt (#d4ff3a)
+   ========================================================================= */
+
+@theme inline {
+  /* Brand palette inspired by joyful-studies-761814 */
+  --color-volt: #d4ff3a;           /* Electric volt / cyber lime signature */
+  --color-volt-hover: #bcf01a;
+  --color-bone: #eeeee8;           /* Warm chalk off-white */
+  --color-night: #08090a;          /* Deepest obsidian black */
+  --color-ink: #0d0e10;            /* Rich dark charcoal body */
+  --color-pine: #16181b;           /* Dark card surface */
+  --color-pine-light: #1f2227;     /* Hover surface */
+  --color-stone: #75766f;          /* Muted body text */
+  --color-fog: #dcdcd3;            /* Subtle secondary text */
+
+  /* Fonts */
+  --font-display: 'Funnel Display', 'Inter', -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+}
+
+/* =========================================================================
+   Base HTML & Typography
+   ========================================================================= */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #08090a;
+  color: #eeeee8;
+  font-family: var(--font-sans);
+}
+
+body {
+  background-color: #08090a;
+  color: #eeeee8;
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+
+/* Monospace technical styling */
+.font-mono-tag {
+  font-family: var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.font-display-hero {
+  font-family: var(--font-display);
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+
+/* =========================================================================
+   Reachwise-style Components & Micro-Interactions
+   ========================================================================= */
+
+/* Pulsing radar ping */
+.ping-dot {
+  position: relative;
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #d4ff3a;
+}
+
+.ping-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px #d4ff3a;
+  animation: ping-wave 1.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+@keyframes ping-wave {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(3.2);
+  }
+}
+
+/* Reachwise signature pill button */
+.rw-pill-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 6px 8px 6px 24px;
+  min-height: 52px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  text-decoration: none;
+  user-select: none;
+}
+
+.rw-pill-solid {
+  background-color: #d4ff3a;
+  color: #08090a;
+}
+
+.rw-pill-solid:hover {
+  background-color: #e5ff75;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px -6px rgba(212, 255, 58, 0.25);
+}
+
+.rw-pill-ghost {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #eeeee8;
+}
+
+.rw-pill-ghost:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* Circular arrow chip inside pill */
+.rw-arrow-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #08090a;
+  color: #d4ff3a;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.rw-pill-solid:hover .rw-arrow-chip {
+  transform: rotate(45deg);
+}
+
+.rw-pill-ghost .rw-arrow-chip {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.rw-pill-ghost:hover .rw-arrow-chip {
+  background-color: #d4ff3a;
+  color: #08090a;
+  transform: rotate(45deg);
+}
+
+/* Hairline card styling */
+.editorial-card {
+  background-color: #121316;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.editorial-card:hover {
+  border-color: rgba(212, 255, 58, 0.3);
+  background-color: #16181b;
+}
+
+/* Sub-grid dividers */
+.hairline-b {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hairline-r {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #08090a;
+}
+::-webkit-scrollbar-thumb {
+  background: #282a30;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d4ff3a;
+}
+
+::selection {
+  background: #d4ff3a;
+  color: #08090a;
+}
