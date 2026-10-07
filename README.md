@@ -150,8 +150,8 @@ Secrets live only in Vercel and in local `.env` files, never in git.
 | Member | Role |
 | --- | --- |
 | Snehank Labade | Backend, database, repository lead |
-| Aayush | Frontend |
+| Aayush | Complete Frontend |
 | Eklavya | Documentation and presentation |
-| Joel | Early database work |
+| Joel | Database work |
 
 Branch rules are in [BRANCHES.md](BRANCHES.md), and the prompts used to build each branch are in [PROMPTS.md](PROMPTS.md).
