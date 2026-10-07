@@ -12,6 +12,7 @@ from typing import Any
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import InterfaceError, OperationalError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.schemas.common import ErrorBody, ErrorCode, ErrorDetail
@@ -39,7 +40,7 @@ _DESCRIPTIONS: dict[int, str] = {
     409: "ASSESSMENT_INCOMPLETE or CONSENT_REQUIRED",
     422: "VALIDATION_ERROR or INVALID_WEIGHTS: details.fields lists what is wrong",
     500: "INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header",
-    503: "UPSTREAM_UNAVAILABLE: the database cannot be reached",
+    503: "UPSTREAM_UNAVAILABLE: the database or the sign-in service cannot be reached",
 }
 
 _HTTP_STATUS_CODES: dict[int, ErrorCode] = {
@@ -133,8 +134,16 @@ async def _on_response_validation_error(request: Request, exc: ResponseValidatio
     return error_response(ErrorCode.INTERNAL_ERROR, "Something went wrong on our side.")
 
 
+async def _on_database_unavailable(request: Request, exc: Exception) -> JSONResponse:
+    # The message can contain the host name; log only the kind of failure.
+    logger.error("database unavailable on %s %s: %s", request.method, request.url.path, type(exc).__name__)
+    return error_response(ErrorCode.UPSTREAM_UNAVAILABLE, "The database can't be reached right now. Try again shortly.")
+
+
 def register_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(AppError, _on_app_error)
     app.add_exception_handler(RequestValidationError, _on_validation_error)
     app.add_exception_handler(ResponseValidationError, _on_response_validation_error)
     app.add_exception_handler(StarletteHTTPException, _on_http_error)
+    app.add_exception_handler(OperationalError, _on_database_unavailable)
+    app.add_exception_handler(InterfaceError, _on_database_unavailable)

@@ -29,7 +29,7 @@ class ErrorCode(StrEnum):
     VALIDATION_ERROR = "VALIDATION_ERROR"  # 422
     INTERNAL_ERROR = "INTERNAL_ERROR"  # 500
     NOT_IMPLEMENTED = "NOT_IMPLEMENTED"  # 501, only until each endpoint's branch lands
-    UPSTREAM_UNAVAILABLE = "UPSTREAM_UNAVAILABLE"  # 503, database only
+    UPSTREAM_UNAVAILABLE = "UPSTREAM_UNAVAILABLE"  # 503, the database or Supabase sign-in
 
 
 class ErrorDetail(StrictModel):

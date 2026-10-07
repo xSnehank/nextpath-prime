@@ -20,6 +20,8 @@ import subprocess
 import sys
 import tempfile
 import time
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 DB_DIR = Path(__file__).resolve().parents[1]
@@ -150,6 +152,30 @@ def remove_tree(path: Path) -> None:
         if not path.exists():
             return
         time.sleep(0.5)
+
+
+@contextmanager
+def throwaway_database(*, seed: bool = True) -> Iterator[str]:
+    """A fresh database built from the shim, the migrations and (by default) the seeds; yields its URL.
+
+    The backend's live-mode tests use this, so they run against the real schema. Raises CheckFailed when
+    the PostgreSQL tools can't be found.
+    """
+    root = Path(tempfile.mkdtemp(prefix="prism-db-test-"))
+    server: ThrowawayServer | None = None
+    try:
+        server = ThrowawayServer(find_bin_dir(), root)
+        server.start()
+        server.psql(DB_DIR / "tests" / "supabase_shim.sql", single_transaction=True)
+        for migration in sorted((DB_DIR / "migrations").glob("*.sql")):
+            server.psql(migration, single_transaction=True)
+        if seed:
+            server.psql(DB_DIR / "seed" / "00_run_all.sql", single_transaction=True)
+        yield f"postgresql://postgres@127.0.0.1:{server.port}/{DATABASE}"
+    finally:
+        if server:
+            server.stop()
+        remove_tree(root)
 
 
 def main() -> int:

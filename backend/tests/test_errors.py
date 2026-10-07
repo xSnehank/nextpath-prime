@@ -103,11 +103,6 @@ def test_demo_disabled_looks_like_a_missing_route() -> None:
     assert_error(make_client(demo_enabled=False).post("/demo/run"), 404, "NOT_FOUND")
 
 
-def test_live_mode_says_which_branch_is_missing() -> None:
-    details = assert_error(make_client(use_mocks=False).get("/domains"), 501, "NOT_IMPLEMENTED")
-    assert details["branch"]
-
-
 def test_unexpected_error_is_a_clean_500() -> None:
     client = make_client()
 
