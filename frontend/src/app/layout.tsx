@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/Navbar";
+import { FloatingPillNavbar } from "@/components/FloatingPillNavbar";
 import { Footer } from "@/components/Footer";
 
 const inter = Inter({
@@ -50,8 +50,8 @@ export default function RootLayout({
       className={`${inter.variable} ${outfit.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col bg-[#0a0a0f] text-slate-100 font-sans selection:bg-violet-600/30 selection:text-white">
-        <Navbar />
-        <main className="flex-1 flex flex-col">{children}</main>
+        <FloatingPillNavbar />
+        <main className="flex-1 flex flex-col pt-16 sm:pt-20">{children}</main>
         <Footer />
       </body>
     </html>
