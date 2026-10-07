@@ -48,6 +48,19 @@ Best prompts used with AI tools, and what they produced (proof of AI-led build).
 - Implemented robust dashboard data resolution: `?result_id=` lookup, `GET /me` error surfacing, missing prerequisites checklist screen, demo badge toggle, and deterministic AI explanation retry fallback.
 - Sanitized user data: removed fictional placeholder names ("Aarav Sharma", "Rajesh Sharma"), removed hardcoded domicile, and validated whole rupees on parent financial calibration.
 
+### Prompt 11: PR #4 Review Polish & Flow Hardening
+> "Resolve 11 reviewer comments on PR #4: support onboarding for email confirmation accounts, inline parent invite generation and explicit consent directly on dashboard prerequisites screen without restarting assessments, non-blocking consent decline ('Not now'), unified role-based sign-in page (/signin) with offline mock mode shortcuts, truth-in-advertising privacy footer, unselected defaults for student preference fields, stay-on-page retry for invite generation, single getSession read in API adapter, and dynamic question counts."
+
+**What it produced:**
+- Created dedicated `/onboarding` page and session storage fallback ensuring student preferences are never lost when Supabase email confirmation is enabled.
+- Built `InviteParentCard` and rendered both parent invite and `ConsentStep` inline on the dashboard prerequisites screen, eliminating assessment restarts and redirect loops.
+- Added non-blocking consent option (`onSkip`) with explicit messaging that cross-generational comparison stays hidden until dual agreement is reached.
+- Created unified `/signin` page routing users by role and completion progress, with local mock mode shortcuts for demo student and demo parent.
+- Replaced "zero-knowledge bridge" claim with truthful explanation that raw answers remain on server and only comparisons are shared.
+- Standardized preference form defaults to start empty/unselected, enforcing explicit choices before proceeding.
+- Eliminated redundant `getUser()` calls by reading Supabase session once in `getHeaders()`.
+- Dynamically rendered assessment question counts using `questions.length` and `me.progress.questions_required`.
+
 ---
 
 ## Backend (Snehank, Claude Code with Opus 5.5)

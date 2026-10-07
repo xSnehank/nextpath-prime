@@ -31,6 +31,8 @@ export default function StudentAssessmentPage() {
   const [inviteModalCode, setInviteModalCode] = React.useState<string | null>(null);
   const [showConsentStep, setShowConsentStep] = React.useState(false);
   const [userId, setUserId] = React.useState<string>("");
+  const [userConsented, setUserConsented] = React.useState<boolean>(false);
+  const [partnerConsented, setPartnerConsented] = React.useState<boolean | undefined>(undefined);
 
   // Timer ref to prevent race condition & double-skipping (Comment 7/14 fix)
   const timerRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -61,6 +63,19 @@ export default function StudentAssessmentPage() {
           api.getMe().catch(() => null),
         ]);
         if (active) {
+          if (me?.role === "student") {
+            if (!me.progress?.profile_complete) {
+              router.replace("/onboarding");
+              return;
+            }
+            if (me.progress?.assessment_complete) {
+              router.replace("/dashboard");
+              return;
+            }
+            setUserConsented(Boolean(me.consented));
+            setPartnerConsented(me.partner?.consented);
+          }
+
           setQuestions(data);
           const currentUserId = me?.user_id || "";
           if (currentUserId) {
@@ -122,7 +137,7 @@ export default function StudentAssessmentPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [router]);
 
   const totalQuestions = questions.length;
   const currentQ = questions[currentIndex];
@@ -256,7 +271,7 @@ export default function StudentAssessmentPage() {
               </div>
 
               <p className="text-xs text-slate-300 leading-relaxed">
-                Your 30 psychometric indicators are securely saved. Share this invite code with your parent so they can calibrate the Financial Constraint Solver:
+                Your {questions.length} psychometric indicators are securely saved. Share this invite code with your parent so they can calibrate the Financial Constraint Solver:
               </p>
 
               <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 text-center space-y-1">
@@ -297,14 +312,45 @@ export default function StudentAssessmentPage() {
           </div>
         )}
 
-        {errorMessage && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs">
-            {errorMessage}
+        {errorMessage && !inviteModalCode && (
+          <div className="mb-4 p-4 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex flex-col gap-2 max-w-lg w-full">
+            <span>{errorMessage}</span>
+            <div className="flex gap-2 pt-1">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={async () => {
+                  setErrorMessage("");
+                  try {
+                    const invite = await api.createInvite();
+                    if (invite?.invite_code) {
+                      setInviteModalCode(invite.invite_code);
+                    } else {
+                      router.push("/dashboard");
+                    }
+                  } catch (err) {
+                    setErrorMessage(err instanceof ApiError ? err.message : "Failed to create invite code.");
+                  }
+                }}
+                className="text-xs"
+              >
+                Try Again
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => router.push("/dashboard")}
+                className="text-xs bg-violet-600 hover:bg-violet-500 text-white"
+              >
+                Continue to Dashboard
+              </Button>
+            </div>
           </div>
         )}
 
         <ConsentStep
           role="student"
+          consented={userConsented}
+          partnerConsented={partnerConsented}
           onConsentGranted={async () => {
             setErrorMessage("");
             try {
@@ -319,9 +365,27 @@ export default function StudentAssessmentPage() {
               if (err instanceof ApiError) {
                 setErrorMessage(err.message);
               } else {
-                setErrorMessage("Failed to create parent invite code.");
+                setErrorMessage("Failed to create parent invite code. You can also generate it later from the dashboard.");
               }
-              router.push("/dashboard");
+              // Comment 8: Stay on page, do not automatically redirect
+            }
+          }}
+          onSkip={async () => {
+            setErrorMessage("");
+            try {
+              const invite = await api.createInvite();
+              if (invite?.invite_code) {
+                setInviteModalCode(invite.invite_code);
+              } else {
+                router.push("/dashboard");
+              }
+            } catch (err) {
+              console.error("Failed to generate invite code:", err);
+              if (err instanceof ApiError) {
+                setErrorMessage(err.message);
+              } else {
+                setErrorMessage("Failed to create parent invite code. You can also generate it later from the dashboard.");
+              }
             }
           }}
         />
@@ -352,7 +416,7 @@ export default function StudentAssessmentPage() {
             </div>
 
             <p className="text-xs text-slate-300 leading-relaxed">
-              Your 30 psychometric indicators are securely saved. Share this invite code with your parent so they can calibrate the Financial Constraint Solver:
+              Your {questions.length} psychometric indicators are securely saved. Share this invite code with your parent so they can calibrate the Financial Constraint Solver:
             </p>
 
             <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 text-center space-y-1">

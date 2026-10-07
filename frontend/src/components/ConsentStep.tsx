@@ -13,6 +13,7 @@ interface ConsentStepProps {
   consented?: boolean;
   partnerConsented?: boolean;
   onConsentWithdrawn?: () => void;
+  onSkip?: () => void;
 }
 
 export function ConsentStep({
@@ -21,11 +22,21 @@ export function ConsentStep({
   consented = false,
   partnerConsented,
   onConsentWithdrawn,
+  onSkip,
 }: ConsentStepProps) {
   const [agreed, setAgreed] = React.useState(consented);
   const [submitting, setSubmitting] = React.useState(false);
   const [error, setError] = React.useState("");
   const [currentConsented, setCurrentConsented] = React.useState(consented);
+
+  // Sync state when props change (Comment 3)
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setAgreed(Boolean(consented));
+      setCurrentConsented(Boolean(consented));
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [consented]);
 
   const isStudent = role === "student";
   const partnerLabel = isStudent ? "parent" : "child";
@@ -131,18 +142,23 @@ export function ConsentStep({
 
         {/* Consent Checkbox */}
         {!currentConsented ? (
-          <label className="flex items-start gap-3 p-3.5 rounded-xl border border-violet-500/30 bg-violet-950/15 cursor-pointer hover:bg-violet-950/25 transition-colors">
-            <input
-              type="checkbox"
-              checked={agreed}
-              onChange={(e) => setAgreed(e.target.checked)}
-              disabled={submitting}
-              className="mt-0.5 h-4 w-4 rounded border-white/20 bg-slate-800 text-violet-600 focus:ring-violet-500 cursor-pointer"
-            />
-            <span className="text-xs text-slate-200 font-medium leading-relaxed">
-              {checkboxLabel}
-            </span>
-          </label>
+          <div className="space-y-2">
+            <label className="flex items-start gap-3 p-3.5 rounded-xl border border-violet-500/30 bg-violet-950/15 cursor-pointer hover:bg-violet-950/25 transition-colors">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                disabled={submitting}
+                className="mt-0.5 h-4 w-4 rounded border-white/20 bg-slate-800 text-violet-600 focus:ring-violet-500 cursor-pointer"
+              />
+              <span className="text-xs text-slate-200 font-medium leading-relaxed">
+                {checkboxLabel}
+              </span>
+            </label>
+            <p className="text-[11px] text-slate-400 leading-relaxed px-1">
+              You can agree later from the dashboard. Until both you and your {partnerLabel} agree, neither side sees the cross-generational comparison.
+            </p>
+          </div>
         ) : (
           <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-950/15 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs text-emerald-300 font-medium">
@@ -163,27 +179,40 @@ export function ConsentStep({
         )}
       </CardContent>
 
-      <CardFooter className="pt-2 flex justify-between items-center">
-        <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
-          <Lock className="h-3 w-3" />
-          <span>Encrypted zero-knowledge bridge</span>
+      <CardFooter className="pt-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+          <Lock className="h-3 w-3 shrink-0 text-slate-500" />
+          <span>Your raw answers stay on our server. Only the comparison is shared.</span>
         </div>
         {!currentConsented ? (
-          <Button
-            type="button"
-            disabled={!agreed || submitting}
-            onClick={handleGrantConsent}
-            className="bg-violet-600 hover:bg-violet-500 text-white text-xs shadow-lg shadow-violet-950/50"
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              "Continue"
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            {onSkip && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={onSkip}
+                disabled={submitting}
+                className="text-xs text-slate-400 hover:text-white hover:bg-white/5"
+              >
+                Not now
+              </Button>
             )}
-          </Button>
+            <Button
+              type="button"
+              disabled={!agreed || submitting}
+              onClick={handleGrantConsent}
+              className="bg-violet-600 hover:bg-violet-500 text-white text-xs shadow-lg shadow-violet-950/50"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Agree & Continue"
+              )}
+            </Button>
+          </div>
         ) : (
           <Button
             type="button"

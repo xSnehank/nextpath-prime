@@ -27,6 +27,8 @@ import {
   Layers,
   ShieldAlert,
 } from "lucide-react";
+import { InviteParentCard } from "@/components/InviteParentCard";
+import { ConsentStep } from "@/components/ConsentStep";
 import { api, ApiError } from "@/lib/api";
 import type { AnalyzeResponse, CareerPath } from "@/types/api";
 
@@ -66,6 +68,7 @@ function DashboardContent() {
     userConsented: boolean;
     partnerAssessmentComplete: boolean;
     partnerConsented: boolean;
+    questionsRequired?: number;
   } | null>(null);
 
   // Dynamic weights state for What-If sensitivity recalculation (Comment 5/14 & 9/14)
@@ -199,6 +202,7 @@ function DashboardContent() {
                 userConsented: Boolean(me.consented),
                 partnerAssessmentComplete: Boolean(me.partner?.assessment_complete),
                 partnerConsented: Boolean(me.partner?.consented),
+                questionsRequired: me.progress?.questions_required,
               });
               setLoading(false);
               return;
@@ -315,7 +319,7 @@ function DashboardContent() {
     );
   }
 
-  // Missing Prerequisites Status Screen (Item 3b)
+  // Missing Prerequisites Status Screen (Item 3b, Comments 2 & 11)
   if (missingPrerequisites) {
     const isStudent = missingPrerequisites.role === "student";
     const partnerRole = isStudent ? "parent" : "child";
@@ -324,7 +328,7 @@ function DashboardContent() {
       {
         title: "Your Assessment",
         description: isStudent
-          ? "Complete your 30-question psychometric battery."
+          ? `Complete your ${missingPrerequisites.questionsRequired ? `${missingPrerequisites.questionsRequired}-question` : "psychometric"} battery.`
           : "Calibrate your household education budget, savings, and debt limits.",
         complete: missingPrerequisites.userAssessmentComplete,
         action: !missingPrerequisites.userAssessmentComplete ? (
@@ -341,10 +345,10 @@ function DashboardContent() {
           ? "Share your invite code with your parent so they can join your family account."
           : "Enter the student invite code to link your family profile.",
         complete: missingPrerequisites.hasPair,
-        action: !missingPrerequisites.hasPair ? (
-          <Link href={isStudent ? "/assessment/student" : "/parent/join"}>
+        action: !missingPrerequisites.hasPair && !isStudent ? (
+          <Link href="/parent/join">
             <Button size="sm" variant="outline" className="text-xs border-cyan-500/30 text-cyan-300">
-              {isStudent ? "Get Invite Code" : "Join Family Link"}
+              Join Family Link
             </Button>
           </Link>
         ) : null,
@@ -359,13 +363,7 @@ function DashboardContent() {
         title: "Your Data Sharing Consent",
         description: "Explicit permission to compare results while safeguarding private answers.",
         complete: missingPrerequisites.userConsented,
-        action: !missingPrerequisites.userConsented ? (
-          <Link href={isStudent ? "/assessment/student" : "/assessment/parent"}>
-            <Button size="sm" className="text-xs bg-emerald-600 hover:bg-emerald-500">
-              Grant Consent
-            </Button>
-          </Link>
-        ) : null,
+        action: null,
       },
       {
         title: `${partnerRole === "parent" ? "Parent" : "Child"}'s Data Sharing Consent`,
@@ -419,6 +417,34 @@ function DashboardContent() {
             </div>
           ))}
         </div>
+
+        {/* Inline Consent Step (Comment 2 & 3: reach consent from dashboard) */}
+        {!missingPrerequisites.userConsented && (
+          <div className="w-full">
+            <ConsentStep
+              role={missingPrerequisites.role}
+              consented={missingPrerequisites.userConsented}
+              partnerConsented={missingPrerequisites.partnerConsented}
+              onConsentGranted={() => {
+                window.location.reload();
+              }}
+              onConsentWithdrawn={() => {
+                window.location.reload();
+              }}
+            />
+          </div>
+        )}
+
+        {/* Inline Parent Invite Card (Comment 2: reach invite from dashboard) */}
+        {isStudent && !missingPrerequisites.hasPair && (
+          <div className="w-full">
+            <InviteParentCard
+              onInviteCreated={() => {
+                // Keep local card updated
+              }}
+            />
+          </div>
+        )}
 
         <Button
           type="button"

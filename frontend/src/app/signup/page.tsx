@@ -1,14 +1,15 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, ShieldCheck, School, MapPin, Loader2, KeyRound, Globe, Compass } from "lucide-react";
+import { ArrowRight, Compass, Globe, KeyRound, Loader2, MapPin, School, ShieldCheck } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
-import { supabase } from "@/lib/supabase";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { IndianState, StudentProfile } from "@/types/api";
 
 const INDIAN_STATES: IndianState[] = [
@@ -37,23 +38,19 @@ const GRADES = [
 
 export default function SignupPage() {
   const router = useRouter();
-
   const isMockMode = process.env.NEXT_PUBLIC_USE_MOCKS === "true";
-
-  // Auth mode: "signup" or "signin" (Item 1a)
-  const [authMode, setAuthMode] = React.useState<"signup" | "signin">("signup");
 
   // Form fields
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [grade, setGrade] = React.useState(GRADES[2]);
-  const [homeState, setHomeState] = React.useState<IndianState>("Maharashtra");
 
-  // Explicit Student Preferences (Item 4a: risk 1-5, preferred_state, open_to_abroad)
-  const [riskAppetite, setRiskAppetite] = React.useState<number>(3);
-  const [preferredState, setPreferredState] = React.useState<IndianState>("Maharashtra");
-  const [openToAbroad, setOpenToAbroad] = React.useState<boolean>(false);
+  // Comment 7: Preferences start empty/unselected
+  const [homeState, setHomeState] = React.useState<IndianState | "">("");
+  const [preferredState, setPreferredState] = React.useState<IndianState | "">("");
+  const [riskAppetite, setRiskAppetite] = React.useState<number | null>(null);
+  const [openToAbroad, setOpenToAbroad] = React.useState<boolean | null>(null);
 
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -73,45 +70,15 @@ export default function SignupPage() {
     setError("");
   };
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setFieldErrors({});
-    setEmailNotice("");
-
-    if (!email.trim() || !email.includes("@")) {
-      setError("Please enter a valid email address.");
-      return;
-    }
-    if (!password || password.length < 8) {
-      setError("Password must be at least 8 characters.");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (authError) {
-        setError(authError.message);
-        return;
-      }
-
-      // Record per-tab mock role fallback (Item 1e)
-      sessionStorage.setItem("prism_mock_role", "student");
-
-      router.push("/assessment/student");
-    } catch (err: unknown) {
-      console.error("Sign-in error:", err);
-      setError(err instanceof Error ? err.message : "Failed to sign in. Please check credentials.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const canSubmit = Boolean(
+    name.trim() &&
+    email.trim() &&
+    password.length >= 8 &&
+    homeState &&
+    preferredState &&
+    riskAppetite !== null &&
+    openToAbroad !== null
+  );
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,10 +98,39 @@ export default function SignupPage() {
       setError("Password must be at least 8 characters.");
       return;
     }
+    if (!homeState || !preferredState || riskAppetite === null || openToAbroad === null) {
+      setError("Please select all required preference fields.");
+      return;
+    }
 
     setLoading(true);
 
     try {
+      // Pending preferences recorded for onboarding / session recovery (Comment 1)
+      const preferencesToSave = {
+        home_state: homeState,
+        preferred_state: preferredState,
+        risk_appetite: riskAppetite,
+        open_to_abroad: openToAbroad,
+      };
+      sessionStorage.setItem("prism_pending_preferences", JSON.stringify(preferencesToSave));
+
+      // Mock mode fallback when Supabase is unconfigured (Comment 5)
+      if (isMockMode && !isSupabaseConfigured) {
+        sessionStorage.setItem("prism_mock_role", "student");
+        const studentProfile: StudentProfile = {
+          role: "student",
+          risk_appetite: riskAppetite,
+          preferred_state: preferredState as IndianState,
+          home_state: homeState as IndianState,
+          open_to_abroad: openToAbroad,
+        };
+        await api.updateProfile(studentProfile);
+        sessionStorage.removeItem("prism_pending_preferences");
+        router.push("/assessment/student");
+        return;
+      }
+
       // 1. Create Supabase account with role: student (Item 1a)
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
@@ -153,45 +149,41 @@ export default function SignupPage() {
       }
 
       // Record per-tab mock role fallback (Item 1e)
-      sessionStorage.setItem("prism_mock_role", "student");
+      if (isMockMode) {
+        sessionStorage.setItem("prism_mock_role", "student");
+      }
 
-      // 2. Email confirmation check (Item 1c)
+      // 2. Email confirmation check (Item 1c, Comment 1)
       if (authData.user && !authData.session) {
         setEmailNotice("Check your email to confirm your account, then sign in");
         return;
       }
 
-      // 3. Save student profile via PUT /profile with student's real choices (Item 4a, 4b, 4c)
+      // 3. If session exists immediately, save profile now
       const studentProfile: StudentProfile = {
         role: "student",
         risk_appetite: riskAppetite,
-        preferred_state: preferredState,
-        home_state: homeState,
+        preferred_state: preferredState as IndianState,
+        home_state: homeState as IndianState,
         open_to_abroad: openToAbroad,
       };
 
       await api.updateProfile(studentProfile);
-
-      // 4. Create invite code via POST /auth/invite (Item 4c: no swallowing errors)
-      const invite = await api.createInvite();
-      if (invite?.invite_code) {
-        localStorage.setItem("prism_parent_invite_code", invite.invite_code);
-      }
-
-      // Clean up legacy keys (Item 13b)
-      localStorage.removeItem("prism_dev_user");
-      localStorage.removeItem("prism_student_name");
-      localStorage.removeItem("prism_parent_name");
+      sessionStorage.removeItem("prism_pending_preferences");
 
       router.push("/assessment/student");
     } catch (err: unknown) {
       console.error("Signup error:", err);
       if (err instanceof ApiError) {
         setError(err.message);
-        if (err.details?.fields && Array.isArray(err.details.fields)) {
+        const detailsObj = err.details as { fields?: Array<{ field?: string; issue?: string }> } | undefined;
+        if (detailsObj && Array.isArray(detailsObj.fields)) {
           const fieldMap: Record<string, string> = {};
-          for (const f of err.details.fields as Array<{ field: string; issue: string }>) {
-            if (f.field && f.issue) fieldMap[f.field] = f.issue;
+          for (const f of detailsObj.fields) {
+            if (f.field && f.issue) {
+              const plainField = f.field.replace(/^student\./, "");
+              fieldMap[plainField] = f.issue;
+            }
           }
           setFieldErrors(fieldMap);
         }
@@ -207,346 +199,284 @@ export default function SignupPage() {
 
   return (
     <div className="flex-1 flex items-center justify-center px-4 py-12 relative">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-violet-600/15 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[350px] bg-violet-600/15 rounded-full blur-[110px] pointer-events-none" />
 
       <Card className="w-full max-w-lg border-white/10 bg-slate-900/80 backdrop-blur-2xl shadow-2xl relative z-10">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
             <Badge variant="cyan">Student Account</Badge>
-            <div className="flex rounded-lg border border-white/10 bg-white/5 p-0.5 text-xs">
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode("signup");
-                  setError("");
-                }}
-                className={`px-2.5 py-1 rounded-md transition-all ${
-                  authMode === "signup"
-                    ? "bg-violet-600 text-white font-medium"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Sign Up
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode("signin");
-                  setError("");
-                }}
-                className={`px-2.5 py-1 rounded-md transition-all ${
-                  authMode === "signin"
-                    ? "bg-violet-600 text-white font-medium"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Sign In
-              </button>
-            </div>
+            <Link
+              href="/signin"
+              className="text-xs text-cyan-400 hover:text-cyan-300 font-medium hover:underline transition-colors"
+            >
+              Sign In Instead
+            </Link>
           </div>
-          <CardTitle className="text-2xl pt-2">
-            {authMode === "signup" ? "Create Student Profile" : "Sign In to NextPath"}
-          </CardTitle>
+          <CardTitle className="text-2xl pt-2">Create Student Profile</CardTitle>
           <CardDescription className="text-xs text-slate-400">
-            {authMode === "signup"
-              ? "Calibrate entrance exam milestones, state quota schemes, and psychometric baseline vectors."
-              : "Access your saved assessments, parent pairing, and career roadmap."}
+            Calibrate entrance exam milestones, state quota schemes, and psychometric baseline vectors.
           </CardDescription>
         </CardHeader>
 
-        {authMode === "signin" ? (
-          <form onSubmit={handleSignIn}>
-            <CardContent className="space-y-4">
-              {error && (
-                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs">
-                  {error}
+        <form onSubmit={handleSignUp}>
+          <CardContent className="space-y-4">
+            {emailNotice ? (
+              <div className="p-4 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-cyan-200 text-xs space-y-2">
+                <p className="font-semibold text-white">{emailNotice}</p>
+                <p className="text-[11px] text-slate-300">
+                  After verifying your email, sign in to calibrate your preferences and begin your assessment.
+                </p>
+                <div className="pt-1">
+                  <Link href="/signin">
+                    <Button size="sm" className="bg-cyan-600 hover:bg-cyan-500 text-white text-xs">
+                      Go to Sign In
+                    </Button>
+                  </Link>
                 </div>
-              )}
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">
-                  Email Address
-                </label>
-                <Input
-                  type="email"
-                  placeholder="student@school.edu.in"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
               </div>
+            ) : null}
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                  <KeyRound className="h-3.5 w-3.5 text-violet-400" />
-                  <span>Password</span>
-                </label>
-                <Input
-                  type="password"
-                  placeholder="At least 8 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={8}
-                />
+            {error && (
+              <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs">
+                {error}
               </div>
-            </CardContent>
+            )}
 
-            <CardFooter className="pt-2 flex justify-between items-center">
-              <button
-                type="button"
-                onClick={() => setAuthMode("signup")}
-                className="text-xs text-slate-400 hover:text-white transition-colors"
-              >
-                Need an account? Sign up
-              </button>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="bg-violet-600 hover:bg-violet-500 text-white"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  "Sign In"
-                )}
-              </Button>
-            </CardFooter>
-          </form>
-        ) : (
-          <form onSubmit={handleSignUp}>
-            <CardContent className="space-y-4">
-              {emailNotice && (
-                <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-cyan-200 text-xs font-medium">
-                  {emailNotice}
-                </div>
-              )}
-
-              {error && (
-                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs">
-                  {error}
-                </div>
-              )}
-
-              {/* Item 1g: Show sample fill ONLY in mock mode */}
-              {isMockMode && (
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/5 text-xs">
-                  <span className="text-slate-400">Mock mode active</span>
-                  <button
-                    type="button"
-                    onClick={handleFillSampleData}
-                    className="text-cyan-400 hover:text-cyan-300 font-semibold underline underline-offset-2 transition-colors"
-                  >
-                    Fill sample data
-                  </button>
-                </div>
-              )}
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">
-                  Full Name
-                </label>
-                <Input
-                  placeholder="e.g. Aarav Sharma"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">
-                  Email Address
-                </label>
-                <Input
-                  type="email"
-                  placeholder="student@school.edu.in"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                  <KeyRound className="h-3.5 w-3.5 text-violet-400" />
-                  <span>Password</span>
-                </label>
-                <Input
-                  type="password"
-                  placeholder="Minimum 8 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={8}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                  <School className="h-3.5 w-3.5 text-violet-400" />
-                  <span>Current Academic Stage</span>
-                </label>
-                <select
-                  value={grade}
-                  onChange={(e) => setGrade(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-slate-900 border border-white/10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500"
+            {/* Item 1g: Show sample fill ONLY in mock mode */}
+            {isMockMode && (
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/5 text-xs">
+                <span className="text-slate-400">Mock mode active</span>
+                <button
+                  type="button"
+                  onClick={handleFillSampleData}
+                  className="text-cyan-400 hover:text-cyan-300 font-semibold underline underline-offset-2 transition-colors"
                 >
-                  {GRADES.map((g) => (
-                    <option key={g} value={g}>
-                      {g}
-                    </option>
-                  ))}
-                </select>
+                  Fill sample data
+                </button>
               </div>
+            )}
 
-              {/* State of Residence */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">
+                Full Name <span className="text-rose-400">*</span>
+              </label>
+              <Input
+                placeholder="e.g. Aarav Sharma"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">
+                Email Address <span className="text-rose-400">*</span>
+              </label>
+              <Input
+                type="email"
+                placeholder="student@school.edu.in"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <KeyRound className="h-3.5 w-3.5 text-violet-400" />
+                <span>Password (At least 8 characters) <span className="text-rose-400">*</span></span>
+              </label>
+              <Input
+                type="password"
+                placeholder="Minimum 8 characters"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={8}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <School className="h-3.5 w-3.5 text-violet-400" />
+                <span>Current Academic Stage</span>
+              </label>
+              <select
+                value={grade}
+                onChange={(e) => setGrade(e.target.value)}
+                className="w-full p-2.5 rounded-xl bg-slate-900 border border-white/10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500"
+              >
+                {GRADES.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Comment 7: Home State starts unselected */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
                   <MapPin className="h-3.5 w-3.5 text-cyan-400" />
-                  <span>Home State / Domicile</span>
-                </label>
-                <select
-                  value={homeState}
-                  onChange={(e) => setHomeState(e.target.value as IndianState)}
-                  className="w-full p-2.5 rounded-xl bg-slate-900 border border-white/10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500"
-                >
-                  {INDIAN_STATES.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
+                  <span>Home State / Domicile <span className="text-rose-400">*</span></span>
+                </span>
                 {fieldErrors.home_state && (
-                  <p className="text-[10px] text-rose-400">{fieldErrors.home_state}</p>
+                  <span className="text-[10px] text-rose-400">{fieldErrors.home_state}</span>
                 )}
-              </div>
+              </label>
+              <select
+                value={homeState}
+                onChange={(e) => setHomeState(e.target.value as IndianState)}
+                required
+                className="w-full p-2.5 rounded-xl bg-slate-900 border border-white/10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500"
+              >
+                <option value="" disabled className="text-slate-500">
+                  Select your state
+                </option>
+                {INDIAN_STATES.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              {/* Item 4a: Preferred State */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            {/* Comment 7: Preferred State starts unselected */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
                   <Compass className="h-3.5 w-3.5 text-emerald-400" />
-                  <span>Preferred State to Study and Work</span>
-                </label>
-                <select
-                  value={preferredState}
-                  onChange={(e) => setPreferredState(e.target.value as IndianState)}
-                  className="w-full p-2.5 rounded-xl bg-slate-900 border border-white/10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500"
-                >
-                  {INDIAN_STATES.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
+                  <span>Preferred State to Study and Work <span className="text-rose-400">*</span></span>
+                </span>
                 {fieldErrors.preferred_state && (
-                  <p className="text-[10px] text-rose-400">{fieldErrors.preferred_state}</p>
+                  <span className="text-[10px] text-rose-400">{fieldErrors.preferred_state}</span>
                 )}
-              </div>
+              </label>
+              <select
+                value={preferredState}
+                onChange={(e) => setPreferredState(e.target.value as IndianState)}
+                required
+                className="w-full p-2.5 rounded-xl bg-slate-900 border border-white/10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500"
+              >
+                <option value="" disabled className="text-slate-500">
+                  Select your state
+                </option>
+                {INDIAN_STATES.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              {/* Item 4a: Risk Comfort (1-5) */}
-              <div className="space-y-1.5">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-semibold text-slate-300">
-                    How comfortable are you with risk? (1 = Low, 5 = High)
-                  </span>
+            {/* Comment 7: Risk Appetite (1-5) starts unselected */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-semibold text-slate-300">
+                  How comfortable are you with risk? <span className="text-rose-400">*</span>
+                </span>
+                {riskAppetite !== null && (
                   <span className="font-mono font-bold text-violet-300 bg-violet-500/20 px-2 py-0.5 rounded">
                     {riskAppetite} / 5
                   </span>
-                </div>
-                <div className="grid grid-cols-5 gap-2">
-                  {[1, 2, 3, 4, 5].map((lvl) => (
-                    <button
-                      key={lvl}
-                      type="button"
-                      onClick={() => setRiskAppetite(lvl)}
-                      className={`py-1.5 rounded-lg border text-xs font-mono font-semibold transition-all ${
-                        riskAppetite === lvl
-                          ? "bg-violet-600 border-violet-400 text-white"
-                          : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
-                      }`}
-                    >
-                      {lvl}
-                    </button>
-                  ))}
-                </div>
-                {fieldErrors.risk_appetite && (
-                  <p className="text-[10px] text-rose-400">{fieldErrors.risk_appetite}</p>
                 )}
               </div>
+              <div className="grid grid-cols-5 gap-2">
+                {[1, 2, 3, 4, 5].map((lvl) => (
+                  <button
+                    key={lvl}
+                    type="button"
+                    onClick={() => setRiskAppetite(lvl)}
+                    className={`py-1.5 rounded-lg border text-xs font-mono font-semibold transition-all ${
+                      riskAppetite === lvl
+                        ? "bg-violet-600 border-violet-400 text-white"
+                        : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    {lvl}
+                  </button>
+                ))}
+              </div>
+              <div className="flex justify-between text-[10px] text-slate-400 px-0.5">
+                <span>1 · Avoids Risk</span>
+                <span>3 · Moderate</span>
+                <span>5 · Dynamic</span>
+              </div>
+              {fieldErrors.risk_appetite && (
+                <p className="text-[10px] text-rose-400">{fieldErrors.risk_appetite}</p>
+              )}
+            </div>
 
-              {/* Item 4a: Open to Studying Abroad (yes/no) */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            {/* Comment 7: Open to Studying Abroad (yes/no) starts unselected */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
                   <Globe className="h-3.5 w-3.5 text-cyan-400" />
-                  <span>Open to studying abroad?</span>
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setOpenToAbroad(true)}
-                    className={`py-2 rounded-xl border text-xs font-semibold transition-all ${
-                      openToAbroad
-                        ? "bg-cyan-500/20 border-cyan-400 text-cyan-200"
-                        : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
-                    }`}
-                  >
-                    Yes, open to abroad
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setOpenToAbroad(false)}
-                    className={`py-2 rounded-xl border text-xs font-semibold transition-all ${
-                      !openToAbroad
-                        ? "bg-cyan-500/20 border-cyan-400 text-cyan-200"
-                        : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
-                    }`}
-                  >
-                    No, India only
-                  </button>
-                </div>
+                  <span>Open to studying abroad? <span className="text-rose-400">*</span></span>
+                </span>
                 {fieldErrors.open_to_abroad && (
-                  <p className="text-[10px] text-rose-400">{fieldErrors.open_to_abroad}</p>
+                  <span className="text-[10px] text-rose-400">{fieldErrors.open_to_abroad}</span>
                 )}
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setOpenToAbroad(true)}
+                  className={`py-2 rounded-xl border text-xs font-semibold transition-all ${
+                    openToAbroad === true
+                      ? "bg-cyan-500/20 border-cyan-400 text-cyan-200"
+                      : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
+                  }`}
+                >
+                  Yes, open to abroad
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOpenToAbroad(false)}
+                  className={`py-2 rounded-xl border text-xs font-semibold transition-all ${
+                    openToAbroad === false
+                      ? "bg-cyan-500/20 border-cyan-400 text-cyan-200"
+                      : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
+                  }`}
+                >
+                  No, domestic only
+                </button>
               </div>
+            </div>
 
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-slate-400 flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
-                <span>We never sell student data. Used solely for deterministic guidance models.</span>
-              </div>
-            </CardContent>
+            <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-slate-400 flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
+              <span>We never sell student data. Used solely for deterministic guidance models.</span>
+            </div>
+          </CardContent>
 
-            <CardFooter className="pt-2 flex justify-between items-center">
-              <button
-                type="button"
-                onClick={() => setAuthMode("signin")}
-                className="text-xs text-slate-400 hover:text-white transition-colors"
-              >
-                Sign in instead
-              </button>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="bg-violet-600 hover:bg-violet-500 text-white shadow-lg shadow-violet-950/50"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Creating Profile...
-                  </>
-                ) : (
-                  <>
-                    <span>Begin Diagnostic</span>
-                    <ArrowRight className="h-4 w-4 ml-1.5" />
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </form>
-        )}
+          <CardFooter className="pt-2 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <Link
+              href="/signin"
+              className="text-xs text-slate-400 hover:text-white transition-colors order-2 sm:order-1"
+            >
+              Already have an account? Sign In
+            </Link>
+            <Button
+              type="submit"
+              disabled={!canSubmit || loading}
+              className="w-full sm:w-auto bg-violet-600 hover:bg-violet-500 text-white shadow-lg shadow-violet-950/50 order-1 sm:order-2"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Creating Profile...
+                </>
+              ) : (
+                <>
+                  <span>Begin Diagnostic</span>
+                  <ArrowRight className="h-4 w-4 ml-1.5" />
+                </>
+              )}
+            </Button>
+          </CardFooter>
+        </form>
       </Card>
     </div>
   );

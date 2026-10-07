@@ -1,26 +1,32 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, ArrowRight, Link2, ShieldCheck, Loader2, AlertCircle, KeyRound, User } from "lucide-react";
+import { CheckCircle, ArrowRight, Link2, ShieldCheck, Loader2, AlertCircle, KeyRound, User, UserCheck } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
-import { supabase } from "@/lib/supabase";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
 function ParentJoinContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isMockMode = process.env.NEXT_PUBLIC_USE_MOCKS === "true";
 
-  // Read code from ?code= ONLY with NO default (Comment 6/14)
+  // Read code from ?code= ONLY with NO default
   const initialCode = searchParams.get("code") || "";
   const [inviteCode, setInviteCode] = React.useState(initialCode);
 
-  // Parent authentication state (Item 1b)
-  const [authMode, setAuthMode] = React.useState<"signup" | "signin">("signup");
+  // Authenticated state check (Comment 4)
+  const [alreadySignedInUser, setAlreadySignedInUser] = React.useState<{
+    role: string;
+    full_name?: string | null;
+  } | null>(null);
+
   const [parentName, setParentName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -35,7 +41,35 @@ function ParentJoinContent() {
   } | null>(null);
 
   const [loading, setLoading] = React.useState(false);
+  const [checkingAuth, setCheckingAuth] = React.useState(true);
   const [error, setError] = React.useState("");
+
+  React.useEffect(() => {
+    let active = true;
+
+    async function checkExistingAuth() {
+      try {
+        const me = await api.getMe();
+        if (!active) return;
+        if (me.role === "parent") {
+          if (me.pair) {
+            router.replace(!me.progress?.assessment_complete ? "/assessment/parent" : "/dashboard");
+            return;
+          }
+          setAlreadySignedInUser({ role: me.role, full_name: me.full_name });
+        }
+      } catch {
+        // Not signed in
+      } finally {
+        if (active) setCheckingAuth(false);
+      }
+    }
+
+    checkExistingAuth();
+    return () => {
+      active = false;
+    };
+  }, [router]);
 
   const handleLink = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,17 +78,20 @@ function ParentJoinContent() {
       setError("Please enter the invite code provided by your child.");
       return;
     }
-    if (!email.trim() || !email.includes("@")) {
-      setError("Please enter a valid email address.");
-      return;
-    }
-    if (!password || password.length < 8) {
-      setError("Password must be at least 8 characters.");
-      return;
-    }
-    if (authMode === "signup" && !parentName.trim()) {
-      setError("Please enter your name.");
-      return;
+
+    if (!alreadySignedInUser) {
+      if (!parentName.trim()) {
+        setError("Please enter your name.");
+        return;
+      }
+      if (!email.trim() || !email.includes("@")) {
+        setError("Please enter a valid email address.");
+        return;
+      }
+      if (!password || password.length < 8) {
+        setError("Password must be at least 8 characters.");
+        return;
+      }
     }
 
     setLoading(true);
@@ -62,55 +99,46 @@ function ParentJoinContent() {
     setEmailNotice("");
 
     try {
-      // 1. Authenticate parent with role "parent" (Item 1b)
-      if (authMode === "signup") {
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              role: "parent",
-              full_name: parentName,
+      // 1. Authenticate parent if not already signed in (Comment 4, 5)
+      if (!alreadySignedInUser) {
+        if (isMockMode && !isSupabaseConfigured) {
+          sessionStorage.setItem("prism_mock_role", "parent");
+        } else {
+          const { data: authData, error: authError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                role: "parent",
+                full_name: parentName,
+              },
             },
-          },
-        });
+          });
 
-        if (authError) {
-          setError(authError.message);
-          return;
+          if (authError) {
+            setError(authError.message);
+            return;
+          }
+
+          if (isMockMode) {
+            sessionStorage.setItem("prism_mock_role", "parent");
+          }
+
+          if (authData.user && !authData.session) {
+            setEmailNotice("Check your email to confirm your account, then sign in");
+            return;
+          }
         }
-
-        // Record per-tab mock role fallback (Item 1e)
-        sessionStorage.setItem("prism_mock_role", "parent");
-
-        // 2. Email confirmation check (Item 1c)
-        if (authData.user && !authData.session) {
-          setEmailNotice("Check your email to confirm your account, then sign in");
-          return;
-        }
-      } else {
-        const { error: authError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (authError) {
-          setError(authError.message);
-          return;
-        }
-
-        // Record per-tab mock role fallback (Item 1e)
-        sessionStorage.setItem("prism_mock_role", "parent");
       }
 
-      // 3. Link parent account using invite code (POST /auth/link)
+      // 2. Link parent account using invite code (POST /auth/link)
       const res = await api.linkParent(cleanCode);
 
-      // Clean up legacy keys (Item 13b)
+      // Clean up legacy keys
       localStorage.removeItem("prism_dev_user");
       localStorage.removeItem("prism_profiles_linked");
 
-      // 4. Discover partner label (Item 5b: no "Aarav Sharma", show "your child")
+      // 3. Discover partner label
       let partnerLabel = "your child";
       try {
         const me = await api.getMe();
@@ -148,6 +176,14 @@ function ParentJoinContent() {
     }
   };
 
+  if (checkingAuth) {
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="h-7 w-7 text-cyan-400 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 flex items-center justify-center px-4 py-12 relative">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-cyan-600/15 rounded-full blur-[100px] pointer-events-none" />
@@ -156,42 +192,20 @@ function ParentJoinContent() {
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
             <Badge variant="cyan">Parent Account Linking</Badge>
-            <div className="flex rounded-lg border border-white/10 bg-white/5 p-0.5 text-xs">
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode("signup");
-                  setError("");
-                }}
-                className={`px-2.5 py-1 rounded-md transition-all ${
-                  authMode === "signup"
-                    ? "bg-cyan-600 text-white font-medium"
-                    : "text-slate-400 hover:text-white"
-                }`}
+            {!alreadySignedInUser && (
+              <Link
+                href="/signin"
+                className="text-xs text-cyan-400 hover:text-cyan-300 font-medium hover:underline transition-colors"
               >
-                Sign Up
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode("signin");
-                  setError("");
-                }}
-                className={`px-2.5 py-1 rounded-md transition-all ${
-                  authMode === "signin"
-                    ? "bg-cyan-600 text-white font-medium"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Sign In
-              </button>
-            </div>
+                Sign In Instead
+              </Link>
+            )}
           </div>
-          <CardTitle className="text-2xl pt-2">
-            {authMode === "signup" ? "Join via Student Invite" : "Sign In & Link Account"}
-          </CardTitle>
+          <CardTitle className="text-2xl pt-2">Join via Student Invite</CardTitle>
           <CardDescription className="text-xs text-slate-400">
-            Create or access your parent account and link with your child using their unique invite code.
+            {alreadySignedInUser
+              ? `Signed in as ${alreadySignedInUser.full_name || "Parent"}. Enter your child's invite code to complete pairing.`
+              : "Create your parent account and link with your child using their unique invite code."}
           </CardDescription>
         </CardHeader>
 
@@ -220,8 +234,18 @@ function ParentJoinContent() {
           <form onSubmit={handleLink}>
             <CardContent className="space-y-4">
               {emailNotice && (
-                <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-cyan-200 text-xs font-medium">
-                  {emailNotice}
+                <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-cyan-200 text-xs font-medium space-y-2">
+                  <p className="font-semibold text-white">{emailNotice}</p>
+                  <p className="text-[11px] text-slate-300">
+                    Once verified, sign in to link with your child.
+                  </p>
+                  <div className="pt-1">
+                    <Link href="/signin">
+                      <Button size="sm" className="bg-cyan-600 hover:bg-cyan-500 text-white text-xs">
+                        Go to Sign In
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               )}
 
@@ -232,11 +256,21 @@ function ParentJoinContent() {
                 </div>
               )}
 
+              {/* Already Signed In Notice (Comment 4) */}
+              {alreadySignedInUser && (
+                <div className="p-3 rounded-xl bg-cyan-950/20 border border-cyan-500/20 flex items-center gap-2 text-xs text-cyan-300">
+                  <UserCheck className="h-4 w-4 text-cyan-400 shrink-0" />
+                  <span>
+                    Logged in as <strong>{alreadySignedInUser.full_name || "Parent"}</strong>
+                  </span>
+                </div>
+              )}
+
               {/* Invite Code Box */}
               <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-2">
                 <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
                   <Link2 className="h-3.5 w-3.5 text-cyan-400" />
-                  <span>Student Invite Code</span>
+                  <span>Student Invite Code <span className="text-rose-400">*</span></span>
                 </label>
                 <Input
                   value={inviteCode}
@@ -245,55 +279,57 @@ function ParentJoinContent() {
                     setError("");
                   }}
                   placeholder="e.g. PRISM-8X2A9"
-                  className="font-mono tracking-widest text-cyan-300 uppercase"
+                  className="font-mono tracking-widest text-cyan-300 uppercase text-center text-lg py-5"
                   disabled={loading}
                   required
                 />
               </div>
 
-              {/* Parent Auth Details */}
-              {authMode === "signup" && (
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                    <User className="h-3.5 w-3.5 text-slate-400" />
-                    <span>Parent Full Name</span>
-                  </label>
-                  <Input
-                    placeholder="e.g. Rajesh Sharma"
-                    value={parentName}
-                    onChange={(e) => setParentName(e.target.value)}
-                    required
-                  />
-                </div>
+              {/* Only prompt for credentials if not signed in */}
+              {!alreadySignedInUser && (
+                <>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                      <User className="h-3.5 w-3.5 text-slate-400" />
+                      <span>Parent Full Name <span className="text-rose-400">*</span></span>
+                    </label>
+                    <Input
+                      placeholder="e.g. Rajesh Sharma"
+                      value={parentName}
+                      onChange={(e) => setParentName(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-300">
+                      Parent Email Address <span className="text-rose-400">*</span>
+                    </label>
+                    <Input
+                      type="email"
+                      placeholder="parent@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                      <KeyRound className="h-3.5 w-3.5 text-cyan-400" />
+                      <span>Password (At least 8 characters) <span className="text-rose-400">*</span></span>
+                    </label>
+                    <Input
+                      type="password"
+                      placeholder="Minimum 8 characters"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={8}
+                    />
+                  </div>
+                </>
               )}
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">
-                  Parent Email Address
-                </label>
-                <Input
-                  type="email"
-                  placeholder="parent@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                  <KeyRound className="h-3.5 w-3.5 text-cyan-400" />
-                  <span>Password</span>
-                </label>
-                <Input
-                  type="password"
-                  placeholder="Minimum 8 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={8}
-                />
-              </div>
 
               <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-slate-400 flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
@@ -301,19 +337,22 @@ function ParentJoinContent() {
               </div>
             </CardContent>
 
-            <CardFooter className="pt-2 flex justify-between items-center">
-              <button
-                type="button"
-                onClick={() => setAuthMode(authMode === "signup" ? "signin" : "signup")}
-                className="text-xs text-slate-400 hover:text-white transition-colors"
-              >
-                {authMode === "signup" ? "Already registered? Sign in" : "Need an account? Sign up"}
-              </button>
+            <CardFooter className="pt-2 flex flex-col sm:flex-row justify-between items-center gap-3">
+              {!alreadySignedInUser ? (
+                <Link
+                  href="/signin"
+                  className="text-xs text-slate-400 hover:text-white transition-colors order-2 sm:order-1"
+                >
+                  Already have an account? Sign In
+                </Link>
+              ) : (
+                <span className="text-xs text-slate-400 order-2 sm:order-1">Single-step pairing</span>
+              )}
 
               <Button
                 type="submit"
                 disabled={loading || !inviteCode.trim()}
-                className="bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-950/50"
+                className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-950/50 order-1 sm:order-2"
               >
                 {loading ? (
                   <>
@@ -322,7 +361,7 @@ function ParentJoinContent() {
                   </>
                 ) : (
                   <>
-                    <span>{authMode === "signup" ? "Sign Up & Link" : "Sign In & Link"}</span>
+                    <span>Link Family Profile</span>
                     <ArrowRight className="h-4 w-4 ml-1.5" />
                   </>
                 )}

@@ -56,16 +56,33 @@ export default function ParentAssessmentPage() {
   const [error, setError] = React.useState("");
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [showConsentStep, setShowConsentStep] = React.useState(false);
+  const [userConsented, setUserConsented] = React.useState<boolean>(false);
+  const [partnerConsented, setPartnerConsented] = React.useState<boolean | undefined>(undefined);
 
-  // Fetch real domains from GET /domains
+  // Fetch real domains and check parent pairing status
   React.useEffect(() => {
     let active = true;
 
-    async function loadDomains() {
+    async function loadData() {
       setLoadingDomains(true);
       try {
-        const domains = await api.getDomains();
+        const [domains, me] = await Promise.all([
+          api.getDomains(),
+          api.getMe().catch(() => null),
+        ]);
         if (active) {
+          if (me?.role === "parent") {
+            if (!me.pair) {
+              router.replace("/parent/join");
+              return;
+            }
+            if (me.progress?.assessment_complete) {
+              router.replace("/dashboard");
+              return;
+            }
+            setUserConsented(Boolean(me.consented));
+            setPartnerConsented(me.partner?.consented);
+          }
           setAvailableDomains(domains);
         }
       } catch (err) {
@@ -78,12 +95,11 @@ export default function ParentAssessmentPage() {
       }
     }
 
-    loadDomains();
-
+    loadData();
     return () => {
       active = false;
     };
-  }, []);
+  }, [router]);
 
   const handleToggleDomain = (domainId: string) => {
     if (selectedDomainIds.includes(domainId)) {
@@ -202,7 +218,12 @@ export default function ParentAssessmentPage() {
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none" />
         <ConsentStep
           role="parent"
+          consented={userConsented}
+          partnerConsented={partnerConsented}
           onConsentGranted={() => {
+            router.push("/dashboard");
+          }}
+          onSkip={() => {
             router.push("/dashboard");
           }}
         />

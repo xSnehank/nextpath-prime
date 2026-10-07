@@ -147,14 +147,14 @@ const FAQS = [
   },
   {
     q: "How does the Parent Portal work without invading the student's privacy?",
-    a: "The student takes their 30-question psychometric assessment independently. A unique pairing link or WhatsApp invite is generated for the parent to declare family educational budget, risk appetite, and loan tolerance. NextPath's Conflict Index compares the two vector spaces objectively, identifying points of friction without turning into an adversarial confrontation.",
+    a: "The student takes their assessment (about 30 questions) independently. A unique pairing link or WhatsApp invite is generated for the parent to declare family educational budget, risk appetite, and loan tolerance. NextPath's Conflict Index compares the two vector spaces objectively, identifying points of friction without turning into an adversarial confrontation.",
   },
   {
     q: "What data sources power the macroeconomic job market signals?",
     a: "Our engine tracks industry hiring datasets across major Indian tech hubs (Bangalore, Pune, Hyderabad, NCR) incorporating 5-year CAGR projections, entry-level CTC benchmarks, and AI-automation risk ratings to ensure recommended roadmaps remain viable over the student's graduation horizon.",
   },
   {
-    q: "Can we test the platform immediately without filling 30 questions?",
+    q: "Can we test the platform immediately without filling about 30 questions?",
     a: "Yes. Click 'Live Demo' in the navbar or select any of the pre-configured sample family personas in our simulator below to launch an instant end-to-end dossier complete with radar charts, financial break-even models, and downloadable PDF reports.",
   },
 ];

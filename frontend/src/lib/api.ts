@@ -9,7 +9,7 @@
  *   into clean component types without fictional data.
  */
 
-import { getAuthToken, supabase } from "@/lib/supabase";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { components } from "@/types/openapi";
 
 export const MOCK_STUDENT_ID = "11111111-1111-4111-8111-111111111111";
@@ -73,22 +73,28 @@ async function getHeaders(extra?: HeadersInit): Promise<Headers> {
   });
 
   if (typeof window !== "undefined") {
+    let token: string | null = null;
+    let role: string | null = null;
+
+    if (isSupabaseConfigured) {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          token = data.session.access_token || null;
+          role = (data.session.user?.user_metadata?.role as string) || null;
+        }
+      } catch {
+        // Supabase error / not reachable
+      }
+    }
+
     // 1. Bearer Token from Supabase session
-    const token = await getAuthToken();
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }
 
     // 2. Mock mode dev user (ONLY when NEXT_PUBLIC_USE_MOCKS === "true")
     if (process.env.NEXT_PUBLIC_USE_MOCKS === "true") {
-      let role: string | null = null;
-      try {
-        const { data } = await supabase.auth.getUser();
-        role = (data?.user?.user_metadata?.role as string) || null;
-      } catch {
-        // Supabase error / not configured
-      }
-
       if (!role) {
         role = sessionStorage.getItem("prism_mock_role");
       }

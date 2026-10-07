@@ -3,11 +3,12 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-let hasWarned = false;
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
+let hasWarned = false;
 const isMockMode = process.env.NEXT_PUBLIC_USE_MOCKS === "true";
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!isSupabaseConfigured) {
   if (process.env.NODE_ENV === "production" && !isMockMode) {
     throw new Error(
       "Missing Supabase configuration: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY must be defined in production."
@@ -36,7 +37,7 @@ export const supabase: SupabaseClient = createClient(
  * Does NOT fall back to localStorage.
  */
 export async function getAuthToken(): Promise<string | null> {
-  if (typeof window === "undefined") return null;
+  if (typeof window === "undefined" || !isSupabaseConfigured) return null;
 
   try {
     const { data } = await supabase.auth.getSession();
