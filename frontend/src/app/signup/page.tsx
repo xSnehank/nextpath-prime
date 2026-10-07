@@ -36,6 +36,8 @@ const GRADES = [
   "College 1st / 2nd Year Undergrad",
 ];
 
+const isAlreadyRegistered = (message: string) => /already (been )?registered/i.test(message);
+
 export default function SignupPage() {
   const router = useRouter();
   const isMockMode = process.env.NEXT_PUBLIC_USE_MOCKS === "true";
@@ -54,6 +56,7 @@ export default function SignupPage() {
 
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [showSignInLink, setShowSignInLink] = React.useState(false);
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [emailNotice, setEmailNotice] = React.useState("");
 
@@ -83,6 +86,7 @@ export default function SignupPage() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setShowSignInLink(false);
     setFieldErrors({});
     setEmailNotice("");
 
@@ -144,7 +148,12 @@ export default function SignupPage() {
       });
 
       if (authError) {
-        setError(authError.message);
+        if (isAlreadyRegistered(authError.message)) {
+          setError("This email already has an account. Sign in instead, and you'll pick up where you left off.");
+          setShowSignInLink(true);
+        } else {
+          setError(authError.message);
+        }
         return;
       }
 
@@ -168,7 +177,16 @@ export default function SignupPage() {
         open_to_abroad: openToAbroad,
       };
 
-      await api.updateProfile(studentProfile);
+      try {
+        await api.updateProfile(studentProfile);
+      } catch (saveErr) {
+        // The account exists now, so retrying this form would only say "already registered".
+        // Onboarding pre-fills the same answers (prism_pending_preferences) and saves them again.
+        console.error("Account created, but saving preferences failed:", saveErr);
+        sessionStorage.setItem("prism_signup_resume", "1");
+        router.push("/onboarding");
+        return;
+      }
       sessionStorage.removeItem("prism_pending_preferences");
 
       router.push("/assessment/student");
@@ -239,6 +257,11 @@ export default function SignupPage() {
             {error && (
               <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs">
                 {error}
+                {showSignInLink && (
+                  <Link href="/signin" className="ml-1 font-semibold underline underline-offset-2 text-rose-200">
+                    Sign in
+                  </Link>
+                )}
               </div>
             )}
 

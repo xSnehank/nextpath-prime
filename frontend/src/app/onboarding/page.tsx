@@ -59,6 +59,16 @@ export default function OnboardingPage() {
         // me fetch failed
       }
 
+      // Sent here by sign-up because the account was created but saving the preferences failed.
+      try {
+        if (sessionStorage.getItem("prism_signup_resume") === "1") {
+          sessionStorage.removeItem("prism_signup_resume");
+          setError("Your account is ready, but your preferences didn't save. Check them below and save again.");
+        }
+      } catch {
+        // sessionStorage unavailable
+      }
+
       // Pre-fill from sessionStorage if present (Comment 1)
       try {
         const pendingRaw = sessionStorage.getItem("prism_pending_preferences");
