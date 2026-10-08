@@ -52,6 +52,18 @@ class Role(StrEnum):
     PARENT = "parent"
 
 
+class SchoolStream(StrEnum):
+    """The student's Class 11-12 stream; decides which careers are open and which come first (guide, step 0)."""
+
+    SCIENCE_PCM = "science_pcm"
+    SCIENCE_PCB = "science_pcb"
+    SCIENCE_PCMB = "science_pcmb"
+    COMMERCE_MATHS = "commerce_maths"
+    COMMERCE = "commerce"
+    ARTS = "arts"
+    UNDECIDED = "undecided"  # Class 10 or earlier: every career counts as the student's own
+
+
 class TraitGroup(StrEnum):
     APTITUDE = "aptitude"
     INTEREST = "interest"

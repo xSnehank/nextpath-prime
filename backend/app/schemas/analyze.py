@@ -130,12 +130,24 @@ class FinanceCheck(StrictModel):
 class College(StrictModel):
     name: str
     annual_fee: Rupees
+    course: str = Field(default="", description="The degree programme at this college, e.g. 'B.Tech Mechanical Engineering'")
+    tier: int | None = Field(
+        default=None, ge=1, le=3, description="1-3 by NIRF; null for routes that aren't colleges (CA, NDA)"
+    )
+    city: str | None = None
+    state: str | None = None
 
 
 class EducationPath(StrictModel):
     education: str
     exams: list[str]
-    colleges: list[College] = Field(description="The finance check uses the first college")
+    colleges: list[College] = Field(
+        description="Up to 12 colleges the student can enter: the best 4 of each tier by NIRF rank, then fee"
+    )
+    typical_college: str | None = Field(
+        default=None,
+        description="The college the finance check is based on: the median-fee one, preferring the student's state",
+    )
 
 
 class MatchedScholarship(StrictModel):
@@ -156,6 +168,11 @@ class RoadmapItem(StrictModel):
     path: EducationPath
     scholarships: list[MatchedScholarship]
     cheaper_alternative: str | None
+    stream_match: Literal["natural", "open"] = Field(
+        default="natural",
+        description="natural: follows the student's Class 11-12 stream; open: they may enter it, but it's another "
+        "stream's usual route (these always rank below the natural ones)",
+    )
 
 
 class RejectedCareer(StrictModel):

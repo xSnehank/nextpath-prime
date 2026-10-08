@@ -203,6 +203,7 @@ export default function DashboardPage() {
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         <Badge variant={career.financeViable ? "success" : "danger"}>{career.financeViable ? "Affordable" : "Over budget"}</Badge>
                         <Badge variant="outline">Demand {career.marketDemand}%</Badge>
+                        {career.streamMatch === "open" && <Badge variant="warning">Outside your stream</Badge>}
                       </div>
                     </button>
                   </li>
@@ -251,14 +252,36 @@ export default function DashboardPage() {
                     {active.exams.length ? active.exams.map((e) => e.name).join(" · ") : "Admission on board marks."}
                   </Detail>
                   <Detail title="Colleges">
-                    <ul className="space-y-1">
+                    {active.typicalCollege && (
+                      <p className="mb-2 text-xs text-muted-foreground">
+                        Cost based on a typical college: <span className="font-medium text-foreground">{active.typicalCollege}</span>
+                      </p>
+                    )}
+                    <ul className="space-y-2">
                       {active.colleges.map((c) => (
                         <li key={c.name} className="flex justify-between gap-3">
-                          <span>{c.name}</span>
-                          {c.annualFee ? <span className="shrink-0 text-muted-foreground">₹{(c.annualFee / 100000).toFixed(1)}L / yr</span> : null}
+                          <div className="min-w-0">
+                            <p className="flex items-center gap-1.5">
+                              {c.tier ? (
+                                <span className="shrink-0 rounded bg-muted px-1.5 text-[10px] font-semibold text-muted-foreground">T{c.tier}</span>
+                              ) : null}
+                              <span className="truncate">{c.name}</span>
+                            </p>
+                            {(c.course || c.location) && (
+                              <p className="truncate text-xs text-muted-foreground">{[c.course, c.location].filter(Boolean).join(" · ")}</p>
+                            )}
+                          </div>
+                          {c.annualFee != null ? (
+                            <span className="shrink-0 text-muted-foreground">
+                              {c.annualFee === 0 ? "No fee" : `₹${(c.annualFee / 100000).toFixed(1)}L / yr`}
+                            </span>
+                          ) : null}
                         </li>
                       ))}
                     </ul>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      T1–T3: NIRF 2025 tiers. Yearly fees; many are estimates, so check the college&apos;s own fee notice.
+                    </p>
                   </Detail>
                   {active.scholarships.length > 0 && (
                     <Detail title="Scholarships you may qualify for">

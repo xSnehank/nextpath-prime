@@ -1,0 +1,356 @@
+key,name,city,state,nirf,ini,fee_group,fee_ref,living,exam,programs
+iit-madras,Indian Institute of Technology Madras,Chennai,Tamil Nadu,Engineering 1,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_aero;btech_ep
+iit-delhi,Indian Institute of Technology Delhi,New Delhi,Delhi,Engineering 2,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_mnc;btech_ep
+iit-bombay,Indian Institute of Technology Bombay,Mumbai,Maharashtra,Engineering 3,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_aero;btech_ep;bdes@UCEED
+iit-kanpur,Indian Institute of Technology Kanpur,Kanpur,Uttar Pradesh,Engineering 4,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_aero;bs_physics
+iit-kharagpur,Indian Institute of Technology Kharagpur,Kharagpur,West Bengal,Engineering 5,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_aero;btech_ic;btech_mnc;btech_cse_aiml;btech_ece;b_arch
+iit-roorkee,Indian Institute of Technology Roorkee,Roorkee,Uttarakhand,Engineering 6,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_ece;btech_ep;btech_cse_ds;b_arch
+iit-hyderabad,Indian Institute of Technology Hyderabad,Hyderabad,Telangana,Engineering 7,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_cse_aiml;btech_ep;bdes@UCEED
+iit-guwahati,Indian Institute of Technology Guwahati,Guwahati,Assam,Engineering 8,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_ece;btech_mnc;btech_ep;btech_cse_ds;bdes@UCEED
+iit-bhu,Indian Institute of Technology (BHU) Varanasi,Varanasi,Uttar Pradesh,Engineering 10,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_ece;btech_mnc;btech_ep;b_arch
+iit-indore,Indian Institute of Technology Indore,Indore,Madhya Pradesh,Engineering 12,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_ep
+iit-ism,Indian Institute of Technology (ISM) Dhanbad,Dhanbad,Jharkhand,Engineering 15,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_ece;btech_mnc;btech_ep
+iit-patna,Indian Institute of Technology Patna,Patna,Bihar,Engineering 19,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_mnc;btech_cse_ds;btech_ep
+iit-gandhinagar,Indian Institute of Technology Gandhinagar,Gandhinagar,Gujarat,Engineering 25,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem
+iit-mandi,Indian Institute of Technology Mandi,Mandi,Himachal Pradesh,Engineering 26,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_cse_ds;btech_ep
+iit-jodhpur,Indian Institute of Technology Jodhpur,Jodhpur,Rajasthan,Engineering 27,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_cse_ds
+iit-ropar,Indian Institute of Technology Ropar,Rupnagar,Punjab,Engineering 32,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem;btech_mnc;btech_ep
+iit-bhubaneswar,Indian Institute of Technology Bhubaneswar,Bhubaneswar,Odisha,Engineering 39,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_ece
+iit-jammu,Indian Institute of Technology Jammu,Jammu,Jammu and Kashmir,Engineering 56,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem
+iit-tirupati,Indian Institute of Technology Tirupati,Tirupati,Andhra Pradesh,Engineering 57,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_chem
+iit-palakkad,Indian Institute of Technology Palakkad,Palakkad,Kerala,Engineering 64,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_civil;btech_cse_ds
+iit-bhilai,Indian Institute of Technology Bhilai,Durg,Chhattisgarh,Engineering 72,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_cse_ds
+iit-dharwad,Indian Institute of Technology Dharwad,Dharwad,Karnataka,Engineering 77,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech
+iit-goa,Indian Institute of Technology Goa,Ponda,Goa,Engineering 101-150,y,iit,iit,,JEE Advanced,btech_cse;btech_ee;btech_mech;btech_mnc
+nit-trichy,National Institute of Technology Tiruchirappalli,Tiruchirappalli,Tamil Nadu,Engineering 9,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic;b_arch@JEE Main Paper 2 (JoSAA)
+nit-rourkela,National Institute of Technology Rourkela,Rourkela,Odisha,Engineering 13,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_biotech;b_arch@JEE Main Paper 2 (JoSAA)
+nitk-surathkal,National Institute of Technology Karnataka Surathkal,Surathkal,Karnataka,Engineering 17,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+nit-calicut,National Institute of Technology Calicut,Kozhikode,Kerala,Engineering 21,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_biotech;b_arch@JEE Main Paper 2 (JoSAA)
+nit-warangal,National Institute of Technology Warangal,Warangal,Telangana,Engineering 28,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+mnit-jaipur,Malaviya National Institute of Technology Jaipur,Jaipur,Rajasthan,Engineering 42,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;b_arch@JEE Main Paper 2 (JoSAA)
+vnit-nagpur,Visvesvaraya National Institute of Technology Nagpur,Nagpur,Maharashtra,Engineering 44,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;b_arch@JEE Main Paper 2 (JoSAA)
+nit-durgapur,National Institute of Technology Durgapur,Durgapur,West Bengal,Engineering 49,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+nit-silchar,National Institute of Technology Silchar,Silchar,Assam,Engineering 50,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_ic
+nit-patna,National Institute of Technology Patna,Patna,Bihar,Engineering 53,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;b_arch@JEE Main Paper 2 (JoSAA)
+nit-jalandhar,Dr B R Ambedkar National Institute of Technology Jalandhar,Jalandhar,Punjab,Engineering 55,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic
+mnnit-allahabad,Motilal Nehru National Institute of Technology Allahabad,Prayagraj,Uttar Pradesh,Engineering 62,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+nit-delhi,National Institute of Technology Delhi,New Delhi,Delhi,Engineering 65,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+svnit-surat,Sardar Vallabhbhai National Institute of Technology Surat,Surat,Gujarat,Engineering 66,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+nit-srinagar,National Institute of Technology Srinagar,Srinagar,Jammu and Kashmir,Engineering 73,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+manit-bhopal,Maulana Azad National Institute of Technology Bhopal,Bhopal,Madhya Pradesh,Engineering 81,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;b_arch@JEE Main Paper 2 (JoSAA)
+nit-jamshedpur,National Institute of Technology Jamshedpur,Jamshedpur,Jharkhand,Engineering 82,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+nit-meghalaya,National Institute of Technology Meghalaya,Shillong,Meghalaya,Engineering 83,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+nit-kurukshetra,National Institute of Technology Kurukshetra,Kurukshetra,Haryana,Engineering 85,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil
+nit-raipur,National Institute of Technology Raipur,Raipur,Chhattisgarh,Engineering 86,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;b_arch@JEE Main Paper 2 (JoSAA)
+nit-hamirpur,National Institute of Technology Hamirpur,Hamirpur,Himachal Pradesh,Engineering 97,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;b_arch@JEE Main Paper 2 (JoSAA)
+nit-puducherry,National Institute of Technology Puducherry,Karaikal,Puducherry,Engineering 99,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+nit-agartala,National Institute of Technology Agartala,Agartala,Tripura,Engineering 101-150,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+nit-arunachal,National Institute of Technology Arunachal Pradesh,Itanagar,Arunachal Pradesh,Engineering 101-150,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+nit-goa,National Institute of Technology Goa,Cuncolim,Goa,Engineering 101-150,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+nit-mizoram,National Institute of Technology Mizoram,Aizawl,Mizoram,Engineering 101-150,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+nit-nagaland,National Institute of Technology Nagaland,Dimapur,Nagaland,Engineering 101-150,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+nit-manipur,National Institute of Technology Manipur,Imphal,Manipur,Engineering 151-200,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+nit-sikkim,National Institute of Technology Sikkim,Ravangla,Sikkim,Engineering 151-200,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+nit-uttarakhand,National Institute of Technology Uttarakhand,Srinagar (Garhwal),Uttarakhand,Engineering 151-200,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+nit-andhra,National Institute of Technology Andhra Pradesh,Tadepalligudem,Andhra Pradesh,,y,nit,nit,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+iiit-allahabad,Indian Institute of Information Technology Allahabad,Prayagraj,Uttar Pradesh,Engineering 101-150,y,national_institute,iiita,,JEE Main (JoSAA),btech_it;btech_ece
+iiitm-gwalior,ABV Indian Institute of Information Technology and Management Gwalior,Gwalior,Madhya Pradesh,Engineering 96,y,national_institute,iiitm,,JEE Main (JoSAA),btech_cse;btech_ee
+iiitdm-jabalpur,PDPM IIITDM Jabalpur,Jabalpur,Madhya Pradesh,Engineering 101-150,y,national_institute,iiitdmj,,JEE Main (JoSAA),btech_cse;btech_ece;btech_mech;bdes
+iiitdm-kancheepuram,IIITDM Kancheepuram,Chennai,Tamil Nadu,Engineering 151-200,y,national_institute,iiitdmk,,JEE Main (JoSAA),btech_cse;btech_ece;btech_mech
+iiest-shibpur,Indian Institute of Engineering Science and Technology Shibpur,Howrah,West Bengal,Engineering 54,y,national_institute,,,JEE Main (JoSAA),btech_cse;be_entc;btech_ee;btech_mech;btech_civil;b_arch@JEE Main Paper 2 (JoSAA)
+iist,Indian Institute of Space Science and Technology,Thiruvananthapuram,Kerala,Engineering 61,,national_institute,,,JEE Advanced,btech_aero;btech_ece;btech_ep
+spa-delhi,School of Planning and Architecture New Delhi,New Delhi,Delhi,Architecture 8,y,national_institute,,,JEE Main Paper 2 (JoSAA),b_arch
+spa-bhopal,School of Planning and Architecture Bhopal,Bhopal,Madhya Pradesh,Architecture 11,y,national_institute,,,JEE Main Paper 2 (JoSAA),b_arch
+spa-vijayawada,School of Planning and Architecture Vijayawada,Vijayawada,Andhra Pradesh,Architecture 19,y,national_institute,,,JEE Main Paper 2 (JoSAA),b_arch
+pec-chandigarh,Punjab Engineering College Chandigarh,Chandigarh,Chandigarh,Engineering 101-150,,national_institute,,,JEE Main (JoSAA),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_aero
+iiit-hyderabad,International Institute of Information Technology Hyderabad,Hyderabad,Telangana,Engineering 38,,private_univ,,,JEE Main / UGEE,btech_cse;btech_ece
+iiit-delhi,Indraprastha Institute of Information Technology Delhi,New Delhi,Delhi,Engineering 63,,private_univ,,,JEE Main (JAC Delhi),btech_cse;btech_ece;btech_cse_ds
+iiit-bangalore,International Institute of Information Technology Bangalore,Bengaluru,Karnataka,Engineering 69,,private_univ,,,JEE Main,btech_cse;btech_ece
+dtu,Delhi Technological University,New Delhi,Delhi,Engineering 30,,state_univ_engg,,,JEE Main (JAC Delhi),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_mnc;btech_ep
+nsut,Netaji Subhas University of Technology,New Delhi,Delhi,Engineering 70,,state_univ_engg,,,JEE Main (JAC Delhi),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_ic
+igdtuw,Indira Gandhi Delhi Technical University for Women,New Delhi,Delhi,,,state_univ_engg,,,JEE Main (JAC Delhi),btech_cse;btech_it;btech_ece
+bits-pilani,Birla Institute of Technology and Science Pilani,Pilani,Rajasthan,Engineering 11,,private_univ,bits,,BITSAT,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic;bpharm
+vit-vellore,Vellore Institute of Technology,Vellore,Tamil Nadu,Engineering 16,,private_univ,vit,,VITEEE,btech_cse;btech_cse_aiml;btech_cse_ds;btech_cse_cyber;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_biotech;btech_ecm
+srm-chennai,SRM Institute of Science and Technology,Chennai,Tamil Nadu,Engineering 14,,private_univ,srm,,SRMJEEE,btech_cse;btech_cse_aiml;btech_cse_ds;btech_cse_cyber;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_aero;btech_auto;btech_mechatronics;btech_biotech
+amrita-coimbatore,Amrita Vishwa Vidyapeetham Coimbatore,Coimbatore,Tamil Nadu,Engineering 23,,private_univ,,,AEEE,btech_cse;btech_cse_aiml;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_aero;btech_robotics;btech_ecm
+thapar,Thapar Institute of Engineering and Technology,Patiala,Punjab,Engineering 29,,private_univ,thapar,,JEE Main,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic;btech_mechatronics;btech_biotech;btech_ecm
+mit-manipal,Manipal Institute of Technology,Manipal,Karnataka,Engineering 59,,private_univ,manipal_mit,,MET,btech_cse;btech_cse_aiml;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_aero;btech_auto;btech_mechatronics;btech_ic;btech_biotech
+kiit,Kalinga Institute of Industrial Technology,Bhubaneswar,Odisha,Engineering 36,,private_univ,,,KIITEE,btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil
+soa-iter,Siksha 'O' Anusandhan (ITER),Bhubaneswar,Odisha,Engineering 22,,private_univ,,,SAAT,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+amity-noida,Amity University Noida,Noida,Uttar Pradesh,Engineering 37,,private_univ,,,JEE Main / Amity entrance,btech_cse;btech_cse_aiml;btech_ece;btech_mech;btech_aero;btech_biotech;bsc_env@CUET-UG / Amity entrance;bsc_actuarial@CUET-UG / Amity entrance;bca@CUET-UG / Amity entrance;bba@CUET-UG / Amity entrance;bsc_forensic@CUET-UG / Amity entrance
+lpu,Lovely Professional University,Phagwara,Punjab,Engineering 48,,private_univ,,,LPUNEST,btech_cse;btech_ece;btech_mech;btech_civil
+chandigarh-univ,Chandigarh University,Mohali,Punjab,Engineering 31,,private_univ,,,CUCET,btech_cse;btech_cse_aiml;btech_ece;btech_mech;btech_civil;btech_aero
+kl-univ,Koneru Lakshmaiah Education Foundation,Vaddeswaram,Andhra Pradesh,Engineering 35,,private_univ,,,KLEEE,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_ecm
+sastra,SASTRA Deemed University,Thanjavur,Tamil Nadu,Engineering 40,,private_univ,,,JEE Main / Class 12 marks,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_biotech
+upes,UPES Dehradun,Dehradun,Uttarakhand,Engineering 43,,private_univ,,,UPESEAT / JEE Main,btech_cse;btech_cse_aiml;btech_cse_cyber;btech_aero
+nirma,Nirma University Institute of Technology,Ahmedabad,Gujarat,Engineering 101-150,,private_univ,,,ACPC (JEE Main),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic
+pes-univ,PES University,Bengaluru,Karnataka,Engineering 101-150,,private_univ,,,PESSAT,btech_cse;btech_ece;btech_ee;btech_mech;btech_biotech
+mit-wpu,Dr Vishwanath Karad MIT World Peace University,Pune,Maharashtra,Engineering 101-150,,private_univ,,,MHT CET / MIT-WPU CET,btech_cse;btech_ece;btech_mech;btech_civil;btech_chem
+symbiosis-sit,Symbiosis Institute of Technology,Pune,Maharashtra,Engineering 46,,private_univ,,,SET (Symbiosis),btech_cse;btech_cse_aiml;be_entc;btech_mech;btech_civil;btech_robotics
+nmims-mpstme,NMIMS Mukesh Patel School of Technology Management & Engineering,Mumbai,Maharashtra,Engineering 101-150,,private_univ,,,NMIMS NPAT / JEE Main,btech_cse;btech_cse_ds;btech_cse_cyber;btech_it;be_entc;btech_mechatronics
+shiv-nadar,Shiv Nadar University,Greater Noida,Uttar Pradesh,University 57,,private_univ,,,JEE Main / SNU entrance,btech_cse;btech_ece;btech_mech;btech_civil;btech_chem
+mahindra-univ,Mahindra University Ecole Centrale School of Engineering,Hyderabad,Telangana,Engineering 101-150,,private_univ,,,JEE Main,btech_cse;btech_cse_aiml;btech_ece;btech_mech;btech_civil
+jiit-noida,Jaypee Institute of Information Technology,Noida,Uttar Pradesh,Engineering 101-150,,private_univ,,,JEE Main,btech_cse;btech_it;btech_ece
+bit-mesra,Birla Institute of Technology Mesra,Ranchi,Jharkhand,Engineering 51,,private_univ,,,JEE Main,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_aero;btech_ic;btech_biotech;b_arch@JEE Main Paper 2
+ict-mumbai,Institute of Chemical Technology Mumbai,Mumbai,Maharashtra,Engineering 41,,state_univ_engg,ict,,MHT CET / JEE Main,btech_chem;bpharm@MHT CET
+coep,COEP Technological University,Pune,Maharashtra,Engineering 90,,state_univ_engg,coep,,MHT CET,btech_cse;be_entc;btech_ee;btech_mech;btech_civil;btech_ic
+vjti,Veermata Jijabai Technological Institute,Mumbai,Maharashtra,Engineering 101-150,,state_univ_engg,vjti,,MHT CET,btech_cse;btech_it;be_entc;btech_ee;btech_mech;btech_civil
+walchand-sangli,Walchand College of Engineering,Sangli,Maharashtra,,,state_univ_engg,walchand,,MHT CET,btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_cse_aiml;btech_robotics
+gec-aurangabad,Government College of Engineering Chhatrapati Sambhajinagar,Chhatrapati Sambhajinagar,Maharashtra,,,state_univ_engg,,,MHT CET,btech_cse;be_entc;btech_ee;btech_mech;btech_civil
+sggs-nanded,SGGS Institute of Engineering and Technology,Nanded,Maharashtra,,,state_univ_engg,,,MHT CET,btech_cse;btech_it;be_entc;btech_ee;btech_mech;btech_civil;btech_ic
+spit-mumbai,Sardar Patel Institute of Technology,Mumbai,Maharashtra,,,private_engg_college,spit,,MHT CET,btech_cse;be_entc;btech_cse_ds
+pict-pune,Pune Institute of Computer Technology,Pune,Maharashtra,,,private_engg_college,pict,,MHT CET,btech_cse;btech_it;be_entc;btech_cse_ds
+vit-pune,Vishwakarma Institute of Technology,Pune,Maharashtra,Engineering 101-150,,private_engg_college,,,MHT CET,btech_cse;btech_it;be_entc;btech_mech;btech_chem;btech_ic;btech_cse_aiml
+pccoe-pune,Pimpri Chinchwad College of Engineering,Pune,Maharashtra,,,private_engg_college,,,MHT CET,btech_cse;btech_it;be_entc;btech_mech;btech_civil
+cummins-pune,Cummins College of Engineering for Women,Pune,Maharashtra,,,private_engg_college,,,MHT CET,btech_cse;btech_it;be_entc;btech_mech;btech_ic
+dypit-pune,Dr D Y Patil Institute of Technology Pimpri,Pune,Maharashtra,Engineering 151-200,,private_engg_college,,,MHT CET,btech_cse;be_entc;btech_mech;btech_civil
+rscoe-pune,JSPM's Rajarshi Shahu College of Engineering,Pune,Maharashtra,Engineering 151-200,,private_engg_college,,,MHT CET,btech_cse;btech_it;be_entc;btech_mech;btech_civil
+sinhgad-coe,Sinhgad College of Engineering,Pune,Maharashtra,,,private_engg_college,,,MHT CET,btech_cse;btech_it;be_entc;btech_mech;btech_civil
+djsce-mumbai,Dwarkadas J Sanghvi College of Engineering,Mumbai,Maharashtra,,,private_engg_college,,,MHT CET,btech_cse;btech_it;be_entc;btech_mech;btech_cse_ds;btech_cse_aiml
+kjsce-mumbai,K J Somaiya College of Engineering,Mumbai,Maharashtra,,,private_engg_college,,,MHT CET / Somaiya entrance,btech_cse;btech_it;be_entc;btech_mech
+ycce-nagpur,Yeshwantrao Chavan College of Engineering,Nagpur,Maharashtra,Engineering 151-200,,private_engg_college,,,MHT CET,btech_cse;be_entc;btech_ee;btech_mech;btech_civil
+rknec-nagpur,Ramdeobaba University,Nagpur,Maharashtra,Engineering 151-200,,private_engg_college,,,MHT CET,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+rvce,R V College of Engineering,Bengaluru,Karnataka,Engineering 101-150,,private_engg_college,kea_unaided,,KCET / COMEDK UGET,btech_cse;btech_cse_aiml;btech_cse_ds;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic;btech_aero;btech_biotech
+msrit,M S Ramaiah Institute of Technology,Bengaluru,Karnataka,Engineering 75,,private_engg_college,kea_unaided,,KCET / COMEDK UGET,btech_cse;btech_cse_aiml;btech_ece;be_entc;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic
+bmsce,B M S College of Engineering,Bengaluru,Karnataka,Engineering 151-200,,private_engg_college,kea_unaided,,KCET / COMEDK UGET,btech_cse;btech_ece;be_entc;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic
+dsce,Dayananda Sagar College of Engineering,Bengaluru,Karnataka,,,private_engg_college,kea_unaided,,KCET / COMEDK UGET,btech_cse;btech_ece;btech_mech;btech_civil;btech_aero;btech_auto
+sit-tumkur,Siddaganga Institute of Technology,Tumakuru,Karnataka,Engineering 101-150,,private_engg_college,kea_unaided,,KCET / COMEDK UGET,btech_cse;btech_ece;be_entc;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic;btech_biotech
+nie-mysuru,The National Institute of Engineering,Mysuru,Karnataka,Engineering 151-200,,private_engg_college,kea_unaided,,KCET / COMEDK UGET,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+nmit-bengaluru,Nitte Meenakshi Institute of Technology,Bengaluru,Karnataka,Engineering 101-150,,private_engg_college,kea_unaided,,KCET / COMEDK UGET,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_aero
+bit-bengaluru,Bangalore Institute of Technology,Bengaluru,Karnataka,,,private_engg_college,kea_unaided,,KCET / COMEDK UGET,btech_cse;btech_ece;be_entc;btech_ee;btech_mech;btech_civil
+jssstu-mysuru,JSS Science and Technology University,Mysuru,Karnataka,,,private_engg_college,kea_unaided,,KCET / COMEDK UGET,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+uvce,University of Visvesvaraya College of Engineering,Bengaluru,Karnataka,,,state_univ_engg,kea_uvce,,KCET,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+gec-hassan,Government Engineering College Hassan,Hassan,Karnataka,,,state_univ_engg,kea_govt,,KCET,btech_cse;btech_ece;btech_mech;btech_civil
+anna-ceg,College of Engineering Guindy (Anna University),Chennai,Tamil Nadu,Engineering 20,,state_univ_engg,,,TNEA (Class 12 marks),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil
+anna-mit,Madras Institute of Technology (Anna University),Chennai,Tamil Nadu,Engineering 20,,state_univ_engg,,,TNEA (Class 12 marks),btech_cse;btech_it;btech_ece;btech_aero;btech_auto;btech_ic
+gct-coimbatore,Government College of Technology Coimbatore,Coimbatore,Tamil Nadu,,,state_univ_engg,gct,,TNEA (Class 12 marks),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_ic
+ssn,Sri Sivasubramaniya Nadar College of Engineering,Kalavakkam,Tamil Nadu,Engineering 47,,private_engg_college,,,TNEA (Class 12 marks),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+psg-tech,PSG College of Technology,Coimbatore,Tamil Nadu,Engineering 67,,private_engg_college,,,TNEA (Class 12 marks),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_auto;btech_robotics;btech_ic
+tce-madurai,Thiagarajar College of Engineering,Madurai,Tamil Nadu,Engineering 101-150,,private_engg_college,,,TNEA (Class 12 marks),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_mechatronics
+kongu,Kongu Engineering College,Perundurai,Tamil Nadu,Engineering 101-150,,private_engg_college,,,TNEA (Class 12 marks),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_auto;btech_mechatronics
+cit-coimbatore,Coimbatore Institute of Technology,Coimbatore,Tamil Nadu,Engineering 101-150,,private_engg_college,,,TNEA (Class 12 marks),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+kct,Kumaraguru College of Technology,Coimbatore,Tamil Nadu,Engineering 151-200,,private_engg_college,,,TNEA (Class 12 marks),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_auto;btech_mechatronics
+jadavpur,Jadavpur University,Kolkata,West Bengal,Engineering 18,,state_univ_engg,,,WBJEE,btech_cse;be_entc;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic;b_arch;ba_econ@Jadavpur Arts admission;ba_polsci@Jadavpur Arts admission;ba_english@Jadavpur Arts admission
+iem-kolkata,Institute of Engineering and Management,Kolkata,West Bengal,Engineering 151-200,,private_engg_college,,,WBJEE / JEE Main,btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_cse_aiml
+heritage-kolkata,Heritage Institute of Technology,Kolkata,West Bengal,,,private_engg_college,,,WBJEE,btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic
+kgec,Kalyani Government Engineering College,Kalyani,West Bengal,,,state_univ_engg,,,WBJEE,btech_cse;btech_it;btech_ece;btech_ee;btech_mech
+jntuh-uce,JNTUH University College of Engineering,Hyderabad,Telangana,Engineering 94,,state_univ_engg,,,TS EAPCET,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+ou-uce,University College of Engineering Osmania University,Hyderabad,Telangana,Engineering 101-150,,state_univ_engg,,,TS EAPCET,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+cbit,Chaitanya Bharathi Institute of Technology,Hyderabad,Telangana,Engineering 151-200,,private_engg_college,,,TS EAPCET,btech_cse;btech_cse_aiml;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_biotech
+vnrvjiet,VNR Vignana Jyothi Institute of Engineering and Technology,Hyderabad,Telangana,Engineering 151-200,,private_engg_college,,,TS EAPCET,btech_cse;btech_cse_aiml;btech_cse_ds;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_auto
+griet,Gokaraju Rangaraju Institute of Engineering and Technology,Hyderabad,Telangana,Engineering 151-200,,private_engg_college,,,TS EAPCET,btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil
+vasavi,Vasavi College of Engineering,Hyderabad,Telangana,,,private_engg_college,,,TS EAPCET,btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil
+au-ce,AU College of Engineering Andhra University,Visakhapatnam,Andhra Pradesh,Engineering 88,,state_univ_engg,,,AP EAPCET,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+jntuk,Jawaharlal Nehru Technological University Kakinada,Kakinada,Andhra Pradesh,Engineering 101-150,,state_univ_engg,,,AP EAPCET,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+vrsec,Velagapudi Ramakrishna Siddhartha Engineering College,Vijayawada,Andhra Pradesh,Engineering 151-200,,private_engg_college,,,AP EAPCET,btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil
+ldce,L D College of Engineering,Ahmedabad,Gujarat,,,state_univ_engg,,,GUJCET (ACPC),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic;btech_auto
+pdeu,Pandit Deendayal Energy University,Gandhinagar,Gujarat,Engineering 98,,private_univ,,,ACPC (JEE Main),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+ddu-nadiad,Dharmsinh Desai University,Nadiad,Gujarat,,,private_univ,,,ACPC (JEE Main / GUJCET),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic
+mmmut,Madan Mohan Malaviya University of Technology,Gorakhpur,Uttar Pradesh,Engineering 60,,state_univ_engg,,,JEE Main (UPTAC),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+hbtu,Harcourt Butler Technical University,Kanpur,Uttar Pradesh,,,state_univ_engg,,,JEE Main (UPTAC),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+iet-lucknow,Institute of Engineering and Technology Lucknow,Lucknow,Uttar Pradesh,,,state_univ_engg,,,JEE Main (UPTAC),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+kiet,KIET Group of Institutions,Ghaziabad,Uttar Pradesh,Engineering 151-200,,private_engg_college,,,JEE Main (UPTAC),btech_cse;btech_cse_aiml;btech_cse_ds;btech_it;btech_ece;btech_ee;btech_mech
+mbm-jodhpur,MBM University,Jodhpur,Rajasthan,,,state_univ_engg,,,JEE Main (REAP),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+sgsits-indore,Shri Govindram Seksaria Institute of Technology and Science,Indore,Madhya Pradesh,,,state_univ_engg,,,JEE Main (MP DTE),btech_cse;btech_it;btech_ece;btech_ee;btech_mech;btech_civil;btech_ic
+cet-trivandrum,College of Engineering Trivandrum,Thiruvananthapuram,Kerala,Engineering 101-150,,state_univ_engg,,,KEAM,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_ic;b_arch@NATA / KEAM
+tkmce-kollam,TKM College of Engineering,Kollam,Kerala,,,state_univ_engg,,,KEAM,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+gec-thrissur,Government Engineering College Thrissur,Thrissur,Kerala,,,state_univ_engg,,,KEAM,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem;btech_ic
+vssut-burla,Veer Surendra Sai University of Technology,Sambalpur,Odisha,Engineering 151-200,,state_univ_engg,,,OJEE / JEE Main,btech_cse;btech_it;be_entc;btech_ee;btech_mech;btech_civil;btech_chem
+ymca-faridabad,J C Bose University of Science and Technology YMCA,Faridabad,Haryana,Engineering 151-200,,state_univ_engg,,,JEE Main (HSTES),btech_cse;btech_ece;btech_ee;btech_mech
+dcrust,Deenbandhu Chhotu Ram University of Science and Technology,Murthal,Haryana,,,state_univ_engg,,,JEE Main (HSTES),btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;btech_chem
+smvdu,Shri Mata Vaishno Devi University,Katra,Jammu and Kashmir,Engineering 151-200,,state_univ_engg,,,JEE Main,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil;b_arch@JEE Main Paper 2
+tezpur-univ,Tezpur University,Tezpur,Assam,Engineering 151-200,,state_univ_engg,,,JEE Main,btech_cse;btech_ece;btech_ee;btech_mech;btech_civil
+cept,CEPT University,Ahmedabad,Gujarat,Architecture 6,,private_univ_general,,,NATA / JEE Main Paper 2,b_arch
+jj-architecture,Sir J J College of Architecture,Mumbai,Maharashtra,,,state_univ_engg,,,NATA / JEE Main Paper 2 (Maharashtra CAP),b_arch
+cca-chandigarh,Chandigarh College of Architecture,Chandigarh,Chandigarh,,,state_univ_engg,,,JEE Main Paper 2 / NATA,b_arch
+jamia-arch,Faculty of Architecture and Ekistics Jamia Millia Islamia,New Delhi,Delhi,Architecture 5,,public_college,,,JEE Main Paper 2 / NATA,b_arch
+bmsca,BMS College of Architecture,Bengaluru,Karnataka,Architecture 20,,private_engg_college,kea_unaided,,NATA / KCET,b_arch
+aiims-delhi,All India Institute of Medical Sciences New Delhi,New Delhi,Delhi,Medical 1,y,aiims,aiims,,NEET-UG,mbbs;bsc_nursing@AIIMS B.Sc Nursing entrance=aiims_nursing
+aiims-rishikesh,All India Institute of Medical Sciences Rishikesh,Rishikesh,Uttarakhand,Medical 13,y,aiims,aiims,,NEET-UG,mbbs
+aiims-bhubaneswar,All India Institute of Medical Sciences Bhubaneswar,Bhubaneswar,Odisha,Medical 14,y,aiims,aiims,,NEET-UG,mbbs
+aiims-jodhpur,All India Institute of Medical Sciences Jodhpur,Jodhpur,Rajasthan,Medical 19,y,aiims,aiims,,NEET-UG,mbbs
+aiims-bhopal,All India Institute of Medical Sciences Bhopal,Bhopal,Madhya Pradesh,Medical 25,y,aiims,aiims,,NEET-UG,mbbs
+aiims-patna,All India Institute of Medical Sciences Patna,Patna,Bihar,Medical 27,y,aiims,aiims,,NEET-UG,mbbs
+aiims-raipur,All India Institute of Medical Sciences Raipur,Raipur,Chhattisgarh,Medical 31,y,aiims,aiims,,NEET-UG,mbbs
+jipmer,Jawaharlal Institute of Postgraduate Medical Education and Research,Puducherry,Puducherry,Medical 4,y,govt_medical,,,NEET-UG,mbbs
+ims-bhu,Institute of Medical Sciences Banaras Hindu University,Varanasi,Uttar Pradesh,Medical 6,,govt_medical,,,NEET-UG,mbbs;bams=bhu_ayurveda
+kgmu,King George's Medical University,Lucknow,Uttar Pradesh,Medical 8,,govt_medical,,,NEET-UG,mbbs
+mmc-chennai,Madras Medical College,Chennai,Tamil Nadu,Medical 16,,govt_medical,mmc,,NEET-UG,mbbs
+vmmc-safdarjung,Vardhman Mahavir Medical College and Safdarjung Hospital,New Delhi,Delhi,Medical 22,,govt_medical,,,NEET-UG,mbbs
+mamc-delhi,Maulana Azad Medical College,New Delhi,Delhi,Medical 26,,govt_medical,mamc,,NEET-UG,mbbs
+amu-jnmc,Jawaharlal Nehru Medical College Aligarh Muslim University,Aligarh,Uttar Pradesh,Medical 29,,govt_medical,,,NEET-UG,mbbs
+lhmc-delhi,Lady Hardinge Medical College,New Delhi,Delhi,Medical 32,,govt_medical,,,NEET-UG,mbbs
+gmch-chandigarh,Government Medical College and Hospital Chandigarh,Chandigarh,Chandigarh,Medical 34,,govt_medical,,,NEET-UG,mbbs
+ucms-delhi,University College of Medical Sciences,Delhi,Delhi,Medical 38,,govt_medical,,,NEET-UG,mbbs
+sms-jaipur,Sawai Man Singh Medical College,Jaipur,Rajasthan,Medical 39,,govt_medical,,,NEET-UG,mbbs
+mck-kolkata,Medical College Kolkata,Kolkata,West Bengal,Medical 41,,govt_medical,,,NEET-UG,mbbs
+bjmc-ahmedabad,B J Medical College,Ahmedabad,Gujarat,Medical 45,,govt_medical,,,NEET-UG,mbbs
+osmania-mc,Osmania Medical College,Hyderabad,Telangana,Medical 48,,govt_medical,,,NEET-UG,mbbs
+grant-mumbai,Grant Government Medical College,Mumbai,Maharashtra,,,govt_medical,grant,,NEET-UG,mbbs
+bjgmc-pune,B J Government Medical College,Pune,Maharashtra,,,govt_medical,,,NEET-UG,mbbs
+bmcri-bengaluru,Bangalore Medical College and Research Institute,Bengaluru,Karnataka,,,govt_medical,,,NEET-UG,mbbs
+cmc-vellore,Christian Medical College Vellore,Vellore,Tamil Nadu,Medical 3,,private_medical,cmc_vellore,,NEET-UG,mbbs
+amrita-kochi,Amrita Institute of Medical Sciences,Kochi,Kerala,Medical 9,,deemed_medical,,,NEET-UG,mbbs
+kmc-manipal,Kasturba Medical College Manipal,Manipal,Karnataka,Medical 10,,deemed_medical,kmc_manipal,,NEET-UG,mbbs
+saveetha-medical,Saveetha Medical College,Chennai,Tamil Nadu,Medical 11,,deemed_medical,,,NEET-UG,mbbs
+dypatil-pune,Dr D Y Patil Medical College Pune,Pune,Maharashtra,Medical 12,,deemed_medical,,,NEET-UG,mbbs
+srm-medical,SRM Medical College Hospital and Research Centre,Chennai,Tamil Nadu,Medical 18,,deemed_medical,,,NEET-UG,mbbs
+dmihe-wardha,Datta Meghe Institute of Higher Education and Research,Wardha,Maharashtra,Medical 20,,deemed_medical,,,NEET-UG,mbbs
+kims-bhubaneswar,Kalinga Institute of Medical Sciences,Bhubaneswar,Odisha,Medical 24,,deemed_medical,,,NEET-UG,mbbs
+st-johns,St John's Medical College,Bengaluru,Karnataka,Medical 30,,private_medical,st_johns,,NEET-UG,mbbs
+kmc-mangalore,Kasturba Medical College Mangalore,Mangaluru,Karnataka,Medical 35,,deemed_medical,,,NEET-UG,mbbs
+dmc-ludhiana,Dayanand Medical College,Ludhiana,Punjab,Medical 36,,private_medical,,,NEET-UG,mbbs
+jss-medical,JSS Medical College,Mysuru,Karnataka,Medical 37,,deemed_medical,,,NEET-UG,mbbs
+msrmc-bengaluru,M S Ramaiah Medical College,Bengaluru,Karnataka,Medical 50,,private_medical,,,NEET-UG,mbbs
+yenepoya-medical,Yenepoya Medical College,Mangaluru,Karnataka,,,deemed_medical,yenepoya,,NEET-UG,mbbs
+maids-delhi,Maulana Azad Institute of Dental Sciences,New Delhi,Delhi,Dental 3,,govt_dental,maids,,NEET-UG,bds
+nair-dental,Nair Hospital Dental College,Mumbai,Maharashtra,Dental 19,,govt_dental,,,NEET-UG,bds
+gdc-nagpur,Government Dental College Nagpur,Nagpur,Maharashtra,Dental 20,,govt_dental,,,NEET-UG,bds
+gdc-mumbai,Government Dental College and Hospital Mumbai,Mumbai,Maharashtra,Dental 21,,govt_dental,gdc_mumbai,,NEET-UG,bds
+gdc-bangalore,Government Dental College Bangalore,Bengaluru,Karnataka,Dental 34,,govt_dental,,,NEET-UG,bds
+saveetha-dental,Saveetha Dental College,Chennai,Tamil Nadu,Dental 2,,private_dental,saveetha_dental,,NEET-UG,bds
+mcods-manipal,Manipal College of Dental Sciences Manipal,Manipal,Karnataka,Dental 5,,private_dental,mcods,,NEET-UG,bds
+abshetty-dental,A B Shetty Memorial Institute of Dental Sciences,Mangaluru,Karnataka,Dental 6,,private_dental,,,NEET-UG,bds
+srm-dental,SRM Dental College,Chennai,Tamil Nadu,Dental 8,,private_dental,,,NEET-UG,bds
+jss-dental,JSS Dental College and Hospital,Mysuru,Karnataka,Dental 10,,private_dental,,,NEET-UG,bds
+nia-jaipur,National Institute of Ayurveda,Jaipur,Rajasthan,,y,ayush,nia,,NEET-UG,bams
+gac-tvm,Government Ayurveda College Thiruvananthapuram,Thiruvananthapuram,Kerala,,,ayush,gac_tvm,,NEET-UG,bams
+tilak-ayurved,Tilak Ayurved Mahavidyalaya,Pune,Maharashtra,,,ayush,tilak,,NEET-UG,bams
+jamia-hamdard,Jamia Hamdard School of Pharmaceutical Education and Research,New Delhi,Delhi,Pharmacy 1,,pharmacy,jamia_hamdard,,Jamia Hamdard entrance / CUET-UG,bpharm
+uips-chandigarh,University Institute of Pharmaceutical Sciences Panjab University,Chandigarh,Chandigarh,Pharmacy 3,,pharmacy,,,CUET-UG / PU entrance,bpharm
+jss-pharmacy-ooty,JSS College of Pharmacy Ooty,Ooty,Tamil Nadu,Pharmacy 4,,pharmacy,,,CUET-UG / JSS entrance,bpharm
+jss-pharmacy-mysuru,JSS College of Pharmacy Mysuru,Mysuru,Karnataka,Pharmacy 7,,pharmacy,,,KCET / JSS entrance,bpharm
+mcops-manipal,Manipal College of Pharmaceutical Sciences,Manipal,Karnataka,Pharmacy 8,,pharmacy,,,MET,bpharm
+dpsru-delhi,Delhi Pharmaceutical Sciences and Research University,New Delhi,Delhi,Pharmacy 19,,pharmacy,,,CUET-UG,bpharm
+poona-pharmacy,Poona College of Pharmacy,Pune,Maharashtra,Pharmacy 34,,pharmacy,,,MHT CET,bpharm
+aiims-nursing,College of Nursing AIIMS New Delhi,New Delhi,Delhi,Medical 1,y,nursing,aiims_nursing,,AIIMS B.Sc Nursing entrance,bsc_nursing
+manipal-nursing,Manipal College of Nursing,Manipal,Karnataka,University 3,,nursing,manipal_nursing,,MET,bsc_nursing
+cmc-nursing,College of Nursing CMC Vellore,Vellore,Tamil Nadu,Medical 3,,nursing,,,CMC entrance,bsc_nursing
+manipal-mchp,Manipal College of Health Professions,Manipal,Karnataka,University 3,,physio,manipal_bpt,,MET,bpt
+saveetha-physio,Saveetha College of Physiotherapy,Chennai,Tamil Nadu,University 13,,physio,,,Saveetha entrance,bpt
+gsmc-physio,Physiotherapy School and Centre Seth G S Medical College,Mumbai,Maharashtra,,,govt_medical,,,MHT CET (PCB),bpt
+ivri,Indian Veterinary Research Institute,Bareilly,Uttar Pradesh,Agriculture 5,,vet,,,NEET-UG (VCI quota),bvsc
+mvc-chennai,Madras Veterinary College (TANUVAS),Chennai,Tamil Nadu,Agriculture 26,,vet,mvc,,NEET-UG / TANUVAS admission,bvsc
+gadvasu,Guru Angad Dev Veterinary and Animal Sciences University,Ludhiana,Punjab,Agriculture 30,,vet,,,NEET-UG,bvsc
+luvas,Lala Lajpat Rai University of Veterinary and Animal Sciences,Hisar,Haryana,Agriculture 37,,vet,,,NEET-UG,bvsc
+bvc-mumbai,Bombay Veterinary College (MAFSU),Mumbai,Maharashtra,,,vet,bvc_mumbai,,NEET-UG,bvsc
+pau-ludhiana,Punjab Agricultural University,Ludhiana,Punjab,Agriculture 3,,agri,pau,,PAU entrance / CUET-ICAR,bsc_agri
+bhu-agri,Institute of Agricultural Sciences Banaras Hindu University,Varanasi,Uttar Pradesh,Agriculture 4,,agri,,,CUET-UG / CUET-ICAR,bsc_agri
+tnau,Tamil Nadu Agricultural University,Coimbatore,Tamil Nadu,Agriculture 6,,agri,tnau,,TNAU admission (Class 12 marks),bsc_agri
+gbpuat,G B Pant University of Agriculture and Technology,Pantnagar,Uttarakhand,Agriculture 9,,agri,,,GBPUAT entrance / CUET-ICAR,bsc_agri
+ccshau,Chaudhary Charan Singh Haryana Agricultural University,Hisar,Haryana,Agriculture 10,,agri,,,CCSHAU entrance,bsc_agri
+uas-bangalore,University of Agricultural Sciences Bangalore,Bengaluru,Karnataka,Agriculture 11,,agri,,,KCET,bsc_agri
+mpkv-rahuri,Mahatma Phule Krishi Vidyapeeth,Rahuri,Maharashtra,,,agri,,,MHT CET (PCB),bsc_agri
+nfsu,National Forensic Sciences University,Gandhinagar,Gujarat,,y,public_college,,,NFSU entrance,bsc_forensic
+ifs-mumbai,Institute of Forensic Science Mumbai,Mumbai,Maharashtra,,,public_college,,,Merit (Class 12 marks),bsc_forensic
+iisc-bengaluru,Indian Institute of Science,Bengaluru,Karnataka,University 1,y,science_national,iisc,,IISc admission (JEE / IAT / NEET),bs_physics
+iiser-pune,Indian Institute of Science Education and Research Pune,Pune,Maharashtra,Research 35,y,iiser,iiser_pune,,IAT (IISER Aptitude Test),bs_physics
+iiser-kolkata,Indian Institute of Science Education and Research Kolkata,Mohanpur,West Bengal,Research 46,y,iiser,,,IAT (IISER Aptitude Test),bs_physics
+iiser-mohali,Indian Institute of Science Education and Research Mohali,Mohali,Punjab,,y,iiser,,,IAT (IISER Aptitude Test),bs_physics
+iiser-bhopal,Indian Institute of Science Education and Research Bhopal,Bhopal,Madhya Pradesh,,y,iiser,,,IAT (IISER Aptitude Test),bs_physics
+iiser-tvm,Indian Institute of Science Education and Research Thiruvananthapuram,Thiruvananthapuram,Kerala,,y,iiser,,,IAT (IISER Aptitude Test),bs_physics
+iiser-tirupati,Indian Institute of Science Education and Research Tirupati,Tirupati,Andhra Pradesh,,y,iiser,,,IAT (IISER Aptitude Test),bs_physics
+iiser-berhampur,Indian Institute of Science Education and Research Berhampur,Berhampur,Odisha,,y,iiser,iiser_bpr,,IAT (IISER Aptitude Test),bs_physics
+niser,National Institute of Science Education and Research (HBNI),Bhubaneswar,Odisha,Research 7,y,science_national,niser,,NEST,bs_physics
+cebs-mumbai,UM-DAE Centre for Excellence in Basic Sciences (HBNI),Mumbai,Maharashtra,Research 7,y,science_national,,,NEST,bs_physics
+isi-kolkata,Indian Statistical Institute Kolkata,Kolkata,West Bengal,,y,science_national,isi_bstat,,ISI Admission Test,b_stat;bsc_ds@ISI Admission Test=isi_bsds
+cmi-chennai,Chennai Mathematical Institute,Chennai,Tamil Nadu,,,science_national,cmi,,CMI Entrance,bsc_maths_stats
+srcc,Shri Ram College of Commerce,New Delhi,Delhi,College 18,,public_college,srcc,,CUET-UG,bcom;ba_econ
+hindu-college,Hindu College,New Delhi,Delhi,College 1,,public_college,hindu,,CUET-UG,bcom;ba_econ;ba_polsci;ba_english;bs_physics;bsc_maths_stats
+miranda-house,Miranda House,New Delhi,Delhi,College 2,,public_college,miranda,,CUET-UG,ba_econ;ba_polsci;ba_english;bs_physics;bsc_maths_stats
+hansraj-college,Hansraj College,New Delhi,Delhi,College 3,,public_college,hansraj,,CUET-UG,bcom;ba_econ;ba_english;bs_physics;bsc_maths_stats
+kirori-mal,Kirori Mal College,New Delhi,Delhi,College 4,,public_college,,,CUET-UG,bcom;ba_econ;ba_polsci;ba_english;bs_physics
+st-stephens,St Stephen's College,New Delhi,Delhi,College 5,,public_college,stephens,,CUET-UG + college interview,ba_econ;ba_polsci;ba_english;bs_physics;bsc_maths_stats
+sri-venkateswara,Sri Venkateswara College,New Delhi,Delhi,College 11,,public_college,,,CUET-UG,bcom;ba_econ;ba_polsci;bsc_biotech
+lsr,Lady Shri Ram College for Women,New Delhi,Delhi,College 17,,public_college,lsr,,CUET-UG,bcom;ba_econ;ba_polsci;ba_english;ba_psych;ba_jmc
+daulat-ram,Daulat Ram College,New Delhi,Delhi,College 26,,public_college,,,CUET-UG,bcom;ba_econ;ba_polsci;ba_english
+ramjas,Ramjas College,New Delhi,Delhi,College 28,,public_college,,,CUET-UG,bcom;ba_econ;ba_polsci;ba_english
+dcac,Delhi College of Arts and Commerce,New Delhi,Delhi,College 30,,public_college,,,CUET-UG,bcom;ba_jmc;ba_polsci
+sggscc,Sri Guru Gobind Singh College of Commerce,New Delhi,Delhi,College 32,,public_college,,,CUET-UG,bcom;bms
+gargi,Gargi College,New Delhi,Delhi,College 33,,public_college,,,CUET-UG,bcom;ba_econ;ba_psych;ba_english
+sbs-college,Shaheed Bhagat Singh College,New Delhi,Delhi,College 39,,public_college,,,CUET-UG,bcom;ba_econ
+knc,Kamala Nehru College,New Delhi,Delhi,College 58,,public_college,,,CUET-UG,ba_jmc;ba_polsci;ba_english
+jmc-delhi,Jesus and Mary College,New Delhi,Delhi,College 85,,public_college,,,CUET-UG,bcom;ba_psych;ba_english
+sscbs,Shaheed Sukhdev College of Business Studies,New Delhi,Delhi,,,public_college,,,CUET-UG,bms;bba
+st-xaviers-kolkata,St Xavier's College Kolkata,Kolkata,West Bengal,College 8,,public_college,,,St Xavier's admission (Class 12 marks),bcom;bba;bca;bsc_maths_stats;ba_english
+presidency-kolkata,Presidency University Kolkata,Kolkata,West Bengal,,,public_college,,,Presidency admission test,ba_econ;ba_polsci;ba_english;bs_physics;bsc_maths_stats
+loyola-chennai,Loyola College,Chennai,Tamil Nadu,College 14,,public_college,,,Loyola admission (Class 12 marks),bcom;ba_econ;ba_english;bs_physics;bsc_maths_stats
+presidency-chennai,Presidency College Chennai,Chennai,Tamil Nadu,College 15,,public_college,,,Merit (Class 12 marks),ba_econ;ba_polsci;ba_english;bs_physics;bsc_maths_stats
+mcc-chennai,Madras Christian College,Chennai,Tamil Nadu,College 16,,public_college,,,MCC admission (Class 12 marks),bcom;ba_econ;ba_polsci;ba_english
+stella-maris,Stella Maris College,Chennai,Tamil Nadu,College 41,,public_college,,,Merit (Class 12 marks),bcom;ba_english;ba_econ
+kristu-jayanti,Kristu Jayanti College,Bengaluru,Karnataka,College 34,,public_college,,,Kristu Jayanti admission,bcom;bba;bca
+sjcc-bengaluru,St Joseph's College of Commerce,Bengaluru,Karnataka,College 98,,public_college,,,SJCC admission,bcom;bba
+fergusson,Fergusson College,Pune,Maharashtra,College 57,,public_college,,,Merit (Class 12 marks),ba_econ;ba_polsci;ba_english;ba_psych;bs_physics;bsc_maths_stats;bsc_micro;bsc_biotech
+st-xaviers-mumbai,St Xavier's College Mumbai,Mumbai,Maharashtra,College 89,,public_college,,,St Xavier's admission (Class 12 marks),bms;ba_jmc;ba_psych;ba_english;bs_physics;bsc_micro;bsc_biotech
+nm-college,Narsee Monjee College of Commerce and Economics,Mumbai,Maharashtra,,,public_college,,,Merit (Class 12 marks),bcom;bms
+hr-college,H R College of Commerce and Economics,Mumbai,Maharashtra,,,public_college,,,Merit (Class 12 marks),bcom;bms
+jai-hind,Jai Hind College,Mumbai,Maharashtra,,,public_college,,,Merit (Class 12 marks),bcom;bms;ba_jmc
+bmcc-pune,Brihan Maharashtra College of Commerce,Pune,Maharashtra,,,public_college,,,Merit (Class 12 marks),bcom
+scac-pune,Symbiosis College of Arts and Commerce,Pune,Maharashtra,,,public_college,,,Merit (Class 12 marks),bcom;ba_econ
+bhu-arts,Banaras Hindu University (Faculties of Arts and Social Sciences),Varanasi,Uttar Pradesh,University 6,,public_college,,,CUET-UG,ba_econ;ba_polsci;ba_english
+amu-arts,Aligarh Muslim University (Faculties of Arts and Social Sciences),Aligarh,Uttar Pradesh,University 10,,public_college,,,AMU entrance,ba_econ;ba_polsci;ba_english;ba_llb@AMU entrance
+jamia-millia,Jamia Millia Islamia,New Delhi,Delhi,University 4,,public_college,,,CUET-UG / JMI entrance,ba_econ;ba_polsci;ba_english;ba_llb@JMI entrance
+christ-univ,Christ University,Bengaluru,Karnataka,Law 24,,private_univ_general,christ_bcom,,Christ Entrance Test,bba=christ_bba;bcom=christ_bcom;ba_econ;ba_psych;ba_english;ba_jmc;bca;bsc_ds;bsc_biotech;ba_llb
+nmims-bba,NMIMS Anil Surendra Modi School of Commerce,Mumbai,Maharashtra,University 52,,private_univ_general,nmims_bba,,NMIMS NPAT,bba;bcom
+scms-pune,Symbiosis Centre for Management Studies,Pune,Maharashtra,University 24,,private_univ_general,scms,,SET (Symbiosis),bba
+simc-pune,Symbiosis Institute of Media and Communication,Pune,Maharashtra,University 24,,private_univ_general,,,SET (Symbiosis),ba_jmc
+sicsr-pune,Symbiosis Institute of Computer Studies and Research,Pune,Maharashtra,University 24,,private_univ_general,,,SET (Symbiosis),bca
+sls-pune,Symbiosis Law School Pune,Pune,Maharashtra,Law 7,,private_univ_general,,,SLAT,ba_llb
+iim-indore,Indian Institute of Management Indore,Indore,Madhya Pradesh,Management 8,y,ipm,iim_indore_ipm,,IPMAT (Indore),ipm
+iim-rohtak,Indian Institute of Management Rohtak,Rohtak,Haryana,Management 19,y,ipm,,,IPMAT (Rohtak),ipm
+iim-ranchi,Indian Institute of Management Ranchi,Ranchi,Jharkhand,Management 18,y,ipm,,,IPMAT (Indore),ipm
+iim-bodhgaya,Indian Institute of Management Bodh Gaya,Gaya,Bihar,Management 31,y,ipm,,,JIPMAT,ipm
+iim-jammu,Indian Institute of Management Jammu,Jammu,Jammu and Kashmir,Management 35,y,ipm,,,JIPMAT,ipm
+icai,Institute of Chartered Accountants of India (ICAI),New Delhi,Delhi,,,professional_body,icai,,CA Foundation,ca
+icsi,Institute of Company Secretaries of India (ICSI),New Delhi,Delhi,,,professional_body,,,CSEET,cs
+icmai,Institute of Cost Accountants of India (ICMAI),Kolkata,West Bengal,,,professional_body,,,CMA Foundation,cma
+ihm-pusa,Institute of Hotel Management Pusa,New Delhi,Delhi,,y,hotel,ihm_pusa,,NCHMCT JEE,bhm
+ihm-mumbai,Institute of Hotel Management Mumbai,Mumbai,Maharashtra,,y,hotel,nchm,,NCHMCT JEE,bhm
+ihm-bengaluru,Institute of Hotel Management Bengaluru,Bengaluru,Karnataka,,y,hotel,nchm,,NCHMCT JEE,bhm
+ihm-kolkata,Institute of Hotel Management Kolkata,Kolkata,West Bengal,,y,hotel,nchm,,NCHMCT JEE,bhm
+ihm-chennai,Institute of Hotel Management Chennai,Chennai,Tamil Nadu,,y,hotel,nchm,,NCHMCT JEE,bhm
+ihm-hyderabad,Institute of Hotel Management Hyderabad,Hyderabad,Telangana,,y,hotel,nchm,,NCHMCT JEE,bhm
+wgsha-manipal,Welcomgroup Graduate School of Hotel Administration,Manipal,Karnataka,University 3,,private_univ_general,,,MET,bhm
+nlsiu,National Law School of India University,Bengaluru,Karnataka,Law 1,,nlu,nlsiu,,CLAT,ba_llb
+nlu-delhi,National Law University Delhi,New Delhi,Delhi,Law 2,,nlu,nlud,,AILET,ba_llb
+nalsar,NALSAR University of Law,Hyderabad,Telangana,Law 3,,nlu,nalsar,,CLAT,ba_llb
+wbnujs,The West Bengal National University of Juridical Sciences,Kolkata,West Bengal,Law 4,,nlu,wbnujs,,CLAT,ba_llb
+gnlu,Gujarat National Law University,Gandhinagar,Gujarat,Law 5,,nlu,gnlu,,CLAT,ba_llb
+nluo,National Law University Odisha,Cuttack,Odisha,Law 15,,nlu,nluo,,CLAT,ba_llb
+cnlu,Chanakya National Law University,Patna,Bihar,Law 17,,nlu,cnlu,,CLAT,ba_llb
+rmlnlu,Dr Ram Manohar Lohiya National Law University,Lucknow,Uttar Pradesh,Law 21,,nlu,rmlnlu,,CLAT,ba_llb
+nliu,National Law Institute University Bhopal,Bhopal,Madhya Pradesh,Law 27,,nlu,nliu,,CLAT,ba_llb
+mnlu-nagpur,Maharashtra National Law University Nagpur,Nagpur,Maharashtra,Law 28,,nlu,,,CLAT,ba_llb
+nusrl,National University of Study and Research in Law,Ranchi,Jharkhand,Law 30,,nlu,nusrl,,CLAT,ba_llb
+hpnlu,Himachal Pradesh National Law University,Shimla,Himachal Pradesh,Law 34,,nlu,,,CLAT,ba_llb
+nlu-assam,National Law University and Judicial Academy Assam,Guwahati,Assam,Law 35,,nlu,nlu_assam,,CLAT,ba_llb
+nlu-jodhpur,National Law University Jodhpur,Jodhpur,Rajasthan,,,nlu,nlu_jodhpur,,CLAT,ba_llb
+hnlu,Hidayatullah National Law University,Raipur,Chhattisgarh,,,nlu,hnlu,,CLAT,ba_llb
+nuals,National University of Advanced Legal Studies,Kochi,Kerala,,,nlu,nuals,,CLAT,ba_llb
+rgnul,Rajiv Gandhi National University of Law,Patiala,Punjab,,,nlu,rgnul,,CLAT,ba_llb
+ail-mohali,Army Institute of Law,Mohali,Punjab,Law 37,,private_univ_general,,,AIL LET,ba_llb
+ils-pune,ILS Law College,Pune,Maharashtra,,,public_college,,,MAH LLB 5-year CET,ba_llb
+glc-mumbai,Government Law College Mumbai,Mumbai,Maharashtra,,,public_college,,,MAH LLB 5-year CET,ba_llb
+nid-ahmedabad,National Institute of Design Ahmedabad,Ahmedabad,Gujarat,,y,design_national,nid,,NID DAT,bdes;bfa
+nift-delhi,National Institute of Fashion Technology New Delhi,New Delhi,Delhi,,y,design_national,nift,,NIFT Entrance,bdes_fashion;bdes
+nift-mumbai,National Institute of Fashion Technology Mumbai,Mumbai,Maharashtra,,y,design_national,nift,,NIFT Entrance,bdes_fashion;bdes
+nift-bengaluru,National Institute of Fashion Technology Bengaluru,Bengaluru,Karnataka,,y,design_national,nift,,NIFT Entrance,bdes_fashion;bdes
+nift-chennai,National Institute of Fashion Technology Chennai,Chennai,Tamil Nadu,,y,design_national,nift,,NIFT Entrance,bdes_fashion;bdes
+nift-kolkata,National Institute of Fashion Technology Kolkata,Kolkata,West Bengal,,y,design_national,nift,,NIFT Entrance,bdes_fashion;bdes
+nift-hyderabad,National Institute of Fashion Technology Hyderabad,Hyderabad,Telangana,,y,design_national,nift,,NIFT Entrance,bdes_fashion;bdes
+nift-gandhinagar,National Institute of Fashion Technology Gandhinagar,Gandhinagar,Gujarat,,y,design_national,nift,,NIFT Entrance,bdes_fashion;bdes
+srishti-manipal,Srishti Manipal Institute of Art Design and Technology,Bengaluru,Karnataka,,,private_univ_general,,,Srishti admission,bdes;bfa
+mitid-pune,MIT Institute of Design,Pune,Maharashtra,,,private_univ_general,,,MIT ID admission,bdes;bfa
+sid-pune,Symbiosis Institute of Design,Pune,Maharashtra,University 24,,private_univ_general,,,SEED (Symbiosis),bdes;bdes_fashion
+pearl-academy,Pearl Academy,New Delhi,Delhi,,,private_univ_general,,,Pearl Academy entrance,bdes;bdes_fashion
+jj-art,Sir J J School of Art,Mumbai,Maharashtra,,,public_college,,,Maharashtra Art CET,bfa
+coa-delhi,College of Art Delhi,New Delhi,Delhi,,,public_college,,,College of Art entrance,bfa
+msu-fine-arts,Faculty of Fine Arts M S University of Baroda,Vadodara,Gujarat,,,public_college,,,MSU Fine Arts entrance,bfa
+kala-bhavana,Kala Bhavana Visva-Bharati,Santiniketan,West Bengal,,,public_college,,,Visva-Bharati admission test,bfa
+rie-ajmer,Regional Institute of Education Ajmer (NCERT),Ajmer,Rajasthan,,y,public_college,,,NCET,itep
+rie-bhopal,Regional Institute of Education Bhopal (NCERT),Bhopal,Madhya Pradesh,,y,public_college,,,NCET,itep
+rie-bhubaneswar,Regional Institute of Education Bhubaneswar (NCERT),Bhubaneswar,Odisha,,y,public_college,,,NCET,itep
+rie-mysuru,Regional Institute of Education Mysuru (NCERT),Mysuru,Karnataka,,y,public_college,,,NCET,itep
+lnipe-gwalior,Lakshmibai National Institute of Physical Education,Gwalior,Madhya Pradesh,,y,public_college,,,LNIPE entrance,bped
+tnpesu,Tamil Nadu Physical Education and Sports University,Chennai,Tamil Nadu,,,public_college,,,TNPESU admission,bped
+nda-khadakwasla,"National Defence Academy, Khadakwasla",Pune,Maharashtra,,,nda,nda,36000,UPSC NDA & NA Examination + SSB interview,nda

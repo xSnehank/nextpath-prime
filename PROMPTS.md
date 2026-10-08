@@ -156,3 +156,32 @@ Decisions taken in planning:
   question through with no answer key.
 - `backend/tests/test_db_consistency.py`: the database's states, roles, categories, genders, trait keys and
   domains match the backend's.
+
+### feat/stream-aware-catalog (database, backend and frontend)
+**Prompt** (plan mode): "Increase the number of professions, career paths, colleges and exams, extending to Tier 3
+colleges as well. Add at least 200 colleges and 20 different streams from Science, Commerce and Arts. Stay accurate.
+A Science PCM student should not have Commerce or Arts options like Chartered Accountant or Business Management on
+top. Everything should be properly curated, with more professions and streams such as Cybersecurity, Data Scientist,
+AI/ML, EnTC, ECE, ECM, Mathematics and Computing, Mechanical, Robotics, Instrumentation, Astronomy and Physics."
+Decisions taken in planning:
+- own-stream careers first
+- the cost is based on a typical college
+- official fees where available, else flagged as estimated
+- a "Not decided yet" stream
+
+**What it produced:**
+- `db/data/*.csv`, a curated catalog:
+  - 56 careers and 59 degree programmes, each with the regulator's eligible streams and its natural streams
+  - 355 colleges with NIRF 2025 ranks and tiers, and 2,811 routes
+  - fee sources: 68 official documents, 90 portal figures marked estimated, and the rest as flagged group medians
+- `db/scripts/build_catalog.py` validates the CSVs and generates seed 02.
+- O*NET trait weights for every career are now read from `careers.csv`, and PayScale market rows were added for the
+  43 new careers.
+- Migration 004 adds `profiles.stream`, `courses.eligible_streams` / `primary_streams` and `exams_colleges.tier`.
+- Backend:
+  - `app/core/streams.py` (step 0) and `finance.typical_option` (median college, preferring the student's state)
+  - a stream-aware ranking (own stream first)
+  - `StudentProfile.stream`, plus `stream_match`, `typical_college` and the college tier, course and city in results
+- Frontend: a stream question on onboarding, "Outside your stream" badges, and colleges grouped by tier.
+- Tests: 161 backend tests, including live checks that every stream's top 5 is its own and that a PCB student never
+  sees a career they can't enter; SQL tests for streams and tiers.

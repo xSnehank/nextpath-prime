@@ -27,7 +27,7 @@ BEGIN
     ASSERT (SELECT count(*) FROM domains) = 8, 'the app has 8 domains';
     ASSERT NOT EXISTS (SELECT 1 FROM domains d WHERE NOT EXISTS (SELECT 1 FROM careers c WHERE c.domain_id = d.id)),
            'every domain has a career';
-    ASSERT (SELECT count(*) FROM careers) = 13, '13 careers';
+    ASSERT (SELECT count(*) FROM careers) = 56, '56 careers (db/data/careers.csv)';
     ASSERT NOT EXISTS (SELECT 1 FROM careers c
                        WHERE NOT EXISTS (SELECT 1 FROM courses co WHERE co.career_id = c.id AND co.level = 'UG')),
            'every career has an undergraduate course';
@@ -40,13 +40,38 @@ BEGIN
         WHERE co.career_id = c.id AND co.level = 'UG' AND ec.annual_fee IS NOT NULL)),
            'every career has an undergraduate route with a known fee, so the solver can cost it';
     ASSERT EXISTS (SELECT 1 FROM regions WHERE name = 'India'), 'the national living cost is loaded';
-    ASSERT (SELECT count(*) FROM scholarships) = 3 AND (SELECT count(*) FROM scholarship_careers) = 23, 'scholarships';
-    ASSERT (SELECT count(*) FROM exams_colleges) = 40, '37 draft routes, 2 added routes and NDA (a mistyped course drops a row)';
-    ASSERT NOT EXISTS (SELECT 1 FROM exams_colleges WHERE source = 'Unverified draft' AND NOT estimated),
-           'unverified figures are marked estimated';
+    ASSERT (SELECT count(*) FROM scholarships) = 3 AND (SELECT count(*) FROM scholarship_careers) = 102, 'scholarships';
+
+    -- the catalog (db/data/*.csv, built by db/scripts/build_catalog.py)
+    ASSERT (SELECT count(*) FROM exams_colleges) = 2811, '2811 routes (a mistyped career or course drops rows)';
+    ASSERT (SELECT count(DISTINCT college) FROM exams_colleges) >= 200, 'at least 200 colleges';
+    ASSERT (SELECT count(DISTINCT name) FROM courses WHERE level = 'UG') >= 20, 'at least 20 degree programmes';
+    ASSERT NOT EXISTS (SELECT 1 FROM exams_colleges WHERE source = 'Unverified draft'), 'the old draft rows are gone';
+    ASSERT NOT EXISTS (SELECT 1 FROM exams_colleges WHERE tier IS NULL
+                       AND college NOT IN ('Institute of Chartered Accountants of India (ICAI)',
+                                           'Institute of Company Secretaries of India (ICSI)',
+                                           'Institute of Cost Accountants of India (ICMAI)',
+                                           'National Defence Academy, Khadakwasla')),
+           'every college has a tier; only the professional bodies and NDA have none';
+    ASSERT (SELECT count(DISTINCT tier) FROM exams_colleges) = 3, 'all three tiers are present';
+
+    -- streams: every stream has careers of its own, and the regulators' minimums hold
+    ASSERT NOT EXISTS (
+        SELECT 1 FROM unnest(ARRAY['science_pcm', 'science_pcb', 'science_pcmb', 'commerce_maths', 'commerce', 'arts']) AS s
+        WHERE (SELECT count(DISTINCT co.career_id) FROM courses co WHERE s = ANY (co.primary_streams::text[])) < 5
+    ), 'every stream has at least 5 careers of its own';
+    ASSERT NOT EXISTS (SELECT 1 FROM courses WHERE (name LIKE 'B.Tech%' OR name LIKE 'B.E.%')
+                       AND 'science_pcb' = ANY (eligible_streams::text[])),
+           'B.Tech / B.E. needs Physics and Mathematics (AICTE): PCB alone is not eligible';
+    ASSERT NOT EXISTS (SELECT 1 FROM courses WHERE name LIKE 'Bachelor of Medicine%'
+                       AND 'science_pcm' = ANY (eligible_streams::text[])),
+           'MBBS needs Biology (NMC): PCM alone is not eligible';
+    ASSERT NOT EXISTS (SELECT 1 FROM courses co JOIN careers c ON c.id = co.career_id
+                       WHERE c.name = 'Chartered Accountant (CA)' AND 'science_pcm' = ANY (co.primary_streams::text[])),
+           'CA is open to a PCM student but never one of their own-stream careers';
 END $$;
 
--- Known gaps, for fix/db-verify-college-data: careers with fewer than 3 undergraduate routes.
+-- Known gaps: careers with fewer than 3 undergraduate routes.
 DO $$
 DECLARE
     r RECORD;

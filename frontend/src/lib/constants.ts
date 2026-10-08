@@ -24,6 +24,17 @@ export const GENDERS = [
   { value: "other", label: "Other" },
 ] as const;
 
+/** Class 11-12 streams, as the API expects them; the stream decides which careers come first. */
+export const STREAMS = [
+  { value: "science_pcm", label: "Science: PCM (Physics, Chemistry, Maths)" },
+  { value: "science_pcb", label: "Science: PCB (Physics, Chemistry, Biology)" },
+  { value: "science_pcmb", label: "Science: PCMB (Physics, Chemistry, Maths, Biology)" },
+  { value: "commerce_maths", label: "Commerce with Maths" },
+  { value: "commerce", label: "Commerce without Maths" },
+  { value: "arts", label: "Arts / Humanities" },
+  { value: "undecided", label: "Not decided yet (Class 10 or below)" },
+] as const;
+
 export const RISK_LEVELS = [
   { value: 1, label: "Very safe" },
   { value: 2, label: "Safe" },
@@ -37,6 +48,8 @@ export const RISK_LEVELS = [
  * Kept here so the student's and the parent's forms explain shared fields the same way.
  */
 export const HINTS = {
+  stream:
+    "Your Class 11–12 subjects. Careers that follow your stream come first, and careers you can't enter (like B.Tech without Maths) are left out. In Class 10 or below? Pick “Not decided yet” to see every option.",
   homeState: "The state you live in now. Used only to find state scholarships you can apply for.",
   preferredState:
     "Where you'd like to study and work. If you and your parent pick different states, it shows up as a difference in the comparison.",

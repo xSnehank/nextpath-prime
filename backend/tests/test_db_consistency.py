@@ -6,18 +6,18 @@ from pathlib import Path
 from typing import Any, get_args
 
 from app.mocks import read
-from app.schemas.common import DIMENSION_GROUP, IndianState, Role
+from app.schemas.common import DIMENSION_GROUP, IndianState, Role, SchoolStream
 from app.schemas.profile import StudentProfile
 
 DB_DIR = Path(__file__).resolve().parents[2] / "db"
-MIGRATION = (DB_DIR / "migrations" / "001_init.sql").read_text(encoding="utf-8")
+MIGRATION = "\n".join(p.read_text(encoding="utf-8") for p in sorted((DB_DIR / "migrations").glob("*.sql")))
 CAREERS_SEED = (DB_DIR / "seed" / "02_careers_courses.sql").read_text(encoding="utf-8")
 
 
 def _domain_values(name: str) -> set[str]:
     """The quoted values in CREATE DOMAIN <name> AS TEXT CHECK (VALUE IN (...))."""
     match = re.search(rf"CREATE DOMAIN {name} AS TEXT CHECK \(VALUE IN \((.*?)\)\);", MIGRATION, re.DOTALL)
-    assert match, f"domain {name} not found in 001_init.sql"
+    assert match, f"domain {name} not found in db/migrations"
     return set(re.findall(r"'([^']+)'", match.group(1)))
 
 
@@ -32,6 +32,10 @@ def test_states_match_indian_state() -> None:
 
 def test_roles_match() -> None:
     assert _domain_values("user_role") == {role.value for role in Role}
+
+
+def test_streams_match() -> None:
+    assert _domain_values("school_stream") == {stream.value for stream in SchoolStream}
 
 
 def test_scholarship_fields_match_the_student_profile() -> None:

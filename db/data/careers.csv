@@ -1,0 +1,57 @@
+id,name,domain,onet,programs,education_path
+c1000000-0000-4000-8000-000000000001,Software Engineer,1,15-1252.00,btech_cse;btech_it;btech_ecm;bca,12th Science (PCM) -> B.Tech in CSE / IT / ECM or BCA -> optional M.Tech or MS
+c1000000-0000-4000-8000-000000000002,Data Scientist,1,15-2051.00,btech_cse_ds;bsc_ds;b_stat;bsc_maths_stats,12th with Mathematics -> B.Tech (Data Science) / BS Data Science / B.Stat -> optional M.Sc or M.Tech in Data Science
+,AI / ML Engineer,1,15-1221.00,btech_cse_aiml;btech_cse_ds;btech_cse,12th Science (PCM) -> B.Tech CSE (AI & ML) or CSE -> optional M.Tech / MS in AI
+,Cybersecurity Analyst,1,15-1212.00,btech_cse_cyber;btech_cse;btech_it;bca,12th Science (PCM) -> B.Tech CSE (Cyber Security) / CSE / IT -> certifications (CEH / OSCP) or M.Tech in Cyber Security
+,Electronics & Telecom Engineer,1,15-1241.01,be_entc;btech_ece,12th Science (PCM) -> B.E. EnTC or B.Tech ECE -> optional M.Tech in Communication Systems
+,VLSI / Chip Design Engineer,1,17-2061.00,btech_ece;btech_ee;btech_ecm,12th Science (PCM) -> B.Tech ECE / EE / ECM -> M.Tech in VLSI Design (most chip roles)
+,Embedded Systems Engineer,1,17-2072.00,btech_ecm;btech_ece;be_entc,12th Science (PCM) -> B.Tech ECM / ECE / EnTC -> optional M.Tech in Embedded Systems
+,Electrical Engineer,1,17-2071.00,btech_ee,12th Science (PCM) -> B.Tech Electrical Engineering -> optional M.Tech in Power Systems
+,Instrumentation & Control Engineer,1,17-2199.05,btech_ic;btech_ee,12th Science (PCM) -> B.Tech Instrumentation & Control -> optional M.Tech in Control Systems
+c1000000-0000-4000-8000-000000000003,Mechanical Engineer,1,17-2141.00,btech_mech,12th Science (PCM) -> B.Tech Mechanical Engineering -> optional M.Tech in Design / Thermal
+c1000000-0000-4000-8000-000000000004,Robotics Engineer,1,17-2199.08,btech_robotics;btech_mechatronics,12th Science (PCM) -> B.Tech Robotics & Automation / Mechatronics -> M.Tech in Robotics
+,Automobile / EV Engineer,1,17-2141.02,btech_auto;btech_mech,12th Science (PCM) -> B.Tech Automobile or Mechanical Engineering -> optional M.Tech in EV Technology
+,Aerospace Engineer,1,17-2011.00,btech_aero,12th Science (PCM) -> B.Tech Aerospace Engineering -> M.Tech / PhD for research roles
+,Civil Engineer,1,17-2051.00,btech_civil,12th Science (PCM) -> B.Tech Civil Engineering -> optional M.Tech in Structures
+,Chemical Engineer,1,17-2041.00,btech_chem,12th Science (PCM) -> B.Tech Chemical Engineering -> optional M.Tech
+,Quantitative Analyst,3,13-2099.01,btech_mnc;b_stat;bsc_maths_stats,12th with Mathematics -> B.Tech Mathematics & Computing / B.Stat / B.Sc Maths -> optional M.Stat / MFE
+,Astrophysicist / Astronomer,2,19-2011.00,bs_physics;btech_ep,12th Science (PCM) -> BS-MS or B.Sc Physics / B.Tech Engineering Physics -> M.Sc -> PhD (IUCAA / RRI / IIA / TIFR)
+,Physicist,2,19-2012.00,bs_physics;btech_ep,12th Science (PCM) -> BS-MS or B.Sc Physics / B.Tech Engineering Physics -> M.Sc -> PhD
+,Mathematician / Statistician,2,15-2041.00,bsc_maths_stats;b_stat;btech_mnc,12th with Mathematics -> B.Sc Maths / Statistics or B.Stat -> M.Sc / M.Stat -> optional PhD
+,Actuary,3,15-2011.00,bsc_actuarial;bsc_maths_stats,12th with Mathematics -> B.Sc Actuarial Science / Statistics + Institute of Actuaries of India exams
+c1000000-0000-4000-8000-000000000006,Biotechnology Researcher,2,19-1021.00,btech_biotech;bsc_biotech,12th Science (PCB / PCM) -> B.Tech or B.Sc Biotechnology -> M.Sc / M.Tech -> PhD
+,Microbiologist,2,19-1022.00,bsc_micro;bsc_biotech,12th Science (PCB) -> B.Sc Microbiology -> M.Sc Microbiology -> optional PhD
+c1000000-0000-4000-8000-000000000011,Agricultural Scientist,2,19-1013.00,bsc_agri,12th Science (PCB / PCM) -> B.Sc (Hons) Agriculture -> M.Sc -> ICAR ARS / PhD
+,Forensic Scientist,2,19-4092.00,bsc_forensic,12th Science -> B.Sc Forensic Science -> M.Sc Forensic Science
+,Environmental Scientist,2,19-2041.00,bsc_env,12th Science -> B.Sc Environmental Science -> M.Sc Environmental Science
+c1000000-0000-4000-8000-000000000005,Medical Doctor (MBBS),4,29-1215.00,mbbs,12th Science (PCB) -> NEET-UG -> MBBS (5.5 years including internship) -> MD / MS
+,Dentist,4,29-1021.00,bds,12th Science (PCB) -> NEET-UG -> BDS (5 years including internship) -> optional MDS
+,Pharmacist,4,29-1051.00,bpharm,12th Science (PCB / PCM) -> B.Pharm -> optional M.Pharm
+,Nurse,4,29-1141.00,bsc_nursing,12th Science (PCB) -> B.Sc Nursing -> optional M.Sc Nursing
+,Physiotherapist,4,29-1123.00,bpt,12th Science (PCB) -> BPT (4.5 years including internship) -> optional MPT
+,Veterinarian,4,29-1131.00,bvsc,12th Science (PCB) -> NEET-UG -> B.V.Sc & AH (5.5 years) -> optional M.V.Sc
+,AYUSH Doctor (BAMS),4,29-1299.01,bams,12th Science (PCB) -> NEET-UG -> BAMS (5.5 years including internship) -> optional MD (Ayurveda)
+,Psychologist,4,19-3033.00,ba_psych,12th any stream -> BA / B.Sc Psychology -> MA / M.Sc Psychology -> M.Phil Clinical Psychology (RCI) for clinical practice
+c1000000-0000-4000-8000-000000000007,Chartered Accountant (CA),3,13-2011.00,ca;bcom,12th Commerce (any stream allowed) -> CA Foundation -> CA Intermediate + articleship -> CA Final
+,Company Secretary,3,13-1041.00,cs;bcom,12th Commerce (any stream allowed) -> CSEET -> CS Executive -> CS Professional + training
+,Cost Accountant (CMA),3,13-2031.00,cma;bcom,12th Commerce (any stream allowed) -> CMA Foundation -> CMA Intermediate -> CMA Final + training
+c1000000-0000-4000-8000-000000000008,Investment Banker,3,41-3031.00,bcom;bba;ipm;ba_econ,12th Commerce -> B.Com / BBA / IPM / Economics -> MBA (Finance) or CFA
+,Financial Analyst,3,13-2041.00,bcom;bba;bms,12th Commerce -> B.Com / BBA / BMS -> CFA or MBA (Finance)
+,Marketing Manager,3,11-2021.00,bba;bms;ipm,12th Commerce -> BBA / BMS / IPM -> MBA (Marketing)
+,HR Manager,3,11-3121.00,bba;bms,12th Commerce -> BBA / BMS -> MBA (HR) or MA HRM
+,Business Analyst,3,13-1111.00,bba;bms;bcom;ipm,12th Commerce -> BBA / BMS / B.Com / IPM -> optional MBA
+,Economist,3,19-3011.00,ba_econ,12th (Mathematics helps) -> BA / B.Sc Economics -> MA Economics -> Indian Economic Service or PhD
+,Hospitality Manager,3,11-9081.00,bhm,12th any stream -> NCHMCT JEE -> B.Sc Hospitality & Hotel Administration -> optional MBA (Hospitality)
+c1000000-0000-4000-8000-000000000009,UX/UI Designer,5,15-1255.00,bdes,12th any stream -> NID DAT / UCEED -> B.Des (Interaction / UX) -> optional M.Des
+,Communication Designer,5,27-1024.00,bdes;bfa,12th any stream -> NID DAT / UCEED -> B.Des (Communication) or BFA -> optional M.Des
+,Fashion Designer,5,27-1022.00,bdes_fashion,12th any stream -> NIFT entrance -> B.Des Fashion Design -> optional M.Des
+,Animator / VFX Artist,5,27-1014.00,bfa;bdes,12th any stream -> B.Des (Animation) or BFA -> portfolio and studio work
+,Journalist,5,27-3023.00,ba_jmc;ba_english,12th any stream -> BA Journalism & Mass Communication / BA English -> optional PG Diploma (IIMC)
+,Architect,5,17-1011.00,b_arch,12th Science (PCM) -> NATA / JEE Main Paper 2 -> B.Arch (5 years) -> COA registration
+c1000000-0000-4000-8000-000000000012,Corporate Lawyer,6,23-1011.00,ba_llb,12th any stream -> CLAT / AILET -> BA LL.B (5 years) -> Bar Council enrolment -> optional LL.M
+,Civil Services Officer (IAS / IPS),6,11-1011.00,ba_polsci;ba_econ;ba_english,Any bachelor's degree -> UPSC Civil Services Examination (Prelims + Mains + Interview) -> LBSNAA training
+,Policy Analyst,6,19-3094.00,ba_polsci;ba_econ,12th any stream -> BA Political Science / Economics -> MA Public Policy
+c1000000-0000-4000-8000-000000000010,Educational Policy Specialist,7,25-9031.00,itep;ba_polsci,12th any stream -> ITEP (BA B.Ed) or BA -> MA Education / Public Policy
+,School Teacher,7,25-2031.00,itep,12th any stream -> NCET -> Integrated Teacher Education Programme (4 years) -> CTET / state TET
+c1000000-0000-4000-8000-000000000013,Armed Forces Officer (NDA),8,33-1012.00,nda,"12th (Physics and Maths for the Air Force and Navy wings) -> UPSC NDA & NA exam + SSB interview -> 3 years at NDA (JNU degree) -> 1 year at IMA or the Naval Academy -> commissioned officer"
+,Sports & Fitness Professional,8,27-2022.00,bped,12th any stream -> BPES / B.P.Ed -> M.P.Ed or coaching certifications (NSNIS)

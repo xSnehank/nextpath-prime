@@ -9,13 +9,33 @@ viable       = loan_needed <= max_loan and breakeven <= tolerance
 F            = 0.5 x min(1, capacity / total_cost) + 0.3 x L + 0.2 x P
   L = 1 when the loan is within the limit, else max(0, 1 - (loan_needed - max_loan) / total_cost)
   P = clamp(1 - breakeven / (2 x tolerance), 0, 1)
+
+Which path: the typical one, not the cheapest. A career has routes from top government colleges (AIIMS, about
+Rs 1,628 a year) to private ones (Rs 20+ lakh); costing the cheapest would make almost everything look free.
+The typical route is the lower median by total cost among the routes in the student's preferred state, or among
+all routes when that state has none.
 """
 
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from typing import TypeVar
 
 from app.schemas.analyze import FinanceReason
 
 EPSILON_RUPEES = 1  # stops a salary below living costs from dividing by zero
+
+T = TypeVar("T")
+
+
+def typical_option(options: Sequence[tuple[int, T]], in_preferred_state: Callable[[T], bool]) -> tuple[int, T]:
+    """The lower median of (total cost, route) options, preferring the student's state.
+
+    `options` must be sorted cheapest first with ties already broken (by college name), so the pick is stable.
+    """
+    if not options:
+        raise ValueError("a career needs at least one route to cost")
+    pool = [option for option in options if in_preferred_state(option[1])] or list(options)
+    return pool[(len(pool) - 1) // 2]
 
 
 def total_cost(annual_fee: int, annual_living_cost: int, duration_years: float, scholarship: int = 0) -> int:
