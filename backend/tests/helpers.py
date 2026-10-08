@@ -32,6 +32,7 @@ PARENT_PROFILE = {
 }
 STUDENT_PROFILE = {
     "role": "student",
+    "stream": "undecided",  # every career stays in play; test_live_streams.py covers the stream rule
     "risk_appetite": 4,
     "preferred_state": "Karnataka",
     "open_to_abroad": True,

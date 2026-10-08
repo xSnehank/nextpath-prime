@@ -11,7 +11,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Liveness and database check */
+        /**
+         * Liveness and database check
+         * @description Always 200 while the app runs; "database" says whether the database answered (skipped in mock mode).
+         */
         get: operations["health_health_get"];
         put?: never;
         post?: never;
@@ -30,7 +33,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Student creates an invite code for their parent */
+        /**
+         * Student creates an invite code for their parent
+         * @description A new code replaces the student's previous one.
+         */
         post: operations["create_invite_auth_invite_post"];
         delete?: never;
         options?: never;
@@ -172,8 +178,8 @@ export interface paths {
         put?: never;
         /**
          * Run the whole pipeline for a linked pair and return the roadmap
-         * @description Mock mode returns the saved demo result. Custom weights are validated
-         *     but only change the ranking once feat/be-E1-E2-roadmap-endpoint lands.
+         * @description Needs both assessments finished (409 ASSESSMENT_INCOMPLETE) and both consents (409 CONSENT_REQUIRED).
+         *     Mock mode returns the saved demo result.
          */
         post: operations["analyze_analyze_post"];
         delete?: never;
@@ -189,7 +195,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** A saved roadmap */
+        /**
+         * A saved roadmap (the demo family's needs no sign-in while DEMO_ENABLED=true)
+         * @description Only for the linked pair, and only while both still agree to the comparison (409 CONSENT_REQUIRED).
+         */
         get: operations["get_result_results__result_id__get"];
         put?: never;
         post?: never;
@@ -208,7 +217,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Plain-language explanation of one career in a result */
+        /**
+         * Plain-language explanation of one career in a result
+         * @description Cached Gemini text, fresh Gemini text, or the template, in that order (source says which).
+         */
         post: operations["explain_explain_post"];
         delete?: never;
         options?: never;
@@ -223,7 +235,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Demand and salary by region for one career */
+        /** Demand and salary by region for one career (public reference data; no sign-in needed) */
         get: operations["career_market_careers__career_id__market_get"];
         put?: never;
         post?: never;
@@ -242,7 +254,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Load the demo family and return its result id (only when DEMO_ENABLED=true; no login) */
+        /**
+         * Load the demo family and return its result id (only when DEMO_ENABLED=true; no login)
+         * @description Runs the full analysis for the seeded demo family with the default weights.
+         */
         post: operations["run_demo_demo_run_post"];
         delete?: never;
         options?: never;
@@ -318,13 +333,16 @@ export interface components {
             question_id: string;
             /**
              * Value
-             * @description 1 = strongly disagree ... 5 = strongly agree
+             * @description likert: 1 = strongly disagree ... 5 = strongly agree; choice: the picked option's value (1-4 = A-D)
              */
             value: number;
         };
         /** AnswerOption */
         AnswerOption: {
-            /** Value */
+            /**
+             * Value
+             * @description likert: 1-5; choice: 1-4 for options A-D
+             */
             value: number;
             /** Label */
             label: string;
@@ -353,6 +371,21 @@ export interface components {
              * @description Whole rupees
              */
             annual_fee: number;
+            /**
+             * Course
+             * @description The degree programme at this college, e.g. 'B.Tech Mechanical Engineering'
+             * @default
+             */
+            course: string;
+            /**
+             * Tier
+             * @description 1-3 by NIRF; null for routes that aren't colleges (CA, NDA)
+             */
+            tier?: number | null;
+            /** City */
+            city?: string | null;
+            /** State */
+            state?: string | null;
         };
         /** Conflict */
         Conflict: {
@@ -475,9 +508,14 @@ export interface components {
             exams: string[];
             /**
              * Colleges
-             * @description The finance check uses the first college
+             * @description Up to 12 colleges the student can enter: the best 4 of each tier by NIRF rank, then fee
              */
             colleges: components["schemas"]["College"][];
+            /**
+             * Typical College
+             * @description The college the finance check is based on: the median-fee one, preferring the student's state
+             */
+            typical_college?: string | null;
         };
         /**
          * ErrorBody
@@ -826,7 +864,7 @@ export interface components {
         };
         /**
          * PartnerStatus
-         * @description Only status flags about the linked partner; never their answers.
+         * @description The linked partner's name and status flags; never their answers.
          */
         PartnerStatus: {
             role: components["schemas"]["Role"];
@@ -859,7 +897,7 @@ export interface components {
         };
         /**
          * Question
-         * @description One 1-5 statement. Whether it is reverse-scored stays on the server.
+         * @description One question. Whether a statement is reverse-scored, and which option is correct, stay on the server.
          */
         Question: {
             /**
@@ -986,12 +1024,25 @@ export interface components {
             scholarships: components["schemas"]["MatchedScholarship"][];
             /** Cheaper Alternative */
             cheaper_alternative: string | null;
+            /**
+             * Stream Match
+             * @description natural: follows the student's Class 11-12 stream; open: they may enter it, but it's another stream's usual route (these always rank below the natural ones)
+             * @default natural
+             * @enum {string}
+             */
+            stream_match: "natural" | "open";
         };
         /**
          * Role
          * @enum {string}
          */
         Role: "student" | "parent";
+        /**
+         * SchoolStream
+         * @description The student's Class 11-12 stream; decides which careers are open and which come first (guide, step 0).
+         * @enum {string}
+         */
+        SchoolStream: "science_pcm" | "science_pcb" | "science_pcmb" | "commerce_maths" | "commerce" | "arts" | "undecided";
         /** Scores */
         Scores: {
             /**
@@ -1030,6 +1081,8 @@ export interface components {
              * @enum {string}
              */
             role: "student";
+            /** @description Class 11-12 stream; decides which careers are open and which come first. 'undecided' (Class 10 or earlier) keeps every career */
+            stream: components["schemas"]["SchoolStream"];
             /**
              * Risk Appetite
              * @description 1 = avoids risk ... 5 = very comfortable with risk
@@ -1141,7 +1194,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorBody"];
                 };
             };
-            /** @description UPSTREAM_UNAVAILABLE: the database cannot be reached */
+            /** @description UPSTREAM_UNAVAILABLE: the database or the sign-in service cannot be reached */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -1669,6 +1722,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorBody"];
                 };
             };
+            /** @description UPSTREAM_UNAVAILABLE: the database or the sign-in service cannot be reached */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
         };
     };
     get_result_results__result_id__get: {
@@ -1700,8 +1762,8 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorBody"];
                 };
             };
-            /** @description FORBIDDEN: signed in, but not allowed to do this */
-            403: {
+            /** @description NOT_FOUND */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1709,8 +1771,8 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorBody"];
                 };
             };
-            /** @description NOT_FOUND */
-            404: {
+            /** @description ASSESSMENT_INCOMPLETE or CONSENT_REQUIRED */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1769,8 +1831,8 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorBody"];
                 };
             };
-            /** @description FORBIDDEN: signed in, but not allowed to do this */
-            403: {
+            /** @description NOT_FOUND */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1778,8 +1840,8 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorBody"];
                 };
             };
-            /** @description NOT_FOUND */
-            404: {
+            /** @description ASSESSMENT_INCOMPLETE or CONSENT_REQUIRED */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1825,15 +1887,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CareerMarket"];
-                };
-            };
-            /** @description UNAUTHENTICATED: missing or invalid access token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorBody"];
                 };
             };
             /** @description NOT_FOUND */
@@ -1894,6 +1947,15 @@ export interface operations {
             };
             /** @description INTERNAL_ERROR: a bug on our side; quote the X-Request-ID header */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description UPSTREAM_UNAVAILABLE: the database or the sign-in service cannot be reached */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

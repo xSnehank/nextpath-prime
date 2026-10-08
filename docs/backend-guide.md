@@ -10,6 +10,16 @@ Sections 4 to 6 of the "PRISM Backend Guide (Claude Code, Opus 5.5)", 7 October 
 
 This is the part judges care about, so each function below is deterministic, explainable and unit-tested. Weights marked *default* are my starting values; they are not from the problem statement, so tell Eklavya the final ones.
 
+**Step 0: The student's stream decides which careers are open and which come first**
+
+The student picks their Class 11-12 stream: `science_pcm`, `science_pcb`, `science_pcmb`, `commerce_maths`, `commerce`, `arts`, or `undecided` (Class 10 or earlier). Every course lists the streams that may enter it (the regulator's minimum: B.Tech needs Physics and Mathematics under AICTE, MBBS needs Biology under NMC, CA is open to every stream under ICAI) and the streams it naturally follows (B.Com follows Commerce). For a student, a course is
+
+- **natural** when it follows their stream (B.Tech for PCM),
+- **open** when they may enter it but it is another stream's route (CA for PCM),
+- **closed** when they can't enter it (B.Tech for PCB).
+
+An `undecided` student counts as natural for every course. A career's match is the best over its courses. Closed careers are left out entirely; a career is costed and listed only with the courses of its best match. In the ranking (step 5), natural careers always come before open ones. The rules and sources per programme are in `db/data/programs.csv`.
+
 **Step 1: Normalize answers**
 
 Every question has a dimension and a kind. A `likert` question is a statement answered 1–5. Per dimension, take the mean and scale to 0–1.
@@ -54,6 +64,8 @@ The 0.5 / 0.3 / 0.2 split is a *default*. Domain score is the mean of its career
 \text{net\_salary} = \max(\text{starting\_salary} - 12 \times \text{monthly\_living}, \varepsilon), \quad \text{breakeven} = \text{total\_cost} / \text{net\_salary}
 ```
 
+Which college path: the **typical** one, not the cheapest. A career's routes run from top government colleges (AIIMS: about Rs 1,628 a year) to private ones (Rs 20+ lakh a year), so the cheapest would make almost every career look free. The typical route is the lower median by total cost among the student's routes in their preferred state, or among all their routes when that state has none (`typical_college` in the response). The response lists up to 4 colleges of each NIRF tier.
+
 A path is **viable** only if `loan_needed <= max_loan` and `breakeven <= breakeven_tolerance_years`. Every failed path returns its reasons (for example `LOAN_EXCEEDS_LIMIT`) and the cheapest viable alternative in the same domain, if one exists. Scholarships reduce cost only if the family matches the eligibility rules.
 
 Financial viability score (0–1), used in ranking:
@@ -78,7 +90,7 @@ M_d = 0.5\,\text{demand} + 0.3\,\text{growth} + 0.2\,\text{salary\_percentile}
 R_d = \alpha S_d + \beta F_d + \gamma M_d, \quad \alpha + \beta + \gamma = 1
 ```
 
-Default α = 0.45, β = 0.30, γ = 0.25 (from the PRD). The request can override them (the what-if sliders) but they must sum to 1, otherwise return a 422 error. Only viable paths enter the top 5; if fewer than 5 are viable, fill from non-viable ones marked `viable: false` with reasons. Ties break on higher S, then higher M, then career id, so results never flip between runs.
+Default α = 0.45, β = 0.30, γ = 0.25 (from the PRD). The request can override them (the what-if sliders) but they must sum to 1, otherwise return a 422 error. The order is: the student's own-stream careers that are viable, then own-stream ones that aren't (marked `viable: false` with reasons), then open careers that are viable, then open ones that aren't (step 0); the top 5 are shown, each with `stream_match`. So a PCM student never sees CA above an engineering career. Within each group, higher R first; ties break on higher S, then higher M, then career id, so results never flip between runs.
 
 **Step 6: Parent-Student Conflict Index**
 

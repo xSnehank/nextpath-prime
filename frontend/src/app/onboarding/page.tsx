@@ -8,8 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Field, RiskPicker, StateSelect, YesNo, fieldErrorMap } from "@/components/ChoiceFields";
 import { Notice, PageShell, selectClass } from "@/components/PageShell";
 import { api, ApiError } from "@/lib/api";
-import { CATEGORIES, GENDERS, HINTS } from "@/lib/constants";
-import type { IndianState, StudentProfile } from "@/types/api";
+import { CATEGORIES, GENDERS, HINTS, STREAMS } from "@/lib/constants";
+import type { IndianState, SchoolStream, StudentProfile } from "@/types/api";
 
 type Category = (typeof CATEGORIES)[number]["value"];
 type Gender = (typeof GENDERS)[number]["value"];
@@ -17,6 +17,7 @@ type Gender = (typeof GENDERS)[number]["value"];
 /** The student's choices (PUT /profile), asked once after sign-up and before the assessment. */
 export default function OnboardingPage() {
   const router = useRouter();
+  const [stream, setStream] = React.useState<SchoolStream | "">("");
   const [homeState, setHomeState] = React.useState<IndianState | "">("");
   const [preferredState, setPreferredState] = React.useState<IndianState | "">("");
   const [risk, setRisk] = React.useState<number | null>(null);
@@ -45,16 +46,17 @@ export default function OnboardingPage() {
     };
   }, [router]);
 
-  const ready = Boolean(homeState && preferredState && risk !== null && abroad !== null);
+  const ready = Boolean(stream && homeState && preferredState && risk !== null && abroad !== null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!ready) return setError("Please answer the four questions above the optional section.");
+    if (!ready) return setError("Please answer the five questions above the optional section.");
     setSaving(true);
     setError("");
     setFieldErrors({});
     const profile: StudentProfile = {
       role: "student",
+      stream: stream as SchoolStream,
       home_state: homeState as IndianState,
       preferred_state: preferredState as IndianState,
       risk_appetite: risk as number,
@@ -84,6 +86,17 @@ export default function OnboardingPage() {
     <PageShell title="A few quick choices" subtitle="Hover over a label to see what it's used for." width="md">
       <form onSubmit={handleSubmit} className="space-y-5">
         {error && <Notice>{error}</Notice>}
+
+        <Field id="stream" label="Your Class 11–12 stream" hint={HINTS.stream} error={fieldErrors.stream}>
+          <select id="stream" value={stream} onChange={(e) => setStream(e.target.value as SchoolStream | "")} className={selectClass}>
+            <option value="">Select your stream</option>
+            {STREAMS.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </Field>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <Field id="home_state" label="Home state" hint={HINTS.homeState} error={fieldErrors.home_state}>

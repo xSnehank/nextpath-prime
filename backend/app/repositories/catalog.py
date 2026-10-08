@@ -46,7 +46,9 @@ def list_routes(conn: Connection) -> list[Row]:
             text(
                 """
                 SELECT co.career_id, co.name AS course, co.level, co.duration_years, ec.exam, ec.college, ec.state,
-                       ec.annual_fee, ec.annual_living_cost, ec.estimated
+                       ec.annual_fee, ec.annual_living_cost, ec.estimated, ec.city, ec.rank, ec.tier,
+                       -- psycopg doesn't know arrays of our domain types and would return the text '{...}'
+                       co.eligible_streams::text[] AS eligible_streams, co.primary_streams::text[] AS primary_streams
                 FROM exams_colleges ec JOIN courses co ON co.id = ec.course_id
                 ORDER BY co.career_id, co.level DESC, ec.college
                 """

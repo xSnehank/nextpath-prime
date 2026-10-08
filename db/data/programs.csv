@@ -1,0 +1,60 @@
+key,name,level,duration_years,eligible_streams,primary_streams,eligibility_rule,eligibility_source
+btech_cse,B.Tech Computer Science & Engineering,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_cse_aiml,B.Tech CSE (Artificial Intelligence & Machine Learning),UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_cse_ds,B.Tech CSE (Data Science) / AI & Data Science,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_cse_cyber,B.Tech CSE (Cyber Security),UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_it,B.Tech Information Technology,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_ece,B.Tech Electronics & Communication Engineering (ECE),UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+be_entc,B.E./B.Tech Electronics & Telecommunication Engineering (EnTC),UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_ecm,B.Tech Electronics & Computer Engineering (ECM),UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_ee,B.Tech Electrical (and Electronics) Engineering,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_ic,B.Tech Instrumentation & Control Engineering,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_mech,B.Tech Mechanical Engineering,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_robotics,B.Tech Robotics & Automation,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_mechatronics,B.Tech Mechatronics Engineering,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_auto,B.Tech Automobile Engineering,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_aero,B.Tech Aerospace / Aeronautical Engineering,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_civil,B.Tech Civil Engineering,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_chem,B.Tech Chemical Engineering,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_mnc,B.Tech Mathematics & Computing,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_ep,B.Tech Engineering Physics,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus one more science or technical subject,AICTE Approval Process Handbook 2024-27
+btech_biotech,B.Tech Biotechnology,UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 plus Chemistry or Biology or Biotechnology,AICTE Approval Process Handbook 2024-27
+b_arch,Bachelor of Architecture (B.Arch),UG,5,SCI_M,SCI_M,"Physics, Chemistry and Mathematics in Class 12, plus NATA or JEE Main Paper 2",Council of Architecture (COA) Minimum Standards of Architectural Education
+bs_physics,BS-MS / B.Sc (Hons) Physics (route to Astronomy & Astrophysics),UG,4,SCI_M,SCI_M,Physics and Mathematics in Class 12 (IISER and university norms),IISER Aptitude Test and university admission norms
+bsc_maths_stats,B.Sc (Hons) Mathematics / Statistics,UG,3,MATHS,science_pcm;science_pcmb;commerce_maths,Mathematics in Class 12,UGC / university admission norms (e.g. Delhi University CSAS)
+b_stat,B.Stat (Hons) / B.Math (Hons),UG,3,MATHS,science_pcm;science_pcmb,Mathematics and English in Class 12,Indian Statistical Institute admission norms
+bsc_ds,B.Sc / BS Data Science,UG,4,MATHS,science_pcm;science_pcmb;commerce_maths,Mathematics and English in Class 12,IIT Madras BS Degree admission norms
+bca,Bachelor of Computer Applications (BCA),UG,3,MATHS,science_pcm;science_pcmb;commerce_maths,"Mathematics (or Computer Science) in Class 12 at most universities, e.g. Christ University",University admission norms
+bsc_biotech,B.Sc Biotechnology,UG,3,SCI_ANY,SCI_B,"Physics, Chemistry and Biology or Mathematics in Class 12",UGC / university admission norms
+bsc_micro,B.Sc Microbiology,UG,3,SCI_B,SCI_B,"Physics, Chemistry and Biology in Class 12",UGC / university admission norms
+bsc_agri,B.Sc (Hons) Agriculture,UG,4,SCI_ANY,SCI_B,"Physics, Chemistry and Biology or Mathematics (or Agriculture) in Class 12",ICAR AIEEA (UG) through CUET-ICAR eligibility
+bsc_forensic,B.Sc Forensic Science,UG,3,SCI_ANY,SCI_ANY,Science stream in Class 12,National Forensic Sciences University admission norms
+bsc_env,B.Sc Environmental Science,UG,3,SCI_ANY,SCI_ANY,Science stream in Class 12,UGC / university admission norms
+bsc_actuarial,B.Sc Actuarial Science,UG,3,MATHS,commerce_maths;science_pcm;science_pcmb,Mathematics in Class 12; the Institute of Actuaries of India exams run alongside,Institute of Actuaries of India (ACET) and university norms
+mbbs,Bachelor of Medicine and Bachelor of Surgery (MBBS),UG,5.5,SCI_B,SCI_B,"Physics, Chemistry, Biology and English in Class 12, plus NEET-UG",National Medical Commission (NMC) Graduate Medical Education Regulations
+bds,Bachelor of Dental Surgery (BDS),UG,5,SCI_B,SCI_B,"Physics, Chemistry, Biology and English in Class 12, plus NEET-UG",Dental Council of India (DCI) BDS Regulations
+bams,Bachelor of Ayurvedic Medicine and Surgery (BAMS),UG,5.5,SCI_B,SCI_B,"Physics, Chemistry and Biology in Class 12, plus NEET-UG",National Commission for Indian System of Medicine (NCISM)
+bpharm,Bachelor of Pharmacy (B.Pharm),UG,4,SCI_ANY,SCI_ANY,"Physics, Chemistry and Mathematics or Biology in Class 12",Pharmacy Council of India (PCI) Education Regulations 2014
+bsc_nursing,B.Sc Nursing,UG,4,SCI_B,SCI_B,"Physics, Chemistry, Biology and English in Class 12",Indian Nursing Council (INC) B.Sc Nursing Regulations
+bpt,Bachelor of Physiotherapy (BPT),UG,4.5,SCI_B,SCI_B,"Physics, Chemistry and Biology in Class 12",National Commission for Allied and Healthcare Professions / university norms
+bvsc,B.V.Sc & Animal Husbandry,UG,5.5,SCI_B,SCI_B,"Physics, Chemistry, Biology and English in Class 12, plus NEET-UG",Veterinary Council of India (VCI) MSVE Regulations
+ba_psych,BA / B.Sc (Hons) Psychology,UG,3,ALL,arts;science_pcb;science_pcmb,Any stream in Class 12,UGC / university admission norms
+bcom,B.Com (Hons),UG,3,ALL,commerce;commerce_maths,Any stream in Class 12 (some universities such as DU require Mathematics),UGC / university admission norms
+bba,Bachelor of Business Administration (BBA),UG,3,ALL,commerce;commerce_maths,Any stream in Class 12,UGC / university admission norms
+bms,Bachelor of Management Studies (BMS),UG,3,ALL,commerce;commerce_maths,Any stream in Class 12,UGC / university admission norms
+ipm,Integrated Programme in Management (BBA + MBA),UG,5,ALL,commerce;commerce_maths,Any stream in Class 12 plus IPMAT or JIPMAT,IIM Indore / IIM Rohtak IPM admission norms
+ca,Chartered Accountancy (Foundation to Final),UG,4.5,ALL,commerce;commerce_maths,Any stream after Class 12 (Foundation route),Institute of Chartered Accountants of India (ICAI)
+cs,Company Secretary (CSEET to Professional),UG,3,ALL,commerce;commerce_maths,Any stream after Class 12 (CSEET route),Institute of Company Secretaries of India (ICSI)
+cma,Cost and Management Accountancy (Foundation to Final),UG,3.5,ALL,commerce;commerce_maths,Any stream after Class 12 (Foundation route),Institute of Cost Accountants of India (ICMAI)
+bhm,B.Sc Hospitality and Hotel Administration,UG,3,ALL,commerce;commerce_maths;arts,Any stream in Class 12 with English,NCHMCT JEE eligibility (National Council for Hotel Management)
+ba_econ,BA / B.Sc (Hons) Economics,UG,3,ALL,arts;commerce;commerce_maths,Any stream in Class 12 (DU and some top colleges require Mathematics),UGC / university admission norms
+ba_polsci,BA (Hons) Political Science / History,UG,3,ALL,arts,Any stream in Class 12,UGC / university admission norms
+ba_english,BA (Hons) English,UG,3,ALL,arts,Any stream in Class 12,UGC / university admission norms
+ba_jmc,BA Journalism & Mass Communication,UG,3,ALL,arts,Any stream in Class 12,UGC / university admission norms
+ba_llb,BA LL.B (Hons) five-year integrated,UG,5,ALL,arts;commerce;commerce_maths,Any stream in Class 12 (45% or more) plus CLAT / AILET / university test,Bar Council of India Legal Education Rules 2008
+bdes,B.Des (Communication / Interaction / UX Design),UG,4,ALL,arts,Any stream in Class 12 plus NID DAT / UCEED,NID DAT and UCEED eligibility
+bdes_fashion,B.Des Fashion Design,UG,4,ALL,arts,Any stream in Class 12 plus the NIFT entrance,NIFT admission prospectus
+bfa,BFA / B.Des Animation and Fine Arts,UG,4,ALL,arts,Any stream in Class 12,UGC / university admission norms
+itep,Integrated Teacher Education Programme (BA / B.Sc / B.Com B.Ed),UG,4,ALL,ALL,Any stream in Class 12 plus NCET,NCTE ITEP regulations and NTA NCET
+bped,Bachelor of Physical Education and Sports (BPES / B.P.Ed),UG,3,ALL,ALL,Any stream in Class 12 with sports participation,LNIPE admission norms
+nda,NDA training (3 years) and service academy (1 year),UG,4,ALL,ALL,Army wing: any stream; Air Force and Navy wings: Physics and Mathematics in Class 12,UPSC NDA & NA Examination (II) 2026 notice
