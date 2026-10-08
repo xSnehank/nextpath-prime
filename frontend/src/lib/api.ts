@@ -216,8 +216,10 @@ export function adaptBackendAnalyzeResponse(
 
     const colleges = (item.path.colleges || []).map((col) => ({
       name: col.name,
-      location: undefined,
+      location: [col.city, col.state].filter(Boolean).join(", ") || undefined,
       annualFee: col.annual_fee,
+      course: col.course || undefined,
+      tier: col.tier ?? null,
     }));
 
     const scholarships = (item.scholarships || []).map((sch) => ({
@@ -260,6 +262,8 @@ export function adaptBackendAnalyzeResponse(
       scholarships,
       timeline: item.path.education,
       cheaperAlternative: item.cheaper_alternative,
+      streamMatch: item.stream_match ?? "natural",
+      typicalCollege: item.path.typical_college ?? null,
     };
   });
 

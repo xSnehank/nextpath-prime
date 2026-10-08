@@ -275,9 +275,14 @@
         "colleges": [
           {
             "name": "Sample Institute of Technology, Bengaluru",
-            "annual_fee": 250000
+            "annual_fee": 250000,
+            "course": "B.Tech CSE (Data Science) / AI & Data Science",
+            "tier": 2,
+            "city": "Bengaluru",
+            "state": "Karnataka"
           }
-        ]
+        ],
+        "typical_college": "Sample Institute of Technology, Bengaluru"
       },
       "scholarships": [
         {
@@ -287,7 +292,8 @@
           "matched_rule": "percentage >= 85"
         }
       ],
-      "cheaper_alternative": null
+      "cheaper_alternative": null,
+      "stream_match": "natural"
     },
     {
       "rank": 2,
@@ -345,9 +351,14 @@
         "colleges": [
           {
             "name": "Sample Government Engineering College, Pune",
-            "annual_fee": 100000
+            "annual_fee": 100000,
+            "course": "B.Tech Computer Science & Engineering",
+            "tier": 3,
+            "city": "Pune",
+            "state": "Maharashtra"
           }
-        ]
+        ],
+        "typical_college": "Sample Government Engineering College, Pune"
       },
       "scholarships": [
         {
@@ -357,7 +368,8 @@
           "matched_rule": "home_state = Maharashtra"
         }
       ],
-      "cheaper_alternative": null
+      "cheaper_alternative": null,
+      "stream_match": "natural"
     },
     {
       "rank": 3,
@@ -415,12 +427,18 @@
         "colleges": [
           {
             "name": "Sample School of Design, Bengaluru",
-            "annual_fee": 300000
+            "annual_fee": 300000,
+            "course": "B.Des (Communication / Interaction / UX Design)",
+            "tier": 2,
+            "city": "Bengaluru",
+            "state": "Karnataka"
           }
-        ]
+        ],
+        "typical_college": "Sample School of Design, Bengaluru"
       },
       "scholarships": [],
-      "cheaper_alternative": null
+      "cheaper_alternative": null,
+      "stream_match": "natural"
     },
     {
       "rank": 4,
@@ -478,12 +496,18 @@
         "colleges": [
           {
             "name": "Sample Institute of Biosciences, Pune",
-            "annual_fee": 180000
+            "annual_fee": 180000,
+            "course": "B.Sc Biotechnology",
+            "tier": 3,
+            "city": "Pune",
+            "state": "Maharashtra"
           }
-        ]
+        ],
+        "typical_college": "Sample Institute of Biosciences, Pune"
       },
       "scholarships": [],
-      "cheaper_alternative": null
+      "cheaper_alternative": null,
+      "stream_match": "natural"
     },
     {
       "rank": 5,
@@ -543,12 +567,18 @@
         "colleges": [
           {
             "name": "Sample School of Architecture, Mumbai",
-            "annual_fee": 280000
+            "annual_fee": 280000,
+            "course": "Bachelor of Architecture (B.Arch)",
+            "tier": 2,
+            "city": "Mumbai",
+            "state": "Maharashtra"
           }
-        ]
+        ],
+        "typical_college": "Sample School of Architecture, Mumbai"
       },
       "scholarships": [],
-      "cheaper_alternative": "Product Design (UX)"
+      "cheaper_alternative": "Product Design (UX)",
+      "stream_match": "natural"
     }
   ],
   "rejected": [

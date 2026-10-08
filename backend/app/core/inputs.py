@@ -28,6 +28,13 @@ class Route:
     annual_fee: int | None
     annual_living_cost: int | None  # hostel and mess; None = use the college's state average
     state: str | None
+    # Class 11-12 streams that may enter the course, and the ones it naturally follows (step 0)
+    eligible_streams: tuple[str, ...] = ()
+    primary_streams: tuple[str, ...] = ()
+    tier: int | None = None  # 1-3 by NIRF; None for routes that aren't colleges (CA, NDA)
+    city: str | None = None
+    rank: int | None = None  # NIRF rank (lower bound of a band)
+    course: str = ""
 
 
 @dataclass(frozen=True)
@@ -65,6 +72,7 @@ class Student:
     category: str | None = None
     percentage: float | None = None
     gender: str | None = None
+    stream: str = "undecided"  # Class 11-12 stream (SchoolStream); undecided keeps every career
 
 
 @dataclass(frozen=True)

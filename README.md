@@ -19,7 +19,8 @@ job market are rarely looked at together. When the student and parents disagree,
 
 ## How it works
 
-1. **Student:** creates an account, picks a few preferences, and answers a 33-question assessment: 23 statements
+1. **Student:** creates an account, picks their Class 11–12 stream (PCM, PCB, PCMB, Commerce with or without
+   Maths, Arts, or "not decided yet") and a few preferences, and answers a 33-question assessment: 23 statements
    on a 1–5 scale and 10 graded aptitude questions, covering 13 traits.
 2. **Parent:** joins with the student's invite code and enters the budget, savings, the largest acceptable loan,
    how many years they can wait to recover the cost, and their top 3 career areas.
@@ -43,13 +44,23 @@ no AI in the ranking.
 | Finance `F` | 0.5 × min(1, capacity / cost) + 0.3 × loan-within-limit + 0.2 × payback-within-tolerance | 0.30 |
 | Market `M` | 0.5 × demand + 0.3 × growth + 0.2 × salary percentile (min–max scaled) | 0.25 |
 
-**Ranking:** `R = 0.45·S + 0.30·F + 0.25·M`.
+**Stream first (step 0):** every degree programme lists the Class 11–12 streams its regulator allows (B.Tech needs
+Physics and Maths under AICTE, MBBS needs Biology under NMC, CA is open to all under ICAI) and the stream it
+naturally follows.
+- Careers the student can't enter are left out: a PCB student never sees a B.Tech-only career.
+- Careers of their own stream always rank above careers that are merely open to them, so a PCM student never gets
+  CA or BBA above an engineering career. Those show an "Outside your stream" badge if they appear at all.
+- "Not decided yet" keeps every career, for Class 10 students choosing a stream.
+
+**Ranking:** `R = 0.45·S + 0.30·F + 0.25·M` within those groups.
 - The weights must add up to 1; the "Adjust priorities" sliders change them live.
 - A career is **affordable** only if the loan needed fits the family's limit and the payback time fits their
-  tolerance. Otherwise the reason is shown, along with a cheaper option in the same area.
+  tolerance. Otherwise the reason is shown, along with a cheaper option in the same area and stream.
 
 **Finance:**
-- cost = (annual fee + annual living cost) × years − matched scholarships
+- cost = (annual fee + annual living cost) × years − matched scholarships, at a **typical college**: the median-fee
+  college the student can enter, preferring their chosen state (not the cheapest, which would make most careers
+  look almost free)
 - capacity = yearly budget × years + savings
 - payback = cost ÷ (starting salary − living cost)
 
@@ -68,17 +79,30 @@ fallback. Gemini never changes a score.
 
 ## Data
 
-The live database (Supabase, PostgreSQL) holds:
-- 8 career areas and 13 careers, with 28 degree routes
-- 40 exam and college rows covering 29 entrance exams
-- 3 government and foundation scholarships with official sources
-- market data for every career
+The catalog is curated in readable CSV files ([`db/data/`](db/data)) and turned into SQL by
+[`db/scripts/build_catalog.py`](db/scripts/build_catalog.py), which checks every rule first. It holds:
+- **56 careers** in 8 areas, among them AI/ML, Cybersecurity, Data Science, VLSI, Embedded Systems, Electronics &
+  Telecom, Instrumentation, Robotics, Aerospace, Astrophysics, Physics, Actuarial Science, Medicine, Law, Design,
+  Journalism, Civil Services and Teaching
+- **59 degree programmes** across Science, Commerce and Arts, including CSE (AI & ML / Data Science / Cyber Security),
+  ECE, EnTC, ECM, Electrical, Instrumentation & Control, Mechanical, Robotics, Mathematics & Computing,
+  Engineering Physics, BS-MS Physics, MBBS, BDS, B.Pharm, B.Com, BBA, IPM, CA, CS, CMA, BA LL.B, B.Des and more,
+  each with its eligible and natural streams and the regulator's rule
+- **355 colleges in 3 tiers** (144 Tier 1, 144 Tier 2, 63 Tier 3; tiers from NIRF 2025), in **2,811**
+  career → programme → college routes with the entrance exam for each
+- 3 government and foundation scholarships with official sources, and market data for every career
 
 Every figure stores its source and date, or is marked `estimated`. **Honest limitations:**
-- Market data is national, not per state. It combines PayScale India salaries, the ManpowerGroup Employment
-  Outlook (Q4 2026) and Naukri JobSpeak (Aug 2026), and is marked estimated.
-- Most college fees are estimates waiting for official fee notices.
-- Living cost uses a national per-capita average, so payback times can look optimistic.
+- **College fees.**
+  - 68 colleges have a fee from an official document: the IIT and NIT tuition notices, KEA, IIM Indore, NCHMCT,
+    IISc, CMI and others.
+  - 90 more use a figure reported by an education portal, marked estimated.
+  - The other 197 use the median of the sourced fees of similar colleges (same type), marked estimated, and their
+    source says so.
+- **Market data** is national, not per state. It combines PayScale India salaries, the ManpowerGroup Employment
+  Outlook (Q4 2026) and Naukri JobSpeak (Aug 2026), and is marked estimated. A few careers use the closest
+  PayScale page; each says which.
+- **Living cost** uses a national per-capita average, so payback times can look optimistic.
 
 ## Architecture
 
@@ -135,14 +159,16 @@ Secrets live only in Vercel and in local `.env` files, never in git.
 
 ## Tests
 
-- **Backend:** `cd backend && .venv/Scripts/python -m pytest -q`. 135 tests cover:
+- **Backend:** `cd backend && .venv/Scripts/python -m pytest -q`. 161 tests cover:
   - every scoring formula, with the arithmetic worked by hand
+  - the stream rule: every stream's top 5 is its own, and no student sees a career they can't enter
   - the error format
   - the API contract
   - the mock data
   - the database enums
   - live end-to-end runs
-- **Database:** SQL checks for constraints, RLS, auth triggers and seeds (`db/tests/`, run by `db/scripts/check_db.py`).
+- **Database:** SQL checks for constraints, RLS, auth triggers, streams, tiers and seeds (`db/tests/`, run by
+  `db/scripts/check_db.py`); `db/scripts/build_catalog.py` validates the catalog CSVs.
 - **Frontend:** `npx tsc --noEmit`, `npx eslint src`, `npm run build`.
 
 ## Team

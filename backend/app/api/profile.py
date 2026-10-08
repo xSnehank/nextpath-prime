@@ -39,6 +39,7 @@ def read_profile(user: CurrentUserDep, settings: SettingsDep, conn: ConnDep) -> 
         raise AppError(ErrorCode.NOT_FOUND, "You haven't saved your profile yet.")
     return StudentProfile(
         role=Role.STUDENT,
+        stream=row.stream,
         risk_appetite=row.risk_appetite,
         preferred_state=row.preferred_state,
         open_to_abroad=row.open_to_abroad,

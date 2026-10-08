@@ -65,6 +65,13 @@ CREATE DOMAIN public.rupees AS integer
 	CONSTRAINT rupees_check CHECK ((VALUE >= 0));
 
 --
+-- Name: school_stream; Type: DOMAIN; Schema: public; Owner: -
+--
+
+CREATE DOMAIN public.school_stream AS text
+	CONSTRAINT school_stream_check CHECK ((VALUE = ANY (ARRAY['science_pcm'::text, 'science_pcb'::text, 'science_pcmb'::text, 'commerce_maths'::text, 'commerce'::text, 'arts'::text, 'undecided'::text])));
+
+--
 -- Name: social_category; Type: DOMAIN; Schema: public; Owner: -
 --
 
@@ -199,7 +206,11 @@ CREATE TABLE public.courses (
     name text NOT NULL,
     level public.course_level NOT NULL,
     duration_years numeric(3,1) NOT NULL,
-    CONSTRAINT courses_duration_years_check CHECK ((duration_years > (0)::numeric))
+    eligible_streams public.school_stream[] NOT NULL,
+    primary_streams public.school_stream[] NOT NULL,
+    CONSTRAINT courses_duration_years_check CHECK ((duration_years > (0)::numeric)),
+    CONSTRAINT courses_eligible_streams_check CHECK (((cardinality(eligible_streams) > 0) AND (NOT ('undecided'::text = ANY ((eligible_streams)::text[]))))),
+    CONSTRAINT courses_primary_streams_check CHECK (((cardinality(primary_streams) > 0) AND (primary_streams <@ eligible_streams)))
 );
 
 --
@@ -231,8 +242,10 @@ CREATE TABLE public.exams_colleges (
     source_url text,
     as_of date,
     estimated boolean DEFAULT false NOT NULL,
+    tier smallint,
     CONSTRAINT exams_colleges_check CHECK ((estimated OR ((source_url IS NOT NULL) AND (as_of IS NOT NULL)))),
-    CONSTRAINT exams_colleges_rank_check CHECK ((rank > 0))
+    CONSTRAINT exams_colleges_rank_check CHECK ((rank > 0)),
+    CONSTRAINT exams_colleges_tier_check CHECK (((tier >= 1) AND (tier <= 3)))
 );
 
 --
@@ -333,6 +346,7 @@ CREATE TABLE public.profiles (
     consent_to_compare boolean DEFAULT false NOT NULL,
     consent_at timestamp with time zone,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    stream public.school_stream,
     CONSTRAINT profiles_breakeven_tolerance_years_check CHECK (((breakeven_tolerance_years >= 1) AND (breakeven_tolerance_years <= 20))),
     CONSTRAINT profiles_check CHECK ((consent_to_compare = (consent_at IS NOT NULL))),
     CONSTRAINT profiles_percentage_check CHECK (((percentage >= (0)::numeric) AND (percentage <= (100)::numeric))),

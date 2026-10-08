@@ -7,6 +7,7 @@ import type { components } from "./openapi";
 
 export type Role = components["schemas"]["Role"];
 export type IndianState = components["schemas"]["IndianState"];
+export type SchoolStream = components["schemas"]["SchoolStream"];
 export type Dimension = components["schemas"]["Dimension"];
 export type TraitGroup = components["schemas"]["TraitGroup"];
 export type ErrorCode = components["schemas"]["ErrorCode"];
@@ -131,6 +132,8 @@ export interface CollegeInfo {
   location?: string;
   ranking?: number;
   annualFee?: number;
+  course?: string;      // the degree programme at this college
+  tier?: number | null; // 1-3 by NIRF; null for routes that aren't colleges (ICAI, NDA)
 }
 
 export interface ExamInfo {
@@ -174,6 +177,8 @@ export interface CareerPath {
   timeline: string;
   cheaperAlternative: string | null;
   explanation?: string;
+  streamMatch: "natural" | "open"; // open = allowed, but another stream's usual route
+  typicalCollege?: string | null;  // the college the cost is based on
 }
 
 // ---------- SWOT ----------

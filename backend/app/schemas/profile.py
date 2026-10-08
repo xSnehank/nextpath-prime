@@ -8,7 +8,7 @@ from uuid import UUID
 
 from pydantic import Field, field_validator
 
-from app.schemas.common import IndianState, RiskLevel, Role, Rupees, StrictModel
+from app.schemas.common import IndianState, RiskLevel, Role, Rupees, SchoolStream, StrictModel
 
 
 class ParentProfile(StrictModel):
@@ -35,6 +35,10 @@ class ParentProfile(StrictModel):
 
 class StudentProfile(StrictModel):
     role: Literal[Role.STUDENT]
+    stream: SchoolStream = Field(
+        description="Class 11-12 stream; decides which careers are open and which come first. "
+        "'undecided' (Class 10 or earlier) keeps every career"
+    )
     risk_appetite: RiskLevel
     preferred_state: IndianState = Field(description="Where the student would like to study and work")
     open_to_abroad: bool

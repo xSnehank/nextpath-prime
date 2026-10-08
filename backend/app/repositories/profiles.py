@@ -25,14 +25,15 @@ def save_student_profile(conn: Connection, user_id: UUID, profile: StudentProfil
     conn.execute(
         text(
             """
-            INSERT INTO profiles (user_id, risk_appetite, preferred_state, open_to_abroad, home_state, category,
-                                  percentage, gender)
-            VALUES (:user_id, :risk_appetite, :preferred_state, :open_to_abroad, :home_state, :category,
-                    :percentage, :gender)
+            INSERT INTO profiles (user_id, stream, risk_appetite, preferred_state, open_to_abroad, home_state,
+                                  category, percentage, gender)
+            VALUES (:user_id, :stream, :risk_appetite, :preferred_state, :open_to_abroad, :home_state,
+                    :category, :percentage, :gender)
             ON CONFLICT (user_id) DO UPDATE SET
-                risk_appetite = EXCLUDED.risk_appetite, preferred_state = EXCLUDED.preferred_state,
-                open_to_abroad = EXCLUDED.open_to_abroad, home_state = EXCLUDED.home_state,
-                category = EXCLUDED.category, percentage = EXCLUDED.percentage, gender = EXCLUDED.gender
+                stream = EXCLUDED.stream, risk_appetite = EXCLUDED.risk_appetite,
+                preferred_state = EXCLUDED.preferred_state, open_to_abroad = EXCLUDED.open_to_abroad,
+                home_state = EXCLUDED.home_state, category = EXCLUDED.category,
+                percentage = EXCLUDED.percentage, gender = EXCLUDED.gender
             """
         ),
         {"user_id": user_id} | profile.model_dump(mode="json", exclude={"role"}),

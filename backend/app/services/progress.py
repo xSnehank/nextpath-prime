@@ -9,7 +9,7 @@ from app.repositories import assessment, profiles
 from app.schemas.common import Role
 
 # The profile fields that must be filled before the analysis can run (the optional ones are left out).
-STUDENT_FIELDS = ("risk_appetite", "preferred_state", "open_to_abroad", "home_state")
+STUDENT_FIELDS = ("stream", "risk_appetite", "preferred_state", "open_to_abroad", "home_state")
 PARENT_FIELDS = (
     "annual_education_budget",
     "savings",

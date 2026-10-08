@@ -1,8 +1,8 @@
 """POST /analyze: load a linked pair's inputs, run the steps in app/core, build the response and save it.
 
-A career takes part only when it has trait weights, an undergraduate route with a known fee, and market data
-(for the student's state or the national figure) with a starting salary. The others are left out rather than
-scored on made-up numbers.
+A career takes part only when it has trait weights, an undergraduate route with a known fee that the student's
+stream may enter (step 0), and market data (for the student's state or the national figure) with a starting
+salary. The others are left out rather than scored on made-up numbers.
 """
 
 from collections import defaultdict
@@ -12,7 +12,7 @@ from uuid import UUID, uuid4
 
 from sqlalchemy.engine import Connection
 
-from app.core import conflict, finance, fit, market, ranking, scholarships, swot, traits
+from app.core import conflict, finance, fit, market, ranking, scholarships, streams, swot, traits
 from app.core.inputs import MarketRow, Parent, QuestionInfo, Route, Scholarship, Student
 from app.errors import AppError
 from app.repositories import assessment, catalog, profiles, results
@@ -40,6 +40,7 @@ from app.schemas.market import RegionMarket
 from app.services.progress import progress_for
 
 NATIONAL = "India"
+COLLEGES_PER_TIER = 4  # the roadmap shows up to 4 colleges of each tier (and 4 non-college routes such as ICAI)
 
 
 def r4(value: float) -> float:
@@ -70,7 +71,11 @@ def load_careers(conn: Connection) -> list[Career]:
     routes: dict[UUID, list[Route]] = defaultdict(list)
     for row in catalog.list_routes(conn):
         routes[row.career_id].append(
-            Route(row.exam, row.college, row.level, float(row.duration_years), row.annual_fee, row.annual_living_cost, row.state)
+            Route(
+                row.exam, row.college, row.level, float(row.duration_years), row.annual_fee, row.annual_living_cost,
+                row.state, tuple(row.eligible_streams), tuple(row.primary_streams), row.tier, row.city, row.rank,
+                row.course,
+            )
         )
     markets: dict[UUID, dict[str, MarketRow]] = defaultdict(dict)
     for row in catalog.list_market_data(conn):
@@ -113,7 +118,7 @@ def load_student(conn: Connection, student_id: UUID) -> Student:
     p = profiles.get_profile(conn, student_id)
     return Student(
         p.risk_appetite, p.preferred_state, p.open_to_abroad, p.home_state, p.category,
-        float(p.percentage) if p.percentage is not None else None, p.gender,
+        float(p.percentage) if p.percentage is not None else None, p.gender, p.stream or streams.UNDECIDED,
     )
 
 
@@ -148,8 +153,10 @@ class Evaluated:
     market_row: MarketRow
     national_fallback: bool
     check: finance.FinanceCheck
-    options: list[tuple[int, Route]]  # (total cost, route), cheapest first
+    options: list[tuple[int, Route]]  # (total cost, route) the student can take, cheapest first
     matched: list[tuple[Scholarship, str]]
+    match: str  # streams.NATURAL or streams.OPEN (closed careers aren't evaluated)
+    typical: tuple[int, Route]  # the route the finance check is based on
 
 
 def monthly_living(living: dict, state: str | None) -> int | None:
@@ -157,11 +164,22 @@ def monthly_living(living: dict, state: str | None) -> int | None:
     return row.monthly_living_cost if row else None
 
 
+def route_match(route: Route, stream: str) -> str:
+    return streams.course_match(stream, route.eligible_streams, route.primary_streams)
+
+
 def evaluate(career: Career, t: dict, student: Student, parent: Parent, living: dict) -> Evaluated | None:
     if not career.trait_weights:
         return None
     row, national_fallback = market.pick_row(career.market, student.preferred_state)
-    routes = [route for route in career.routes if route.level == "UG" and route.annual_fee is not None]
+    eligible = [
+        route for route in career.routes
+        if route.level == "UG" and route.annual_fee is not None and route_match(route, student.stream) != streams.CLOSED
+    ]
+    match = streams.best_match(route_match(route, student.stream) for route in eligible)
+    # Cost and list only the routes of the career's best match: a PCM student's Data Scientist path is B.Tech,
+    # not the B.Sc routes that suit a Commerce-with-Maths student.
+    routes = [route for route in eligible if route_match(route, student.stream) == match]
     after_graduation = monthly_living(living, student.preferred_state)
     if row is None or row.entry_salary is None or not routes or after_graduation is None:
         return None
@@ -179,7 +197,7 @@ def evaluate(career: Career, t: dict, student: Student, parent: Parent, living: 
         best_award = max((scholarships.total_value(a, route.duration_years) for a, _ in matched), default=0)
         options.append((finance.total_cost(route.annual_fee, studying, route.duration_years, best_award), route))
     options.sort(key=lambda option: (option[0], option[1].college))
-    cost, route = options[0]
+    cost, route = typical = finance.typical_option(options, lambda r: r.state == student.preferred_state)
     check = finance.check_path(
         cost,
         finance.capacity(parent.annual_budget, parent.savings, route.duration_years),
@@ -189,7 +207,9 @@ def evaluate(career: Career, t: dict, student: Student, parent: Parent, living: 
         parent.breakeven_tolerance_years,
         route.duration_years,
     )
-    return Evaluated(career, fit.career_fit(career.trait_weights, t), row, national_fallback, check, options, matched)
+    return Evaluated(
+        career, fit.career_fit(career.trait_weights, t), row, national_fallback, check, options, matched, match, typical
+    )
 
 
 # ---------- the whole pipeline ----------
@@ -212,7 +232,10 @@ def run(conn: Connection, student_id: UUID, parent_id: UUID, weights: Weights, r
     by_id = {e.career.id: e for e in evaluated}
     market_scores = market.market_scores({e.career.id: e.market_row for e in evaluated})
     candidates = [
-        ranking.Candidate(e.career.id, e.fit_result.total, e.check.score, market_scores[e.career.id].total, e.check.viable)
+        ranking.Candidate(
+            e.career.id, e.fit_result.total, e.check.score, market_scores[e.career.id].total, e.check.viable,
+            natural=e.match == streams.NATURAL,
+        )
         for e in evaluated
     ]
     ranked, left_out = ranking.rank(candidates, weights)
@@ -220,8 +243,13 @@ def run(conn: Connection, student_id: UUID, parent_id: UUID, weights: Weights, r
     def cheaper_alternative(e: Evaluated) -> str | None:
         if e.check.viable:
             return None
+        # Stay within the student's stream: a PCM student's alternative to Robotics isn't CA.
         options = sorted(
-            (o for o in evaluated if o.check.viable and o.career.domain_id == e.career.domain_id),
+            (
+                o for o in evaluated
+                if o.check.viable and o.career.domain_id == e.career.domain_id
+                and (o.match == streams.NATURAL or e.match == streams.OPEN)
+            ),
             key=lambda o: (o.check.total_cost, o.career.name),
         )
         return options[0].career.name if options else None
@@ -245,6 +273,8 @@ def run(conn: Connection, student_id: UUID, parent_id: UUID, weights: Weights, r
     )
     gaps = _gaps(student, parent, domains, domain_names, roadmap)
     index = conflict.conflict_index([g.gap for g in gaps])
+    # Opportunities and threats come from the student's own-stream careers when there are any.
+    in_stream = [e for e in evaluated if e.match == streams.NATURAL] or evaluated
     summary = swot.build_swot(
         t,
         [
@@ -252,7 +282,7 @@ def run(conn: Connection, student_id: UUID, parent_id: UUID, weights: Weights, r
                 e.career.name, e.fit_result.total, market_scores[e.career.id].total, e.market_row.demand_index / 100,
                 e.market_row.region, e.check.viable, e.check.reasons, e.check.loan_needed, e.check.breakeven_years,
             )
-            for e in evaluated
+            for e in in_stream
         ],
         index,
     )
@@ -289,6 +319,7 @@ def _roadmap_item(
     market_ = r4(m.total)
     final = r4(ranking.final_score(weights, fit_, finance_, market_))
     exams = list(dict.fromkeys(route.exam for _, route in e.options))
+    shown = _colleges_to_show(e.options)
     return RoadmapItem(
         rank=rank,
         career_id=e.career.id,
@@ -329,14 +360,37 @@ def _roadmap_item(
         path=EducationPath(
             education=e.career.education_path,
             exams=exams,
-            colleges=[College(name=route.college, annual_fee=route.annual_fee) for _, route in e.options],
+            colleges=[
+                College(
+                    name=route.college, annual_fee=route.annual_fee, course=route.course, tier=route.tier,
+                    city=route.city, state=route.state,
+                )
+                for route in shown
+            ],
+            typical_college=e.typical[1].college,
         ),
         scholarships=[
             MatchedScholarship(name=a.name, amount=a.amount, deadline=a.deadline, matched_rule=rule)
             for a, rule in sorted(e.matched, key=lambda m: (-scholarships.total_value(m[0], check.duration_years), m[0].name))
         ],
         cheaper_alternative=alternative,
+        stream_match=e.match,
     )
+
+
+def _colleges_to_show(options: list[tuple[int, Route]]) -> list[Route]:
+    """Up to 4 routes per tier (1, 2, 3, then non-college routes such as ICAI): best NIRF rank, then lowest fee.
+
+    A college offering two of the career's courses is listed once, with the course ranked first.
+    """
+    best: dict[str, Route] = {}
+    for _, route in sorted(options, key=lambda o: (o[1].rank or 10**6, o[1].annual_fee or 0, o[1].college)):
+        best.setdefault(route.college, route)
+    by_tier: dict[int | None, list[Route]] = defaultdict(list)
+    for route in best.values():
+        if len(by_tier[route.tier]) < COLLEGES_PER_TIER:
+            by_tier[route.tier].append(route)
+    return [route for tier in (1, 2, 3, None) for route in by_tier[tier]]
 
 
 def _gaps(
